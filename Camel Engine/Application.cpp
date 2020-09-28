@@ -5,11 +5,9 @@ Application::Application()
 	window = new ModuleWindow(this);
 	input = new ModuleInput(this);
 	audio = new ModuleAudio(this, true);
-	scene_intro = new ModuleSceneIntro(this);
 	renderer3D = new ModuleRenderer3D(this);
 	camera = new ModuleCamera3D(this);
 	physics = new ModulePhysics3D(this);
-	player = new ModulePlayer(this);
 
 	// The order of calls is very important!
 	// Modules will Init() Start() and Update in this order
@@ -22,10 +20,6 @@ Application::Application()
 	AddModule(audio);
 	AddModule(physics);
 	
-	// Scenes
-	AddModule(scene_intro);
-	AddModule(player);
-
 	// Renderer last!
 	AddModule(renderer3D);
 }
@@ -56,8 +50,6 @@ bool Application::Init()
 		ret = item->data->Init();
 		item = item->next;
 	}
-
-	ret = scene_intro->Awake();
 
 	// After all Init calls we call Start() in all modules
 	LOG("Application Start --------------");
