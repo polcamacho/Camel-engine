@@ -8,6 +8,7 @@
 #include "ModuleRenderer3D.h"
 #include "ModuleSceneIntro.h"
 #include "ModuleCamera3D.h"
+#include "EngineUI.h"
 
 #include <list>
 
@@ -19,6 +20,7 @@ public:
 	ModuleAudio* audio;
 	ModuleRenderer3D* renderer3D;
 	ModuleSceneIntro* scene_intro;
+	EngineUI* engine_ui;
 	ModuleCamera3D* camera;
 
 private:
