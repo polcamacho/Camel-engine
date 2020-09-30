@@ -2,7 +2,6 @@
 #include "Globals.h"
 #include "EngineUI.h"
 
-#include "imgui/imgui.h"
 #include "imgui/imgui_internal.h"
 
 #include <gl/GL.h>
