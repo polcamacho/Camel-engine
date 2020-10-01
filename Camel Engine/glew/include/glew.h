@@ -765,7 +765,7 @@ typedef void *GLeglImageOES; /* GL_EXT_EGL_image_storage */
 #define GL_CLIP_PLANE4 0x3004
 #define GL_CLIP_PLANE5 0x3005
 #define GL_LIGHT0 0x4000
-#define GL_COLOR_BUFFER_BIT	0x00000000	// !WARNING! This was the original color 0x00004000
+#define GL_COLOR_BUFFER_BIT	0x00004000
 #define GL_LIGHT1 0x4001
 #define GL_LIGHT2 0x4002
 #define GL_LIGHT3 0x4003
