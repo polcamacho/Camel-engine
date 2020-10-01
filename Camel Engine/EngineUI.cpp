@@ -44,7 +44,6 @@ bool EngineUI::CleanUp()
 	ImGui_ImplSDL2_Shutdown();
 	ImGui::DestroyContext();
 
-
 	return true;
 }
 
@@ -61,10 +60,20 @@ update_status EngineUI::PreUpdate(float dt)
 // Update
 update_status EngineUI::Update(float dt)
 {
-	bool show_demo_wndow = true;
+	bool show_demo_wndow = false;
 	ImGui::ShowDemoWindow(&show_demo_wndow);
+	Test();
+	if (ImGui::BeginMainMenuBar())
+	{
+		if (ImGui::BeginMenu("File"))
+		{
+			if (ImGui::MenuItem("Exit"))
+				return update_status::UPDATE_STOP;
 
-	ImGuiIO& io = ImGui::GetIO();
+			ImGui::EndMenu();
+		}
+		ImGui::EndMainMenuBar();
+	}
 
 	return UPDATE_CONTINUE;
 }
@@ -90,4 +99,10 @@ update_status EngineUI::PostUpdate(float dt)
 
 
 	return UPDATE_CONTINUE;
+}
+
+void EngineUI::Test()
+{
+	ImGui::Begin("Test", (bool*)0);
+	ImGui::End();
 }
