@@ -99,9 +99,6 @@
     <ClInclude Include="imgui\examples\imgui_impl_sdl.h">
       <Filter>External Libraries\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="imgui\examples\imgui_impl_opengl2.h">
-      <Filter>External Libraries\ImGui</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ModuleAudio.cpp">
@@ -168,9 +165,6 @@
       <Filter>External Libraries\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="imgui\examples\imgui_impl_sdl.cpp">
-      <Filter>External Libraries\ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="imgui\examples\imgui_impl_opengl2.cpp">
       <Filter>External Libraries\ImGui</Filter>
     </ClCompile>
   </ItemGroup>
