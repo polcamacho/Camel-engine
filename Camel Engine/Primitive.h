@@ -54,7 +54,6 @@ class Sphere : public Primitive
 public:
 	Sphere();
 	Sphere(float radius);
-	void InnerRender() const;
 public:
 	float radius;
 };
