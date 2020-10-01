@@ -60,7 +60,7 @@ update_status EngineUI::PreUpdate(float dt)
 // Update
 update_status EngineUI::Update(float dt)
 {
-	bool show_demo_wndow = false;
+	bool show_demo_wndow = true;
 	ImGui::ShowDemoWindow(&show_demo_wndow);
 	Test();
 	if (ImGui::BeginMainMenuBar())
@@ -83,7 +83,7 @@ update_status EngineUI::PostUpdate(float dt)
 
 	ImGui::Render();
 
-	ImVec4 clear_color = ImVec4(0.1f, 0.87f, 0.32f, 0.64f);
+	ImVec4 clear_color = ImVec4(0.0f, 0.0f, 0.0f, 0.64f);
 
 	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 	glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
@@ -96,7 +96,6 @@ update_status EngineUI::PostUpdate(float dt)
 	//glUseProgram(0);
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 	//glUseProgram(last_program);
-
 
 	return UPDATE_CONTINUE;
 }
