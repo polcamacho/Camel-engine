@@ -1,5 +1,8 @@
 #include "Application.h"
 
+#include "MathGeoLib/include/MathBuildConfig.h"
+#include "MathGeoLib/include/MathGeoLib.h"
+
 Application::Application()
 {
 	window = new ModuleWindow(this);

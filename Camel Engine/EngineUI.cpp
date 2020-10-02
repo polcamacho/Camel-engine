@@ -67,10 +67,17 @@ update_status EngineUI::Update(float dt)
 	{
 		if (ImGui::BeginMenu("File"))
 		{
-			if (ImGui::MenuItem("Exit"))
+			if (ImGui::MenuItem("Exit")) {
 				return update_status::UPDATE_STOP;
-
+			}
 			ImGui::EndMenu();
+		}
+		if (ImGui::MenuItem("System Status")) {
+			/*sprintf_s(title, 25, "Framerate %.1f", vector_fps[vector_fps.size() - 1]);
+			ImGui::PlotHistogram("##framerate", &vector_fps[0], vector_fps.size(), 0, title, 0.0f, 100.0f, ImVec2(310, 100));
+
+			sprintf_s(title, 25, "Milliseconds %.1f", vector_ms[vector_ms.size() - 1]);
+			ImGui::PlotHistogram("##milliseconds", &vector_ms[0], vector_ms.size(), 0, title, 0.0f, 100.0f, ImVec2(310, 100));*/
 		}
 		ImGui::EndMainMenuBar();
 	}
