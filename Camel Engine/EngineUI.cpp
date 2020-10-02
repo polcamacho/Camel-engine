@@ -62,13 +62,13 @@ update_status EngineUI::Update(float dt)
 {
 	bool show_demo_wndow = true;
 	ImGui::ShowDemoWindow(&show_demo_wndow);
-	Test();
+
 	if (ImGui::BeginMainMenuBar())
 	{
 		if (ImGui::BeginMenu("File"))
 		{
-			if (ImGui::MenuItem("Exit"))
-				return update_status::UPDATE_STOP;
+			if (ImGui::MenuItem("Exit Engine"))
+				App->QuitEngine();
 
 			ImGui::EndMenu();
 		}
@@ -98,10 +98,4 @@ update_status EngineUI::PostUpdate(float dt)
 	//glUseProgram(last_program);
 
 	return UPDATE_CONTINUE;
-}
-
-void EngineUI::Test()
-{
-	ImGui::Begin("Test", (bool*)0);
-	ImGui::End();
 }

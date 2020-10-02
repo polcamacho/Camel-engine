@@ -27,6 +27,8 @@ private:
 	float	dt;
 	std::list<Module*> list_modules;
 
+	bool quit_engine;
+
 public:
 
 	Timer T;
@@ -37,6 +39,8 @@ public:
 	bool Init();
 	update_status Update();
 	bool CleanUp();
+
+	void QuitEngine();
 
 private:
 

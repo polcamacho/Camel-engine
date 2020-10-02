@@ -26,6 +26,8 @@ Application::Application()
 	
 	// Renderer last!
 	AddModule(renderer3D);
+
+	quit_engine = false;
 }
 
 Application::~Application()
@@ -112,6 +114,8 @@ update_status Application::Update()
 		++item;
 	}
 
+	if (quit_engine)return update_status::UPDATE_STOP;
+
 	FinishUpdate();
 	return ret;
 }
@@ -132,4 +136,9 @@ bool Application::CleanUp()
 void Application::AddModule(Module* mod)
 {
 	list_modules.push_back(mod);
+}
+
+void Application::QuitEngine()
+{
+	quit_engine = true;
 }
