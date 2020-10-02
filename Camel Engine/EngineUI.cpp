@@ -63,17 +63,7 @@ update_status EngineUI::Update(float dt)
 	bool show_demo_wndow = true;
 	ImGui::ShowDemoWindow(&show_demo_wndow);
 
-	if (ImGui::BeginMainMenuBar())
-	{
-		if (ImGui::BeginMenu("File"))
-		{
-			if (ImGui::MenuItem("Exit Engine"))
-				App->QuitEngine();
-
-			ImGui::EndMenu();
-		}
-		ImGui::EndMainMenuBar();
-	}
+	MainMenu();
 
 	return UPDATE_CONTINUE;
 }
@@ -98,4 +88,30 @@ update_status EngineUI::PostUpdate(float dt)
 	//glUseProgram(last_program);
 
 	return UPDATE_CONTINUE;
+}
+
+void EngineUI::MainMenu()
+{
+	if (ImGui::BeginMainMenuBar())
+	{
+		if (ImGui::BeginMenu("File"))
+		{
+			if (ImGui::MenuItem("Exit Engine"))
+				App->QuitEngine();
+
+			ImGui::EndMenu();
+		}
+		if (ImGui::BeginMenu("Help"))
+		{
+			if (ImGui::MenuItem("About"))
+			{
+				ImGui::Begin("About", (bool*)0);
+				ImGui::End();
+			}
+
+
+			ImGui::EndMenu();
+		}
+		ImGui::EndMainMenuBar();
+	}
 }
