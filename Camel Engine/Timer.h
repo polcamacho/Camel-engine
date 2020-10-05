@@ -25,4 +25,22 @@ private:
 	Uint32	stopped_at;
 };
 
+class j1PerfTimer
+{
+public:
+
+	// Constructor
+	j1PerfTimer();
+
+	void Start();
+	double ReadMs() const;
+	double ReadTicks() const;
+
+private:
+	double	started_at = 0;
+	static Uint64 frequency;
+	
+};
+
+
 #endif //__TIMER_H__
