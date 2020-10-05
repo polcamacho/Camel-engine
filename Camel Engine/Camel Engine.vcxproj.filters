@@ -135,6 +135,9 @@
     <ClInclude Include="parson\parson.h">
       <Filter>External Libraries\parson</Filter>
     </ClInclude>
+    <ClInclude Include="JSONDataController.h">
+      <Filter>Source Code\Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="glmath.cpp">
@@ -202,6 +205,9 @@
     </ClCompile>
     <ClCompile Include="parson\parson.c">
       <Filter>External Libraries\parson</Filter>
+    </ClCompile>
+    <ClCompile Include="JSONDataController.cpp">
+      <Filter>Source Code\Utils</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
