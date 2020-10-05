@@ -62,19 +62,7 @@ update_status EngineUI::Update(float dt)
 {
 	bool show_demo_wndow = true;
 	ImGui::ShowDemoWindow(&show_demo_wndow);
-	if (ImGui::BeginMainMenuBar())
-	{
-		if (ImGui::BeginMenu("File"))
-		{
-			if (ImGui::MenuItem("Exit")) {
-				return update_status::UPDATE_STOP;
-			}
-			ImGui::EndMenu();
-		}
-		
-		ImGui::EndMainMenuBar();
-	}
-
+	
 	MainMenu();
 
 	return UPDATE_CONTINUE;
