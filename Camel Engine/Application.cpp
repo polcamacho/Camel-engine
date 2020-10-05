@@ -1,5 +1,8 @@
 #include "Application.h"
 
+#include "MathGeoLib/include/MathBuildConfig.h"
+#include "MathGeoLib/include/MathGeoLib.h"
+
 Application::Application()
 {
 	window = new ModuleWindow(this);
@@ -77,11 +80,13 @@ void Application::PrepareUpdate()
 {
 	dt = (float)ms_timer.Read() / 1000.0f;
 	ms_timer.Start();
+	p_timer.Start();
 }
 
 // ---------------------------------------------
 void Application::FinishUpdate()
 {
+	ms_now = p_timer.ReadMs();
 }
 
 // Call PreUpdate, Update and PostUpdate on all modules
@@ -138,6 +143,14 @@ void Application::AddModule(Module* mod)
 	list_modules.push_back(mod);
 }
 
+void Application::DrawEngineGraphics()
+{
+	ms_vec.push_back(ms_now);
+
+	sprintf_s(graph_variable, 25, "Milliseconds %.1f", ms_vec[ms_vec.size() - 1]);
+	ImGui::PlotHistogram("##milliseconds", &ms_vec[0], ms_vec.size(), 0, graph_variable, 0.0f, 100.0f, ImVec2(310, 100));
+
+}
 void Application::QuitEngine()
 {
 	quit_engine = true;

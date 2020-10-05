@@ -62,7 +62,7 @@ update_status EngineUI::Update(float dt)
 {
 	bool show_demo_wndow = true;
 	ImGui::ShowDemoWindow(&show_demo_wndow);
-
+	
 	MainMenu();
 
 	return UPDATE_CONTINUE;
@@ -92,6 +92,11 @@ update_status EngineUI::PostUpdate(float dt)
 
 void EngineUI::MainMenu()
 {
+	ImGui::Begin("Test", (bool*)0);
+	if (ImGui::CollapsingHeader("System Status")) {
+		App->DrawEngineGraphics();
+	}
+	ImGui::End();
 	if (ImGui::BeginMainMenuBar())
 	{
 		if (ImGui::BeginMenu("File"))

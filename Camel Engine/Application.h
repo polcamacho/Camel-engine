@@ -10,6 +10,7 @@
 #include "EngineUI.h"
 
 #include <list>
+#include <vector>
 
 class Application
 {
@@ -24,8 +25,15 @@ public:
 private:
 
 	Timer	ms_timer;
+	j1PerfTimer p_timer;
 	float	dt;
+
+	float ms_now;
+
 	std::list<Module*> list_modules;
+	std::vector<float> fps_vec;
+	std::vector<float> ms_vec;
+	char graph_variable[50];
 
 	bool quit_engine;
 
@@ -40,6 +48,7 @@ public:
 	update_status Update();
 	bool CleanUp();
 
+	void DrawEngineGraphics();
 	void QuitEngine();
 
 private:

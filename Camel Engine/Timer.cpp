@@ -5,6 +5,8 @@
 
 #include "Timer.h"
 
+#include "mmgr/mmgr.h"
+
 // ---------------------------------------------
 Timer::Timer()
 {
@@ -15,7 +17,7 @@ Timer::Timer()
 void Timer::Start()
 {
 	running = true;
-	if (d == true) {
+	if (d) {
 		started_at = SDL_GetTicks() + delay;
 		d = false;
 	}
@@ -42,6 +44,35 @@ Uint32 Timer::Read()
 	{
 		return stopped_at - started_at;
 	}
+}
+
+Uint64 j1PerfTimer::frequency = 0;
+
+// ---------------------------------------------
+j1PerfTimer::j1PerfTimer()
+{
+	if (frequency == 0)
+		frequency = SDL_GetPerformanceFrequency();
+
+	Start();
+}
+
+// ---------------------------------------------
+void j1PerfTimer::Start()
+{
+	started_at = SDL_GetPerformanceCounter();
+}
+
+// ---------------------------------------------
+double j1PerfTimer::ReadMs() const
+{
+	return 1000.0 * (double(SDL_GetPerformanceCounter() - started_at) / double(frequency));
+}
+
+//// ---------------------------------------------
+double j1PerfTimer::ReadTicks() const
+{
+	return SDL_GetPerformanceCounter() - started_at;
 }
 
 
