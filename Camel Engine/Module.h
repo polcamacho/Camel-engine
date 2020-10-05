@@ -49,4 +49,8 @@ public:
 
 	virtual void OnCollision(PhysBody3D* body1, PhysBody3D* body2)
 	{}
+
+	virtual void LoadModuleConfig(JSON_Object* root) {}
+
+	virtual void SaveModuleConfig(JSON_Object* root) {}
 };
