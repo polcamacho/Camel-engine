@@ -20,5 +20,5 @@ public:
 	update_status PostUpdate(float dt);
 	bool CleanUp();
 
-	void Test();
+	void MainMenu();
 };

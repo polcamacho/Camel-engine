@@ -62,7 +62,6 @@ update_status EngineUI::Update(float dt)
 {
 	bool show_demo_wndow = true;
 	ImGui::ShowDemoWindow(&show_demo_wndow);
-	Test();
 	if (ImGui::BeginMainMenuBar())
 	{
 		if (ImGui::BeginMenu("File"))
@@ -75,6 +74,8 @@ update_status EngineUI::Update(float dt)
 		
 		ImGui::EndMainMenuBar();
 	}
+
+	MainMenu();
 
 	return UPDATE_CONTINUE;
 }
@@ -101,11 +102,33 @@ update_status EngineUI::PostUpdate(float dt)
 	return UPDATE_CONTINUE;
 }
 
-void EngineUI::Test()
+void EngineUI::MainMenu()
 {
 	ImGui::Begin("Test", (bool*)0);
 	if (ImGui::CollapsingHeader("System Status")) {
 		App->DrawEngineGraphics();
 	}
 	ImGui::End();
+	if (ImGui::BeginMainMenuBar())
+	{
+		if (ImGui::BeginMenu("File"))
+		{
+			if (ImGui::MenuItem("Exit Engine"))
+				App->QuitEngine();
+
+			ImGui::EndMenu();
+		}
+		if (ImGui::BeginMenu("Help"))
+		{
+			if (ImGui::MenuItem("About"))
+			{
+				ImGui::Begin("About", (bool*)0);
+				ImGui::End();
+			}
+
+
+			ImGui::EndMenu();
+		}
+		ImGui::EndMainMenuBar();
+	}
 }

@@ -29,6 +29,8 @@ Application::Application()
 	
 	// Renderer last!
 	AddModule(renderer3D);
+
+	quit_engine = false;
 }
 
 Application::~Application()
@@ -117,6 +119,8 @@ update_status Application::Update()
 		++item;
 	}
 
+	if (quit_engine)return update_status::UPDATE_STOP;
+
 	FinishUpdate();
 	return ret;
 }
@@ -139,7 +143,6 @@ void Application::AddModule(Module* mod)
 	list_modules.push_back(mod);
 }
 
-
 void Application::DrawEngineGraphics()
 {
 	ms_vec.push_back(ms_now);
@@ -147,4 +150,8 @@ void Application::DrawEngineGraphics()
 	sprintf_s(graph_variable, 25, "Milliseconds %.1f", ms_vec[ms_vec.size() - 1]);
 	ImGui::PlotHistogram("##milliseconds", &ms_vec[0], ms_vec.size(), 0, graph_variable, 0.0f, 100.0f, ImVec2(310, 100));
 
+}
+void Application::QuitEngine()
+{
+	quit_engine = true;
 }

@@ -35,6 +35,8 @@ private:
 	std::vector<float> ms_vec;
 	char graph_variable[50];
 
+	bool quit_engine;
+
 public:
 
 	Timer T;
@@ -47,6 +49,7 @@ public:
 	bool CleanUp();
 
 	void DrawEngineGraphics();
+	void QuitEngine();
 
 private:
 
