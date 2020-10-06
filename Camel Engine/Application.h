@@ -29,6 +29,7 @@ private:
 	float	dt;
 
 	float ms_now;
+	float fps_now;
 
 	std::list<Module*> list_modules;
 	std::vector<float> fps_vec;
