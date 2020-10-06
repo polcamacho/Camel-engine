@@ -42,5 +42,13 @@ update_status ModuleSceneIntro::Update(float dt)
 	p.axis = true;
 	p.Render();
 
+	Cube c;
+
+	if (App->input->GetKey(SDL_SCANCODE_1) == KEY_REPEAT) {
+		c.Size(1, 1, 1);
+		c.SetPos(0, 0, 0);
+	}
+	c.Render();
+
 	return UPDATE_CONTINUE;
 }
