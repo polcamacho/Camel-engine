@@ -8,6 +8,7 @@
 #include "ModuleSceneIntro.h"
 #include "ModuleCamera3D.h"
 #include "EngineUI.h"
+#include "parson/parson.h"
 
 #include <list>
 #include <vector>
@@ -21,6 +22,8 @@ public:
 	ModuleSceneIntro* scene_intro;
 	EngineUI* engine_ui;
 	ModuleCamera3D* camera;
+
+	JSON_Value* main_root;
 
 private:
 

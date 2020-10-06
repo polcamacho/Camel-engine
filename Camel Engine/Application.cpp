@@ -1,7 +1,10 @@
 #include "Application.h"
+#include "JSONDataController.h"
 
 #include "MathGeoLib/include/MathBuildConfig.h"
 #include "MathGeoLib/include/MathGeoLib.h"
+
+#include <string>
 
 Application::Application()
 {
@@ -48,6 +51,8 @@ Application::~Application()
 bool Application::Init()
 {
 	bool ret = true;
+
+	main_root = json_parse_file((std::string("json_files/paths.json")).data());
 
 	T.d = true;
 	T.Start();
@@ -144,6 +149,10 @@ void Application::AddModule(Module* mod)
 
 void Application::DrawEngineGraphics()
 {
+
+	JSON_Value* test;
+	GetJsonValueFromPath(main_root, "about", &test);
+	ImGui::Text(json_object_get_string(json_value_get_object(test), "about"));
 	fps_now = 1000 / ms_now;
 	if (ms_vec.size() <= 80) {
 		ms_vec.push_back(ms_now);

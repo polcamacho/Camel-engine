@@ -4,6 +4,6 @@
 
 #include "parson/parson.h"
 
-JSON_Value* GetJsonValueFromPath(JSON_Value* main_root, const char* name);
+void GetJsonValueFromPath(JSON_Value* main_root, const char* name, JSON_Value** container);
 
 #endif // !__JSON_DATA_CONTROL_H__
