@@ -1,5 +1,8 @@
 #include "Application.h"
 
+#include "MathGeoLib/include/MathBuildConfig.h"
+#include "MathGeoLib/include/MathGeoLib.h"
+
 Application::Application()
 {
 	window = new ModuleWindow(this);
@@ -68,7 +71,6 @@ bool Application::Init()
 		++item;
 	}
 	
-	ms_timer.Start();
 	return ret;
 }
 
@@ -77,11 +79,13 @@ void Application::PrepareUpdate()
 {
 	dt = (float)ms_timer.Read() / 1000.0f;
 	ms_timer.Start();
+	p_timer.Start();
 }
 
 // ---------------------------------------------
 void Application::FinishUpdate()
 {
+	ms_now = p_timer.ReadMs();
 }
 
 // Call PreUpdate, Update and PostUpdate on all modules
@@ -138,6 +142,25 @@ void Application::AddModule(Module* mod)
 	list_modules.push_back(mod);
 }
 
+void Application::DrawEngineGraphics()
+{
+	fps_now = 1000 / ms_now;
+	if (ms_vec.size() <= 80) {
+		ms_vec.push_back(ms_now);
+		fps_vec.push_back(fps_now);
+	}
+	else {
+		ms_vec.erase(ms_vec.begin());
+		ms_vec.push_back(ms_now);
+		fps_vec.erase(fps_vec.begin());
+		fps_vec.push_back(fps_now);
+	}
+	
+	sprintf_s(graph_variable, 25, "Milliseconds %.1f", ms_vec[ms_vec.size() - 1]);
+	ImGui::PlotHistogram("##milliseconds", &ms_vec[0], ms_vec.size(), 0, graph_variable, 0.0f, 100.0f, ImVec2(310, 100));
+	sprintf_s(graph_variable, 25, "Framerate %.1f", fps_vec[fps_vec.size() - 1]);
+	ImGui::PlotHistogram("##framerate", &fps_vec[0], fps_vec.size(), 0, graph_variable, 0.0f, 100.0f, ImVec2(310, 100));
+}
 void Application::QuitEngine()
 {
 	quit_engine = true;

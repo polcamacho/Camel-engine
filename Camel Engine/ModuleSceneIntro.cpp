@@ -21,6 +21,7 @@ bool ModuleSceneIntro::Start()
 	App->camera->Move(vec3(1.0f, 1.0f, 0.0f));
 	App->camera->LookAt(vec3(0, 0, 0));
 
+	
 
 	return ret;
 }
@@ -40,6 +41,14 @@ update_status ModuleSceneIntro::Update(float dt)
 	Plane p(0, 1, 0, 0);
 	p.axis = true;
 	p.Render();
+
+	Cube c;
+
+	if (App->input->GetKey(SDL_SCANCODE_1) == KEY_REPEAT) {
+		c.Size(1, 1, 1);
+		c.SetPos(0, 0, 0);
+	}
+	c.Render();
 
 	return UPDATE_CONTINUE;
 }

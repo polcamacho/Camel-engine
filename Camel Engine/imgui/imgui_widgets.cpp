@@ -23,6 +23,7 @@ Index of this file:
 // [SECTION] Widgets: Value helpers
 // [SECTION] Widgets: MenuItem, BeginMenu, EndMenu, etc.
 // [SECTION] Widgets: BeginTabBar, EndTabBar, etc.
+// [SECTION] Widgets: BeginTabBar, EndTabBar, etc.
 // [SECTION] Widgets: BeginTabItem, EndTabItem, etc.
 // [SECTION] Widgets: Columns, BeginColumns, EndColumns, etc.
 
