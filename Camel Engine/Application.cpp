@@ -145,7 +145,7 @@ void Application::AddModule(Module* mod)
 void Application::DrawEngineGraphics()
 {
 	fps_now = 1000 / ms_now;
-	if (ms_vec.size() <= 25) {
+	if (ms_vec.size() <= 80) {
 		ms_vec.push_back(ms_now);
 		fps_vec.push_back(fps_now);
 	}
