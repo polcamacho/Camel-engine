@@ -9,6 +9,8 @@
 
 class EngineUI : public Module
 {
+private:
+	bool is_vsync = false, is_fullscreen = false, is_resizable = false;
 
 public: 
 	EngineUI(Application* app, bool start_enabled = true);
@@ -21,4 +23,5 @@ public:
 	bool CleanUp();
 
 	void MainMenu();
+	void CheckOptions();
 };

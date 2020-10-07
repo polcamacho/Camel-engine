@@ -1,6 +1,7 @@
 #include "Application.h"
 #include "Globals.h"
 #include "EngineUI.h"
+#include "ModuleWindow.h"
 
 #include "imgui/imgui_internal.h"
 
@@ -95,6 +96,7 @@ void EngineUI::MainMenu()
 	ImGui::Begin("Test", (bool*)0);
 	if (ImGui::CollapsingHeader("System Status")) {
 		App->DrawEngineGraphics();
+		CheckOptions();
 	}
 	ImGui::End();
 	if (ImGui::BeginMainMenuBar())
@@ -118,5 +120,22 @@ void EngineUI::MainMenu()
 			ImGui::EndMenu();
 		}
 		ImGui::EndMainMenuBar();
+	}
+}
+
+void EngineUI::CheckOptions()
+{
+	Uint32 flags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN;
+
+	ImGui::Checkbox("Fullscreen", &is_fullscreen);
+	ImGui::SameLine(200);
+	ImGui::Checkbox("Resizable", &is_resizable);
+	ImGui::Checkbox("Vsync", &is_vsync);
+
+	if (is_fullscreen) {
+		SDL_SetWindowFullscreen(App->window->window, SDL_WINDOW_FULLSCREEN);
+	}
+	else {
+		SDL_SetWindowFullscreen(App->window->window, SDL_WINDOW_RESIZABLE);
 	}
 }
