@@ -125,8 +125,6 @@ void EngineUI::MainMenu()
 
 void EngineUI::CheckOptions()
 {
-	Uint32 flags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN;
-
 	ImGui::Checkbox("Fullscreen", &is_fullscreen);
 	ImGui::SameLine(200);
 	ImGui::Checkbox("Resizable", &is_resizable);
