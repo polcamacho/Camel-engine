@@ -10,8 +10,11 @@
 class EngineUI : public Module
 {
 private:
-	bool is_vsync = false, is_fullscreen = false, is_resizable = false;
+	bool is_vsync = false, is_fullscreen = false, is_resizable = true, is_borderless = false;
+	char name[30] = "Camel Engine";
+	char name2[30] = "UPC CITM";
 
+	int width, height;
 public: 
 	EngineUI(Application* app, bool start_enabled = true);
 	~EngineUI();
@@ -23,5 +26,7 @@ public:
 	bool CleanUp();
 
 	void MainMenu();
-	void CheckOptions();
+	void CheckBoxOptions();
+	void TextNames();
+	void ScrollBarOptions();
 };

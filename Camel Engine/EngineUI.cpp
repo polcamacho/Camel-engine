@@ -7,7 +7,10 @@
 
 #include <gl/GL.h>
 
-EngineUI::EngineUI(Application* app, bool start_enabled) : Module(app, start_enabled) {}
+EngineUI::EngineUI(Application* app, bool start_enabled) : Module(app, start_enabled) {
+	width = SCREEN_WIDTH;
+	height = SCREEN_HEIGHT;
+}
 
 EngineUI::~EngineUI() {}
 
@@ -63,7 +66,7 @@ update_status EngineUI::Update(float dt)
 {
 	bool show_demo_wndow = true;
 	ImGui::ShowDemoWindow(&show_demo_wndow);
-	
+
 	MainMenu();
 
 	return UPDATE_CONTINUE;
@@ -95,8 +98,13 @@ void EngineUI::MainMenu()
 {
 	ImGui::Begin("Test", (bool*)0);
 	if (ImGui::CollapsingHeader("System Status")) {
-		App->DrawEngineGraphics();
-		CheckOptions();
+		TextNames();
+		if (ImGui::TreeNode("Graphics view")) {
+			App->DrawEngineGraphics();
+			ImGui::TreePop();
+		}
+		CheckBoxOptions();
+		ScrollBarOptions();
 	}
 	ImGui::End();
 	if (ImGui::BeginMainMenuBar())
@@ -123,11 +131,19 @@ void EngineUI::MainMenu()
 	}
 }
 
-void EngineUI::CheckOptions()
+void EngineUI::TextNames()
+{
+	ImGui::InputText("App name", name, 30);
+	ImGui::InputText("Organization", name2, 30);
+}
+
+void EngineUI::	CheckBoxOptions()
 {
 	ImGui::Checkbox("Fullscreen", &is_fullscreen);
 	ImGui::SameLine(200);
 	ImGui::Checkbox("Resizable", &is_resizable);
+	ImGui::Checkbox("Borderless", &is_borderless);
+	ImGui::SameLine(200);
 	ImGui::Checkbox("Vsync", &is_vsync);
 
 	if (is_fullscreen) {
@@ -136,4 +152,28 @@ void EngineUI::CheckOptions()
 	else {
 		SDL_SetWindowFullscreen(App->window->window, SDL_WINDOW_RESIZABLE);
 	}
+	if (is_resizable) {
+		SDL_SetWindowResizable(App->window->window, SDL_TRUE);
+	}
+	else {
+		SDL_SetWindowResizable(App->window->window, SDL_FALSE);
+	}
+
+	if (is_borderless) {
+		SDL_SetWindowBordered(App->window->window, SDL_FALSE);
+	}
+	else {
+		SDL_SetWindowBordered(App->window->window, SDL_TRUE);
+	}
+
+}
+
+void EngineUI::ScrollBarOptions()
+{
+	SDL_SetWindowBrightness(App->window->window, App->window->brightness_value);
+	SDL_SetWindowSize(App->window->window, width, height);
+	ImGui::SliderFloat("Brightness", &App->window->brightness_value, 0.0f, 1.0f);
+	ImGui::SliderInt("Width", &width, 360, 1920);
+	ImGui::SliderInt("Height", &height, 720, 1080);
+	//ImGui::SliderFloat("Brightness", &App->window->brightness_value, 0.0f, 1.0f);
 }
