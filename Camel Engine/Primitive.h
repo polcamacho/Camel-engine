@@ -31,6 +31,7 @@ public:
 	Color color;
 	mat4x4 transform;
 	bool axis,wire;
+	int id_for_buffer;
 
 protected:
 	PrimitiveTypes type;

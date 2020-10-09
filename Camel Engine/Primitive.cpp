@@ -7,7 +7,9 @@
 
 // ------------------------------------------------------------
 Primitive::Primitive() : transform(IdentityMatrix), color(White), wire(false), axis(false), type(PrimitiveTypes::Primitive_Point)
-{}
+{
+	id_for_buffer = 3;
+}
 
 // ------------------------------------------------------------
 PrimitiveTypes Primitive::GetType() const
@@ -47,8 +49,35 @@ void Primitive::Render() const
 		glVertex3f(-0.05f, 0.1f, 1.05f); glVertex3f(0.05f, 0.1f, 1.05f);
 		glVertex3f(0.05f, 0.1f, 1.05f); glVertex3f(-0.05f, -0.1f, 1.05f);
 		glVertex3f(-0.05f, -0.1f, 1.05f); glVertex3f(0.05f, -0.1f, 1.05f);
-
 		glEnd();
+		
+		/*float vertices[] = {
+			0.0f, 0.0f, 0.0f,
+			0.1f, 0.1f, 0.1f,
+			0.2f, 0.2f, 0.2f,
+			0.3f, 0.3f, 0.3f
+		};
+
+		glEnableClientState(GL_VERTEX_ARRAY);
+		glGenBuffers(4, (GLuint*)&(id_for_buffer));
+		glBindBuffer(GL_ARRAY_BUFFER, id_for_buffer);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 4 * 3, vertices, GL_STATIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, id_for_buffer);
+		glVertexPointer(4, GL_FLOAT, 0, NULL);
+		glColor4f(0.0f, 1.0f, 1.0f, 1.0f);
+		glDrawArrays(GL_TRIANGLES, 0, 4);
+		glDisableClientState(GL_VERTEX_ARRAY);*/
+
+		
+		/*glBegin(GL_TRIANGLE_STRIP);
+		glColor4f(0.0f, 1.0f, 1.0f, 1.0f);
+		glVertex3f(0.f, 0.f, 0.f);
+		glVertex3f(0.f, 2.f, 0.f);
+		glVertex3f(0.f, 2.f, 4.f);
+		glVertex3f(3.f, 0.f, 0.f);
+
+		glRotatef(0.1f, 1.0f, 1.0f, 0.0f);
+		glEnd();*/
 
 		glLineWidth(1.0f);
 	}

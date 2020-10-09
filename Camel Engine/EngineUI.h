@@ -29,4 +29,5 @@ public:
 	void CheckBoxOptions();
 	void TextNames();
 	void ScrollBarOptions();
+	void HardwareDisplay();
 };

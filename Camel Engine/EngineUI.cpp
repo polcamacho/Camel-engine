@@ -103,8 +103,16 @@ void EngineUI::MainMenu()
 			App->DrawEngineGraphics();
 			ImGui::TreePop();
 		}
-		CheckBoxOptions();
-		ScrollBarOptions();
+		if (ImGui::TreeNode("Screen options")) {
+			CheckBoxOptions();
+			ScrollBarOptions();
+			ImGui::TreePop();
+		}
+		
+		if (ImGui::TreeNode("Hardware status")) {
+			HardwareDisplay();
+			ImGui::TreePop();
+		}
 	}
 	ImGui::End();
 	if (ImGui::BeginMainMenuBar())
@@ -175,5 +183,28 @@ void EngineUI::ScrollBarOptions()
 	ImGui::SliderFloat("Brightness", &App->window->brightness_value, 0.0f, 1.0f);
 	ImGui::SliderInt("Width", &width, 360, 1920);
 	ImGui::SliderInt("Height", &height, 720, 1080);
-	//ImGui::SliderFloat("Brightness", &App->window->brightness_value, 0.0f, 1.0f);
+}
+
+void EngineUI::HardwareDisplay()
+{
+	int major_version = SDL_MAJOR_VERSION, minor_version = SDL_MINOR_VERSION, pach_level = SDL_PATCHLEVEL;
+	ImGui::Text("SDL Version: ");
+	ImGui::SameLine(200);
+	ImGui::TextColored({ 1, 1, 0, 100 }, "%d.%d.%d", major_version, minor_version, pach_level);
+
+	ImGui::Text("CPU cores: ");
+	ImGui::SameLine(200);
+	ImGui::TextColored({ 1, 1, 0, 100 }, "%d", SDL_GetCPUCount());
+
+	ImGui::Text("Cache: ");
+	ImGui::SameLine(200);
+	ImGui::TextColored({ 1, 1, 0, 100 }, "%d KB", SDL_GetCPUCacheLineSize());
+
+	ImGui::Text("RAM: ");
+	ImGui::SameLine(200);
+	ImGui::TextColored({ 1, 1, 0, 100 }, "%d GB", SDL_GetSystemRAM()/1000);
+
+	ImGui::Text("3D: ");
+	ImGui::SameLine(200);
+	ImGui::TextColored({ 1, 1, 0, 100 }, "%b", SDL_Has3DNow());
 }
