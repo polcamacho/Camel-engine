@@ -132,7 +132,6 @@ void EngineUI::MainMenu()
 				ImGui::End();
 			}
 
-
 			ImGui::EndMenu();
 		}
 		ImGui::EndMainMenuBar();
@@ -152,8 +151,9 @@ void EngineUI::	CheckBoxOptions()
 	ImGui::Checkbox("Resizable", &is_resizable);
 	ImGui::Checkbox("Borderless", &is_borderless);
 	ImGui::SameLine(200);
-	ImGui::Checkbox("Vsync", &is_vsync);
-
+	if (ImGui::Checkbox("Vsync", &App->is_vsync)) {
+		App->SetVsync();
+	}
 	if (is_fullscreen) {
 		SDL_SetWindowFullscreen(App->window->window, SDL_WINDOW_FULLSCREEN);
 	}
@@ -166,7 +166,6 @@ void EngineUI::	CheckBoxOptions()
 	else {
 		SDL_SetWindowResizable(App->window->window, SDL_FALSE);
 	}
-
 	if (is_borderless) {
 		SDL_SetWindowBordered(App->window->window, SDL_FALSE);
 	}
@@ -187,10 +186,15 @@ void EngineUI::ScrollBarOptions()
 
 void EngineUI::HardwareDisplay()
 {
-	int major_version = SDL_MAJOR_VERSION, minor_version = SDL_MINOR_VERSION, pach_level = SDL_PATCHLEVEL;
+	int SDL_major_version = SDL_MAJOR_VERSION, SDL_minor_version = SDL_MINOR_VERSION, SDL_pach_level = SDL_PATCHLEVEL;
+	int GL_major_version = GL_MAJOR_VERSION, GL_minor_version = GL_MINOR_VERSION, GL_pach_level = GL_NUM_EXTENSIONS;
 	ImGui::Text("SDL Version: ");
 	ImGui::SameLine(200);
-	ImGui::TextColored({ 1, 1, 0, 100 }, "%d.%d.%d", major_version, minor_version, pach_level);
+	ImGui::TextColored({ 1, 1, 0, 100 }, "%d.%d.%d", SDL_major_version, SDL_minor_version, SDL_pach_level);
+
+	ImGui::Text("GL Version: ");
+	ImGui::SameLine(200);
+	ImGui::TextColored({ 1, 1, 0, 100 }, "%d.%d.%d", GL_major_version, GL_minor_version, GL_pach_level);
 
 	ImGui::Text("CPU cores: ");
 	ImGui::SameLine(200);
@@ -204,7 +208,50 @@ void EngineUI::HardwareDisplay()
 	ImGui::SameLine(200);
 	ImGui::TextColored({ 1, 1, 0, 100 }, "%d GB", SDL_GetSystemRAM()/1000);
 
-	ImGui::Text("3D: ");
-	ImGui::SameLine(200);
-	ImGui::TextColored({ 1, 1, 0, 100 }, "%b", SDL_Has3DNow());
+	ImGui::Text("Caps:");
+	ImGui::SameLine();
+
+	if (SDL_Has3DNow()) {
+		ImGui::TextColored({ 1, 1, 0, 100 }, "3DNow,");
+		ImGui::SameLine();
+	}
+	if (SDL_HasRDTSC()) {
+		ImGui::TextColored({ 1, 1, 0, 100 }, "RDTSC,");
+		ImGui::SameLine();
+	}
+	if (SDL_HasMMX()) {
+		ImGui::TextColored({ 1, 1, 0, 100 }, "MMX,");
+		ImGui::SameLine();
+	}
+	if (SDL_HasSSE()) {
+		ImGui::TextColored({ 1, 1, 0, 100 }, "SSE,");
+		ImGui::SameLine();
+	}
+	if (SDL_HasSSE2()) {
+		ImGui::TextColored({ 1, 1, 0, 100 }, "SSE2,");
+		ImGui::SameLine();
+	}
+	if (SDL_HasSSE3()) {
+		ImGui::TextColored({ 1, 1, 0, 100 }, "SSE3,");
+		ImGui::SameLine();
+	}
+	if (SDL_HasSSE41()) {
+		ImGui::TextColored({ 1, 1, 0, 100 }, "SSE41,");
+	}
+	if (SDL_HasSSE42()) {
+		ImGui::TextColored({ 1, 1, 0, 100 }, "SSE42,");
+		ImGui::SameLine();
+	}
+	if (SDL_HasAVX()) {
+		ImGui::TextColored({ 1, 1, 0, 100 }, "AVX,");
+		ImGui::SameLine();
+	}
+	if (SDL_HasAVX2()) {
+		ImGui::TextColored({ 1, 1, 0, 100 }, "AVX2,");
+		ImGui::SameLine();
+	}
+	if (SDL_HasAltiVec()) {
+		ImGui::TextColored({ 1, 1, 0, 100 }, "AltiVec,");
+		ImGui::SameLine();
+	}
 }
