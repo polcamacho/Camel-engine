@@ -11,6 +11,7 @@
 #include "parson/parson.h"
 
 #include <list>
+#include <string>
 #include <vector>
 
 class Application
@@ -54,6 +55,8 @@ public:
 
 	void DrawEngineGraphics();
 	void QuitEngine();
+
+	bool DoesFileExist(const std::string& file);
 
 private:
 

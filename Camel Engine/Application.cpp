@@ -4,8 +4,6 @@
 #include "MathGeoLib/include/MathBuildConfig.h"
 #include "MathGeoLib/include/MathGeoLib.h"
 
-#include <string>
-
 Application::Application()
 {
 	window = new ModuleWindow(this);
@@ -52,7 +50,13 @@ bool Application::Init()
 {
 	bool ret = true;
 
-	main_root = json_parse_file((std::string("json_files/paths.json")).data());
+	if(DoesFileExist("json_files/paths.json"))
+		main_root = json_parse_file((std::string("json_files/paths.json")).data());
+	else
+	{
+		LOG("Failed to load main json file...\nAborting...");
+		ret = false;
+	}
 
 	T.d = true;
 	T.Start();
@@ -131,6 +135,8 @@ update_status Application::Update()
 
 bool Application::CleanUp()
 {
+	json_value_free(main_root);
+
 	bool ret = true;
 	std::list<Module*>::reverse_iterator item = list_modules.rbegin();
 
@@ -149,10 +155,6 @@ void Application::AddModule(Module* mod)
 
 void Application::DrawEngineGraphics()
 {
-
-	JSON_Value* test;
-	GetJsonValueFromPath(main_root, "about", &test);
-	ImGui::Text(json_object_get_string(json_value_get_object(test), "about"));
 	fps_now = 1000 / ms_now;
 	if (ms_vec.size() <= 80) {
 		ms_vec.push_back(ms_now);
@@ -173,4 +175,9 @@ void Application::DrawEngineGraphics()
 void Application::QuitEngine()
 {
 	quit_engine = true;
+}
+
+inline bool Application::DoesFileExist(const std::string& file) {
+	struct stat buffer;
+	return (stat(file.c_str(), &buffer) == 0);
 }

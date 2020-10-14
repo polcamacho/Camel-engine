@@ -120,3 +120,19 @@ void EngineUI::MainMenu()
 		ImGui::EndMainMenuBar();
 	}
 }
+
+void EngineUI::AboutWindow()
+{
+	ImGui::Begin("About");
+	ImGui::End();
+}
+
+void EngineUI::ConfigWindow() 
+{
+
+}
+
+void EngineUI::SystemWindow()
+{
+
+}

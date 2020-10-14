@@ -21,4 +21,7 @@ public:
 	bool CleanUp();
 
 	void MainMenu();
+	void AboutWindow();
+	void SystemWindow();
+	void ConfigWindow();
 };
