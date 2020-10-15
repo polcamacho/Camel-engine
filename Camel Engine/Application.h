@@ -22,12 +22,14 @@ public:
 	EngineUI* engine_ui;
 	ModuleCamera3D* camera;
 
+	bool is_vsync;
+	int caps_fps_ideal;
+	int caps_fps_real;
 private:
 
 	Timer	ms_timer;
 	j1PerfTimer p_timer;
 	float	dt;
-
 	float ms_now;
 	float fps_now;
 
@@ -37,10 +39,9 @@ private:
 	char graph_variable[50];
 
 	bool quit_engine;
+	Uint32 flags;
 
 public:
-
-	Timer T;
 
 	Application();
 	~Application();
@@ -51,6 +52,7 @@ public:
 
 	void DrawEngineGraphics();
 	void QuitEngine();
+	void SetVsync();
 
 private:
 

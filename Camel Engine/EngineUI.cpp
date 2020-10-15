@@ -1,12 +1,16 @@
 #include "Application.h"
 #include "Globals.h"
 #include "EngineUI.h"
+#include "ModuleWindow.h"
 
 #include "imgui/imgui_internal.h"
 
 #include <gl/GL.h>
 
-EngineUI::EngineUI(Application* app, bool start_enabled) : Module(app, start_enabled) {}
+EngineUI::EngineUI(Application* app, bool start_enabled) : Module(app, start_enabled) {
+	width = SCREEN_WIDTH;
+	height = SCREEN_HEIGHT;
+}
 
 EngineUI::~EngineUI() {}
 
@@ -62,7 +66,7 @@ update_status EngineUI::Update(float dt)
 {
 	bool show_demo_wndow = true;
 	ImGui::ShowDemoWindow(&show_demo_wndow);
-	
+
 	MainMenu();
 
 	return UPDATE_CONTINUE;
@@ -94,7 +98,21 @@ void EngineUI::MainMenu()
 {
 	ImGui::Begin("Test", (bool*)0);
 	if (ImGui::CollapsingHeader("System Status")) {
-		App->DrawEngineGraphics();
+		TextNames();
+		if (ImGui::TreeNode("Graphics view")) {
+			App->DrawEngineGraphics();
+			ImGui::TreePop();
+		}
+		if (ImGui::TreeNode("Screen options")) {
+			CheckBoxOptions();
+			ScrollBarOptions();
+			ImGui::TreePop();
+		}
+		
+		if (ImGui::TreeNode("Hardware status")) {
+			HardwareDisplay();
+			ImGui::TreePop();
+		}
 	}
 	ImGui::End();
 	if (ImGui::BeginMainMenuBar())
@@ -114,9 +132,126 @@ void EngineUI::MainMenu()
 				ImGui::End();
 			}
 
-
 			ImGui::EndMenu();
 		}
 		ImGui::EndMainMenuBar();
+	}
+}
+
+void EngineUI::TextNames()
+{
+	ImGui::InputText("App name", name, 30);
+	ImGui::InputText("Organization", name2, 30);
+}
+
+void EngineUI::	CheckBoxOptions()
+{
+	ImGui::Checkbox("Fullscreen", &is_fullscreen);
+	ImGui::SameLine(200);
+	ImGui::Checkbox("Resizable", &is_resizable);
+	ImGui::Checkbox("Borderless", &is_borderless);
+	ImGui::SameLine(200);
+	if (ImGui::Checkbox("Vsync", &App->is_vsync)) {
+		App->SetVsync();
+	}
+	if (is_fullscreen) {
+		SDL_SetWindowFullscreen(App->window->window, SDL_WINDOW_FULLSCREEN);
+	}
+	else {
+		SDL_SetWindowFullscreen(App->window->window, SDL_WINDOW_RESIZABLE);
+	}
+	if (is_resizable) {
+		SDL_SetWindowResizable(App->window->window, SDL_TRUE);
+	}
+	else {
+		SDL_SetWindowResizable(App->window->window, SDL_FALSE);
+	}
+	if (is_borderless) {
+		SDL_SetWindowBordered(App->window->window, SDL_FALSE);
+	}
+	else {
+		SDL_SetWindowBordered(App->window->window, SDL_TRUE);
+	}
+
+}
+
+void EngineUI::ScrollBarOptions()
+{
+	SDL_SetWindowBrightness(App->window->window, App->window->brightness_value);
+	SDL_SetWindowSize(App->window->window, width, height);
+	ImGui::SliderFloat("Brightness", &App->window->brightness_value, 0.0f, 1.0f);
+	ImGui::SliderInt("Width", &width, 360, 1920);
+	ImGui::SliderInt("Height", &height, 720, 1080);
+}
+
+void EngineUI::HardwareDisplay()
+{
+	int SDL_major_version = SDL_MAJOR_VERSION, SDL_minor_version = SDL_MINOR_VERSION, SDL_pach_level = SDL_PATCHLEVEL;
+	int GL_major_version = GL_MAJOR_VERSION, GL_minor_version = GL_MINOR_VERSION, GL_pach_level = GL_NUM_EXTENSIONS;
+	ImGui::Text("SDL Version: ");
+	ImGui::SameLine(200);
+	ImGui::TextColored({ 1, 1, 0, 100 }, "%d.%d.%d", SDL_major_version, SDL_minor_version, SDL_pach_level);
+
+	ImGui::Text("GL Version: ");
+	ImGui::SameLine(200);
+	ImGui::TextColored({ 1, 1, 0, 100 }, "%d.%d.%d", GL_major_version, GL_minor_version, GL_pach_level);
+
+	ImGui::Text("CPU cores: ");
+	ImGui::SameLine(200);
+	ImGui::TextColored({ 1, 1, 0, 100 }, "%d", SDL_GetCPUCount());
+
+	ImGui::Text("Cache: ");
+	ImGui::SameLine(200);
+	ImGui::TextColored({ 1, 1, 0, 100 }, "%d KB", SDL_GetCPUCacheLineSize());
+
+	ImGui::Text("RAM: ");
+	ImGui::SameLine(200);
+	ImGui::TextColored({ 1, 1, 0, 100 }, "%d GB", SDL_GetSystemRAM()/1000);
+
+	ImGui::Text("Caps:");
+	ImGui::SameLine();
+
+	if (SDL_Has3DNow()) {
+		ImGui::TextColored({ 1, 1, 0, 100 }, "3DNow,");
+		ImGui::SameLine();
+	}
+	if (SDL_HasRDTSC()) {
+		ImGui::TextColored({ 1, 1, 0, 100 }, "RDTSC,");
+		ImGui::SameLine();
+	}
+	if (SDL_HasMMX()) {
+		ImGui::TextColored({ 1, 1, 0, 100 }, "MMX,");
+		ImGui::SameLine();
+	}
+	if (SDL_HasSSE()) {
+		ImGui::TextColored({ 1, 1, 0, 100 }, "SSE,");
+		ImGui::SameLine();
+	}
+	if (SDL_HasSSE2()) {
+		ImGui::TextColored({ 1, 1, 0, 100 }, "SSE2,");
+		ImGui::SameLine();
+	}
+	if (SDL_HasSSE3()) {
+		ImGui::TextColored({ 1, 1, 0, 100 }, "SSE3,");
+		ImGui::SameLine();
+	}
+	if (SDL_HasSSE41()) {
+		ImGui::TextColored({ 1, 1, 0, 100 }, "SSE41,");
+	}
+	if (SDL_HasSSE42()) {
+		ImGui::TextColored({ 1, 1, 0, 100 }, "SSE42,");
+		ImGui::SameLine();
+	}
+	if (SDL_HasAVX()) {
+		ImGui::TextColored({ 1, 1, 0, 100 }, "AVX,");
+		ImGui::SameLine();
+	}
+	if (SDL_HasAVX2()) {
+		ImGui::TextColored({ 1, 1, 0, 100 }, "AVX2,");
+		ImGui::SameLine();
+	}
+	if (SDL_HasAltiVec()) {
+		ImGui::TextColored({ 1, 1, 0, 100 }, "AltiVec,");
+		ImGui::SameLine();
 	}
 }
