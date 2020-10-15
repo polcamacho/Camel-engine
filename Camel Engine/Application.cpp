@@ -50,7 +50,7 @@ bool Application::Init()
 {
 	bool ret = true;
 
-	if(DoesFileExist("json_files/paths.json"))
+	if(DoesJsonFileExist("json_files/paths.json"))
 		main_root = json_parse_file((std::string("json_files/paths.json")).data());
 	else
 	{
@@ -175,9 +175,4 @@ void Application::DrawEngineGraphics()
 void Application::QuitEngine()
 {
 	quit_engine = true;
-}
-
-inline bool Application::DoesFileExist(const std::string& file) {
-	struct stat buffer;
-	return (stat(file.c_str(), &buffer) == 0);
 }

@@ -56,8 +56,6 @@ public:
 	void DrawEngineGraphics();
 	void QuitEngine();
 
-	bool DoesFileExist(const std::string& file);
-
 private:
 
 	void AddModule(Module* mod);
