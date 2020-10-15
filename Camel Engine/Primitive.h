@@ -31,7 +31,9 @@ public:
 	Color color;
 	mat4x4 transform;
 	bool axis,wire;
-	int id_for_buffer;
+	uint id_for_buffer;
+	uint id_for_vertex;
+	//float points_array[24];
 
 protected:
 	PrimitiveTypes type;
@@ -42,6 +44,7 @@ class Cube : public Primitive
 {
 public :
 	Cube();
+	//Cube();
 	Cube(float sizeX, float sizeY, float sizeZ);
 	void InnerRender() const;
 	void Size(float x, float y, float z);

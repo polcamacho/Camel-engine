@@ -8,7 +8,8 @@
 // ------------------------------------------------------------
 Primitive::Primitive() : transform(IdentityMatrix), color(White), wire(false), axis(false), type(PrimitiveTypes::Primitive_Point)
 {
-	id_for_buffer = 3;
+	id_for_buffer = 0;
+	id_for_vertex = 0;
 }
 
 // ------------------------------------------------------------
@@ -50,34 +51,6 @@ void Primitive::Render() const
 		glVertex3f(0.05f, 0.1f, 1.05f); glVertex3f(-0.05f, -0.1f, 1.05f);
 		glVertex3f(-0.05f, -0.1f, 1.05f); glVertex3f(0.05f, -0.1f, 1.05f);
 		glEnd();
-		
-		/*float vertices[] = {
-			0.0f, 0.0f, 0.0f,
-			0.1f, 0.1f, 0.1f,
-			0.2f, 0.2f, 0.2f,
-			0.3f, 0.3f, 0.3f
-		};
-
-		glEnableClientState(GL_VERTEX_ARRAY);
-		glGenBuffers(4, (GLuint*)&(id_for_buffer));
-		glBindBuffer(GL_ARRAY_BUFFER, id_for_buffer);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 4 * 3, vertices, GL_STATIC_DRAW);
-		glBindBuffer(GL_ARRAY_BUFFER, id_for_buffer);
-		glVertexPointer(4, GL_FLOAT, 0, NULL);
-		glColor4f(0.0f, 1.0f, 1.0f, 1.0f);
-		glDrawArrays(GL_TRIANGLES, 0, 4);
-		glDisableClientState(GL_VERTEX_ARRAY);*/
-
-		
-		/*glBegin(GL_TRIANGLE_STRIP);
-		glColor4f(0.0f, 1.0f, 1.0f, 1.0f);
-		glVertex3f(0.f, 0.f, 0.f);
-		glVertex3f(0.f, 2.f, 0.f);
-		glVertex3f(0.f, 2.f, 4.f);
-		glVertex3f(3.f, 0.f, 0.f);
-
-		glRotatef(0.1f, 1.0f, 1.0f, 0.0f);
-		glEnd();*/
 
 		glLineWidth(1.0f);
 	}
@@ -127,7 +100,7 @@ void Primitive::Scale(float x, float y, float z)
 }
 
 // CUBE ============================================
-Cube::Cube() : Primitive(), size(1.0f, 1.0f, 1.0f)
+Cube::Cube() :Primitive()
 {
 	type = PrimitiveTypes::Primitive_Cube;
 }
@@ -137,9 +110,10 @@ Cube::Cube(float sizeX, float sizeY, float sizeZ) : Primitive(), size(sizeX, siz
 	type = PrimitiveTypes::Primitive_Cube;
 }
 
+
 void Cube::InnerRender() const
 {	
-	float sx = size.x * 0.5f;
+	/*float sx = size.x * 0.5f;
 	float sy = size.y * 0.5f;
 	float sz = size.z * 0.5f;
 
@@ -181,7 +155,63 @@ void Cube::InnerRender() const
 	glVertex3f( sx, -sy,  sz);
 	glVertex3f(-sx, -sy,  sz);
 
-	glEnd();
+	glEnd();*/
+	
+	float vertex[24]{
+			0.0f, 0.0f, 0.0f,
+			0.0f, 0.0f, 1.0f,
+			0.0f, 1.0f, 1.0f,
+			0.0f, 1.0f, 0.0f,
+			1.0f, 0.0f, 0.0f,
+			1.0f, 0.0f, 1.0f,
+			1.0f, 1.0f, 0.0f,
+			1.0f, 1.0f, 1.0f,
+	};
+
+	int indices[36]{
+		
+		//front
+		0, 1, 2,
+		2, 3, 0,
+
+		//right
+		1, 5, 7,
+		7, 2, 1,
+
+		//left
+		4, 0, 3,
+		3, 6, 4,
+
+		//back
+		5, 4, 6,
+		6, 7, 5,
+
+		//up
+		3, 2, 7,
+		7, 6, 3,
+
+		//down
+		1, 0, 4,
+		4, 5, 1
+	};
+
+	glGenBuffers(1, (GLuint*)&(id_for_vertex));
+	glBindBuffer(GL_ARRAY_BUFFER, id_for_vertex);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 24, vertex, GL_STATIC_DRAW);
+
+	glGenBuffers(1, (GLuint*)&(id_for_buffer));
+	glBindBuffer(GL_ARRAY_BUFFER, id_for_buffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(int) * 36, indices, GL_STATIC_DRAW);
+
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glBindBuffer(GL_ARRAY_BUFFER, id_for_vertex);
+	glVertexPointer(3, GL_FLOAT, 0, NULL);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id_for_buffer);
+	glColor4f(0.0f, 1.0f, 1.0f, 1.0f);
+	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, NULL);
+	glDisableClientState(GL_VERTEX_ARRAY);
+
 }
 
 void Cube::Size(float x, float y, float z)

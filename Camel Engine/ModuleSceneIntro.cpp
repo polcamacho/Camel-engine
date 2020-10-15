@@ -44,6 +44,8 @@ update_status ModuleSceneIntro::Update(float dt)
 	p.axis = true;
 	p.Render();
 
-	
+	Cube c(1.0f, 1.0f, 1.0f);
+	c.color = Red;
+	c.InnerRender();
 	return UPDATE_CONTINUE;
 }

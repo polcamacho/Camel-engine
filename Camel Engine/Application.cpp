@@ -94,7 +94,7 @@ void Application::FinishUpdate()
 			
 		}
 	}
-	LOG("MS NOW: %.2f", ms_now);
+	//LOG("MS NOW: %.2f", ms_now);
 }
 
 // Call PreUpdate, Update and PostUpdate on all modules
