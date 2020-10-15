@@ -44,8 +44,10 @@ update_status ModuleSceneIntro::Update(float dt)
 	p.axis = true;
 	p.Render();
 
-	Cube c(1.0f, 1.0f, 1.0f);
-	c.color = Red;
+	Cube c(1.5f, 1.5f, 1.5f, -2.0f, 0.0f, 2.0f);
 	c.InnerRender();
+	Pyramid pyr(2.0f, 2.0f, 2.0f, 0.0f, 0.0f, 1.0f);
+	pyr.InnerRender();
+
 	return UPDATE_CONTINUE;
 }

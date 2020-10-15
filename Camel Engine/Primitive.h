@@ -10,6 +10,8 @@ enum PrimitiveTypes
 	Primitive_Plane,
 	Primitive_Cube,
 	Primitive_Sphere,
+	Primitive_Triangle_pyramid,
+	Primitive_Pyramid,
 	Primitive_Cylinder
 };
 
@@ -33,7 +35,6 @@ public:
 	bool axis,wire;
 	uint id_for_buffer;
 	uint id_for_vertex;
-	//float points_array[24];
 
 protected:
 	PrimitiveTypes type;
@@ -44,12 +45,11 @@ class Cube : public Primitive
 {
 public :
 	Cube();
-	//Cube();
-	Cube(float sizeX, float sizeY, float sizeZ);
+	Cube(float sizeX, float sizeY, float sizeZ, float posX, float posY, float posZ);
 	void InnerRender() const;
 	void Size(float x, float y, float z);
 public:
-	vec3 size;
+	vec3 size, pos;
 };
 
 // ============================================
@@ -60,6 +60,17 @@ public:
 	Sphere(float radius);
 public:
 	float radius;
+};
+
+// ============================================
+class Pyramid : public Primitive
+{
+public:
+	Pyramid();
+	Pyramid(float sizeX, float sizeY, float sizeZ, float posX, float posY, float posZ);
+	void InnerRender() const;
+public:
+	vec3 size, pos;
 };
 
 // ============================================
