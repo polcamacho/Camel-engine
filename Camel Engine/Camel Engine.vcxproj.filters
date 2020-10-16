@@ -73,6 +73,9 @@
     <Filter Include="External Libraries\MatGeoLib\Time">
       <UniqueIdentifier>{386d5c0f-a99e-4963-802e-60a4b77fda26}</UniqueIdentifier>
     </Filter>
+    <Filter Include="External Libraries\Assimp">
+      <UniqueIdentifier>{7a420efc-c4d6-42a6-aaad-4bbd17cfd5e7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="glmath.h">
@@ -333,6 +336,105 @@
     <ClInclude Include="MathGeoLib\include\MathGeoLibFwd.h">
       <Filter>External Libraries\MatGeoLib</Filter>
     </ClInclude>
+    <ClInclude Include="Assimp\Assimp\include\ai_assert.h">
+      <Filter>External Libraries\Assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="Assimp\Assimp\include\anim.h">
+      <Filter>External Libraries\Assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="Assimp\Assimp\include\camera.h">
+      <Filter>External Libraries\Assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="Assimp\Assimp\include\cexport.h">
+      <Filter>External Libraries\Assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="Assimp\Assimp\include\cfileio.h">
+      <Filter>External Libraries\Assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="Assimp\Assimp\include\cimport.h">
+      <Filter>External Libraries\Assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="Assimp\Assimp\include\color4.h">
+      <Filter>External Libraries\Assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="Assimp\Assimp\include\config.h">
+      <Filter>External Libraries\Assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="Assimp\Assimp\include\DefaultLogger.hpp">
+      <Filter>External Libraries\Assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="Assimp\Assimp\include\defs.h">
+      <Filter>External Libraries\Assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="Assimp\Assimp\include\Exporter.hpp">
+      <Filter>External Libraries\Assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="Assimp\Assimp\include\Importer.hpp">
+      <Filter>External Libraries\Assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="Assimp\Assimp\include\importerdesc.h">
+      <Filter>External Libraries\Assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="Assimp\Assimp\include\IOStream.hpp">
+      <Filter>External Libraries\Assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="Assimp\Assimp\include\IOSystem.hpp">
+      <Filter>External Libraries\Assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="Assimp\Assimp\include\light.h">
+      <Filter>External Libraries\Assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="Assimp\Assimp\include\Logger.hpp">
+      <Filter>External Libraries\Assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="Assimp\Assimp\include\LogStream.hpp">
+      <Filter>External Libraries\Assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="Assimp\Assimp\include\material.h">
+      <Filter>External Libraries\Assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="Assimp\Assimp\include\matrix3x3.h">
+      <Filter>External Libraries\Assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="Assimp\Assimp\include\matrix4x4.h">
+      <Filter>External Libraries\Assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="Assimp\Assimp\include\mesh.h">
+      <Filter>External Libraries\Assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="Assimp\Assimp\include\metadata.h">
+      <Filter>External Libraries\Assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="Assimp\Assimp\include\NullLogger.hpp">
+      <Filter>External Libraries\Assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="Assimp\Assimp\include\postprocess.h">
+      <Filter>External Libraries\Assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="Assimp\Assimp\include\ProgressHandler.hpp">
+      <Filter>External Libraries\Assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="Assimp\Assimp\include\quaternion.h">
+      <Filter>External Libraries\Assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="Assimp\Assimp\include\scene.h">
+      <Filter>External Libraries\Assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="Assimp\Assimp\include\texture.h">
+      <Filter>External Libraries\Assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="Assimp\Assimp\include\types.h">
+      <Filter>External Libraries\Assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="Assimp\Assimp\include\vector2.h">
+      <Filter>External Libraries\Assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="Assimp\Assimp\include\vector3.h">
+      <Filter>External Libraries\Assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="Assimp\Assimp\include\version.h">
+      <Filter>External Libraries\Assimp</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="glmath.cpp">
@@ -519,6 +621,30 @@
     </None>
     <None Include="MathGeoLib\include\Math\Matrix.inl">
       <Filter>External Libraries\MatGeoLib\Math</Filter>
+    </None>
+    <None Include="Assimp\Assimp\include\.editorconfig">
+      <Filter>External Libraries\Assimp</Filter>
+    </None>
+    <None Include="Assimp\Assimp\include\color4.inl">
+      <Filter>External Libraries\Assimp</Filter>
+    </None>
+    <None Include="Assimp\Assimp\include\material.inl">
+      <Filter>External Libraries\Assimp</Filter>
+    </None>
+    <None Include="Assimp\Assimp\include\matrix3x3.inl">
+      <Filter>External Libraries\Assimp</Filter>
+    </None>
+    <None Include="Assimp\Assimp\include\matrix4x4.inl">
+      <Filter>External Libraries\Assimp</Filter>
+    </None>
+    <None Include="Assimp\Assimp\include\quaternion.inl">
+      <Filter>External Libraries\Assimp</Filter>
+    </None>
+    <None Include="Assimp\Assimp\include\vector2.inl">
+      <Filter>External Libraries\Assimp</Filter>
+    </None>
+    <None Include="Assimp\Assimp\include\vector3.inl">
+      <Filter>External Libraries\Assimp</Filter>
     </None>
   </ItemGroup>
 </Project>

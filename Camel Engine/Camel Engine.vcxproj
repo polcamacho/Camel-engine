@@ -77,6 +77,39 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
+    <ClInclude Include="Assimp\Assimp\include\ai_assert.h" />
+    <ClInclude Include="Assimp\Assimp\include\anim.h" />
+    <ClInclude Include="Assimp\Assimp\include\camera.h" />
+    <ClInclude Include="Assimp\Assimp\include\cexport.h" />
+    <ClInclude Include="Assimp\Assimp\include\cfileio.h" />
+    <ClInclude Include="Assimp\Assimp\include\cimport.h" />
+    <ClInclude Include="Assimp\Assimp\include\color4.h" />
+    <ClInclude Include="Assimp\Assimp\include\config.h" />
+    <ClInclude Include="Assimp\Assimp\include\DefaultLogger.hpp" />
+    <ClInclude Include="Assimp\Assimp\include\defs.h" />
+    <ClInclude Include="Assimp\Assimp\include\Exporter.hpp" />
+    <ClInclude Include="Assimp\Assimp\include\Importer.hpp" />
+    <ClInclude Include="Assimp\Assimp\include\importerdesc.h" />
+    <ClInclude Include="Assimp\Assimp\include\IOStream.hpp" />
+    <ClInclude Include="Assimp\Assimp\include\IOSystem.hpp" />
+    <ClInclude Include="Assimp\Assimp\include\light.h" />
+    <ClInclude Include="Assimp\Assimp\include\Logger.hpp" />
+    <ClInclude Include="Assimp\Assimp\include\LogStream.hpp" />
+    <ClInclude Include="Assimp\Assimp\include\material.h" />
+    <ClInclude Include="Assimp\Assimp\include\matrix3x3.h" />
+    <ClInclude Include="Assimp\Assimp\include\matrix4x4.h" />
+    <ClInclude Include="Assimp\Assimp\include\mesh.h" />
+    <ClInclude Include="Assimp\Assimp\include\metadata.h" />
+    <ClInclude Include="Assimp\Assimp\include\NullLogger.hpp" />
+    <ClInclude Include="Assimp\Assimp\include\postprocess.h" />
+    <ClInclude Include="Assimp\Assimp\include\ProgressHandler.hpp" />
+    <ClInclude Include="Assimp\Assimp\include\quaternion.h" />
+    <ClInclude Include="Assimp\Assimp\include\scene.h" />
+    <ClInclude Include="Assimp\Assimp\include\texture.h" />
+    <ClInclude Include="Assimp\Assimp\include\types.h" />
+    <ClInclude Include="Assimp\Assimp\include\vector2.h" />
+    <ClInclude Include="Assimp\Assimp\include\vector3.h" />
+    <ClInclude Include="Assimp\Assimp\include\version.h" />
     <ClInclude Include="Color.h" />
     <ClInclude Include="EngineUI.h" />
     <ClInclude Include="glmath.h" />
@@ -221,6 +254,14 @@
     <ClCompile Include="Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assimp\Assimp\include\.editorconfig" />
+    <None Include="Assimp\Assimp\include\color4.inl" />
+    <None Include="Assimp\Assimp\include\material.inl" />
+    <None Include="Assimp\Assimp\include\matrix3x3.inl" />
+    <None Include="Assimp\Assimp\include\matrix4x4.inl" />
+    <None Include="Assimp\Assimp\include\quaternion.inl" />
+    <None Include="Assimp\Assimp\include\vector2.inl" />
+    <None Include="Assimp\Assimp\include\vector3.inl" />
     <None Include="MathGeoLib\include\Geometry\KDTree.inl" />
     <None Include="MathGeoLib\include\Geometry\QuadTree.inl" />
     <None Include="MathGeoLib\include\Geometry\TriangleMesh_IntersectRay_AVX.inl" />
