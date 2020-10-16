@@ -16,7 +16,7 @@ void GetJsonValueFromPath(JSON_Value* main_root, const char* name, JSON_Value** 
 	}
 }
 
-inline bool DoesJsonFileExist(const std::string& file) {
+bool DoesJsonFileExist(const std::string& file) {
 	struct stat buffer;
 	return (stat(file.c_str(), &buffer) == 0);
 }
