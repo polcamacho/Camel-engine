@@ -1,4 +1,5 @@
 #include "Application.h"
+#include "JSONDataController.h"
 
 #include "MathGeoLib/include/MathBuildConfig.h"
 #include "MathGeoLib/include/MathGeoLib.h"
@@ -52,7 +53,15 @@ Application::~Application()
 bool Application::Init()
 {
 	bool ret = true;
-	
+
+	if(DoesJsonFileExist("json_files/paths.json"))
+		main_root = json_parse_file((std::string("json_files/paths.json")).data());
+	else
+	{
+		LOG("Failed to load main json file...\nAborting...");
+		ret = false;
+	}
+
 	// Call Init() in all modules
 	std::list<Module*>::iterator item= list_modules.begin();
 
@@ -135,6 +144,8 @@ update_status Application::Update()
 
 bool Application::CleanUp()
 {
+	json_value_free(main_root);
+
 	bool ret = true;
 	std::list<Module*>::reverse_iterator item = list_modules.rbegin();
 

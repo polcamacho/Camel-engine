@@ -8,8 +8,10 @@
 #include "ModuleSceneIntro.h"
 #include "ModuleCamera3D.h"
 #include "EngineUI.h"
+#include "parson/parson.h"
 
 #include <list>
+#include <string>
 #include <vector>
 
 class Application
@@ -22,9 +24,12 @@ public:
 	EngineUI* engine_ui;
 	ModuleCamera3D* camera;
 
+	JSON_Value* main_root;
+
 	bool is_vsync;
 	int caps_fps_ideal;
 	int caps_fps_real;
+
 private:
 
 	Timer	ms_timer;

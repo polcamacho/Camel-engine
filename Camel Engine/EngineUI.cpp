@@ -138,6 +138,22 @@ void EngineUI::MainMenu()
 	}
 }
 
+void EngineUI::AboutWindow()
+{
+	ImGui::Begin("About");
+	ImGui::End();
+}
+
+void EngineUI::ConfigWindow() 
+{
+
+}
+
+void EngineUI::SystemWindow()
+{
+
+}
+
 void EngineUI::TextNames()
 {
 	ImGui::InputText("App name", name, 30);

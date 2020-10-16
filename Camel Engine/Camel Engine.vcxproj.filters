@@ -55,6 +55,9 @@
     <Filter Include="Source Code\Modules\Internal Engine\Processing\Scene Management">
       <UniqueIdentifier>{84d748ad-63d1-4470-adfc-60e9ee491b98}</UniqueIdentifier>
     </Filter>
+    <Filter Include="External Libraries\parson">
+      <UniqueIdentifier>{45323793-7d3d-4256-99c3-1b5abf8ec0e2}</UniqueIdentifier>
+    </Filter>
     <Filter Include="External Libraries\MatGeoLib">
       <UniqueIdentifier>{348ce83d-a2d8-4660-9f88-e5897eccfbd2}</UniqueIdentifier>
     </Filter>
@@ -143,6 +146,12 @@
     </ClInclude>
     <ClInclude Include="ModuleSceneIntro.h">
       <Filter>Source Code\Modules\Internal Engine\Processing\Scene Management</Filter>
+    </ClInclude>
+    <ClInclude Include="parson\parson.h">
+      <Filter>External Libraries\parson</Filter>
+    </ClInclude>
+    <ClInclude Include="JSONDataController.h">
+      <Filter>Source Code\Utils</Filter>
     </ClInclude>
     <ClInclude Include="MathGeoLib\include\Algorithm\Random\LCG.h">
       <Filter>External Libraries\MatGeoLib\Algorythm</Filter>
@@ -388,6 +397,12 @@
     </ClCompile>
     <ClCompile Include="ModuleSceneIntro.cpp">
       <Filter>Source Code\Modules\Internal Engine\Processing\Scene Management</Filter>
+    </ClCompile>
+    <ClCompile Include="parson\parson.c">
+      <Filter>External Libraries\parson</Filter>
+    </ClCompile>
+    <ClCompile Include="JSONDataController.cpp">
+      <Filter>Source Code\Utils</Filter>
     </ClCompile>
     <ClCompile Include="MathGeoLib\include\Algorithm\Random\LCG.cpp">
       <Filter>External Libraries\MatGeoLib\Algorythm</Filter>

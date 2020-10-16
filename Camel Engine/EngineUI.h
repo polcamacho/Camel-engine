@@ -26,6 +26,11 @@ public:
 	bool CleanUp();
 
 	void MainMenu();
+
+	void AboutWindow();
+	void SystemWindow();
+	void ConfigWindow();
+
 	void CheckBoxOptions();
 	void TextNames();
 	void ScrollBarOptions();
