@@ -2,7 +2,9 @@
 #include "Application.h"
 #include "ModuleSceneIntro.h"
 #include "Primitive.h"
-
+#include <gl/GL.h>
+#include "glew/include/glew.h"
+#include <gl/GLU.h>
 
 ModuleSceneIntro::ModuleSceneIntro(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
@@ -42,13 +44,10 @@ update_status ModuleSceneIntro::Update(float dt)
 	p.axis = true;
 	p.Render();
 
-	Cube c;
-
-	if (App->input->GetKey(SDL_SCANCODE_1) == KEY_REPEAT) {
-		c.Size(1, 1, 1);
-		c.SetPos(0, 0, 0);
-	}
-	c.Render();
+	Cube c(1.5f, 1.5f, 1.5f, -2.0f, 0.0f, 2.0f);
+	c.InnerRender();
+	Pyramid pyr(2.0f, 2.0f, 2.0f, 0.0f, 0.0f, 1.0f);
+	pyr.InnerRender();
 
 	return UPDATE_CONTINUE;
 }

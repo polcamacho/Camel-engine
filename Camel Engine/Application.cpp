@@ -31,7 +31,11 @@ Application::Application()
 	// Renderer last!
 	AddModule(renderer3D);
 
+	is_vsync = true;
+	caps_fps_ideal = 30;
+	caps_fps_real = (1 / caps_fps_ideal) * 1000;
 	quit_engine = false;
+	Uint32 flags = SDL_RENDERER_ACCELERATED;
 }
 
 Application::~Application()
@@ -58,9 +62,6 @@ bool Application::Init()
 		ret = false;
 	}
 
-	T.d = true;
-	T.Start();
-
 	// Call Init() in all modules
 	std::list<Module*>::iterator item= list_modules.begin();
 
@@ -79,7 +80,7 @@ bool Application::Init()
 		ret = (*item)->Start();
 		++item;
 	}
-	
+	p_timer.Start();
 	return ret;
 }
 
@@ -95,6 +96,14 @@ void Application::PrepareUpdate()
 void Application::FinishUpdate()
 {
 	ms_now = p_timer.ReadMs();
+	caps_fps_real = (1 / caps_fps_ideal) * 1000;
+	if (is_vsync) {
+		if (ms_now < caps_fps_real) {
+			SDL_Delay(caps_fps_real - ms_now);
+			
+		}
+	}
+	//LOG("MS NOW: %.2f", ms_now);
 }
 
 // Call PreUpdate, Update and PostUpdate on all modules
@@ -156,6 +165,7 @@ void Application::AddModule(Module* mod)
 void Application::DrawEngineGraphics()
 {
 	fps_now = 1000 / ms_now;
+	
 	if (ms_vec.size() <= 80) {
 		ms_vec.push_back(ms_now);
 		fps_vec.push_back(fps_now);
@@ -166,12 +176,17 @@ void Application::DrawEngineGraphics()
 		fps_vec.erase(fps_vec.begin());
 		fps_vec.push_back(fps_now);
 	}
-	
 	sprintf_s(graph_variable, 25, "Milliseconds %.1f", ms_vec[ms_vec.size() - 1]);
 	ImGui::PlotHistogram("##milliseconds", &ms_vec[0], ms_vec.size(), 0, graph_variable, 0.0f, 100.0f, ImVec2(310, 100));
 	sprintf_s(graph_variable, 25, "Framerate %.1f", fps_vec[fps_vec.size() - 1]);
 	ImGui::PlotHistogram("##framerate", &fps_vec[0], fps_vec.size(), 0, graph_variable, 0.0f, 100.0f, ImVec2(310, 100));
 }
+
+void Application::SetVsync()
+{
+	caps_fps_real = (1 / caps_fps_ideal) * 1000;
+}
+
 void Application::QuitEngine()
 {
 	quit_engine = true;

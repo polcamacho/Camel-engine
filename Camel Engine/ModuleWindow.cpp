@@ -6,6 +6,7 @@ ModuleWindow::ModuleWindow(Application* app, bool start_enabled) : Module(app, s
 {
 	window = NULL;
 	screen_surface = NULL;
+	brightness_value = 1.0f;
 }
 
 // Destructor
@@ -68,6 +69,7 @@ bool ModuleWindow::Init()
 			screen_surface = SDL_GetWindowSurface(window);
 		}
 	}
+
 
 	return ret;
 }
