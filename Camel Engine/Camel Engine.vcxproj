@@ -84,6 +84,9 @@
     <ClInclude Include="Assimp\Assimp\include\cfileio.h" />
     <ClInclude Include="Assimp\Assimp\include\cimport.h" />
     <ClInclude Include="Assimp\Assimp\include\color4.h" />
+    <ClInclude Include="Assimp\Assimp\include\Compiler\poppack1.h" />
+    <ClInclude Include="Assimp\Assimp\include\Compiler\pstdint.h" />
+    <ClInclude Include="Assimp\Assimp\include\Compiler\pushpack1.h" />
     <ClInclude Include="Assimp\Assimp\include\config.h" />
     <ClInclude Include="Assimp\Assimp\include\DefaultLogger.hpp" />
     <ClInclude Include="Assimp\Assimp\include\defs.h" />
@@ -101,6 +104,7 @@
     <ClInclude Include="Assimp\Assimp\include\mesh.h" />
     <ClInclude Include="Assimp\Assimp\include\metadata.h" />
     <ClInclude Include="Assimp\Assimp\include\NullLogger.hpp" />
+    <ClInclude Include="Assimp\Assimp\include\port\AndroidJNI\AndroidJNIIOSystem.h" />
     <ClInclude Include="Assimp\Assimp\include\postprocess.h" />
     <ClInclude Include="Assimp\Assimp\include\ProgressHandler.hpp" />
     <ClInclude Include="Assimp\Assimp\include\quaternion.h" />

@@ -76,6 +76,12 @@
     <Filter Include="External Libraries\Assimp">
       <UniqueIdentifier>{7a420efc-c4d6-42a6-aaad-4bbd17cfd5e7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="External Libraries\Assimp\Compiler">
+      <UniqueIdentifier>{b8eb36db-8812-4515-b7c2-3f91b8863136}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External Libraries\Assimp\Port">
+      <UniqueIdentifier>{c6830009-b3ae-454d-a93b-90c40a750e0d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="glmath.h">
@@ -434,6 +440,18 @@
     </ClInclude>
     <ClInclude Include="Assimp\Assimp\include\version.h">
       <Filter>External Libraries\Assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="Assimp\Assimp\include\Compiler\poppack1.h">
+      <Filter>External Libraries\Assimp\Compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="Assimp\Assimp\include\Compiler\pstdint.h">
+      <Filter>External Libraries\Assimp\Compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="Assimp\Assimp\include\Compiler\pushpack1.h">
+      <Filter>External Libraries\Assimp\Compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="Assimp\Assimp\include\port\AndroidJNI\AndroidJNIIOSystem.h">
+      <Filter>External Libraries\Assimp\Port</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
