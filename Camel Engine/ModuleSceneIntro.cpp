@@ -44,10 +44,16 @@ update_status ModuleSceneIntro::Update(float dt)
 	p.axis = true;
 	p.Render();
 
-	Cube c(1.5f, 1.5f, 1.5f, -2.0f, 0.0f, 2.0f);
+	Cube c(0, 0, 0, 2, 2, 2);
 	c.InnerRender();
-	Pyramid pyr(2.0f, 2.0f, 2.0f, 0.0f, 0.0f, 1.0f);
+	Pyramid pyr(5, 0, 0, 2, 4, 2);
 	pyr.InnerRender();
+
+	Sphere s(10, 0, 0, 2.0f, 10, 10);
+	s.InnerRender();
+
+	Cylinder cy(10, 0, 0, 1.0f, 5.0f, 10);
+	cy.InnerRender();
 
 	return UPDATE_CONTINUE;
 }

@@ -3,6 +3,8 @@
 #include "glmath.h"
 #include "Color.h"
 
+#include <vector>
+
 enum PrimitiveTypes
 {
 	Primitive_Point,
@@ -45,7 +47,7 @@ class Cube : public Primitive
 {
 public :
 	Cube();
-	Cube(float sizeX, float sizeY, float sizeZ, float posX, float posY, float posZ);
+	Cube(int posX, int posY, int posZ, int sizeX, int sizeY, int sizeZ);
 	void InnerRender() const;
 	void Size(float x, float y, float z);
 public:
@@ -57,9 +59,12 @@ class Sphere : public Primitive
 {
 public:
 	Sphere();
-	Sphere(float radius);
+	Sphere(int posX, int posY, int posZ, float radius, int num_sectors, int num_stacks);
+	void InnerRender() const;
 public:
 	float radius;
+	int sectorCount, stackCount;
+	vec3 pos;
 };
 
 // ============================================
@@ -67,7 +72,7 @@ class Pyramid : public Primitive
 {
 public:
 	Pyramid();
-	Pyramid(float sizeX, float sizeY, float sizeZ, float posX, float posY, float posZ);
+	Pyramid(int posX, int posY, int posZ, int sizeX, int sizeY, int sizeZ);
 	void InnerRender() const;
 public:
 	vec3 size, pos;
@@ -78,11 +83,13 @@ class Cylinder : public Primitive
 {
 public:
 	Cylinder();
-	Cylinder(float radius, float height);
+	Cylinder(float posX, float posY, float posZ, float radius, float height, int num_sectors);
 	void InnerRender() const;
 public:
 	float radius;
 	float height;
+	int sectorCount;
+	vec3 pos;
 };
 
 // ============================================
