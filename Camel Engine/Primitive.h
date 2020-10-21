@@ -3,6 +3,8 @@
 #include "glmath.h"
 #include "Color.h"
 
+#include <vector>
+
 enum PrimitiveTypes
 {
 	Primitive_Point,
@@ -10,7 +12,6 @@ enum PrimitiveTypes
 	Primitive_Plane,
 	Primitive_Cube,
 	Primitive_Sphere,
-	Primitive_Triangle_pyramid,
 	Primitive_Pyramid,
 	Primitive_Cylinder
 };
@@ -23,21 +24,19 @@ public:
 
 	virtual void	Render() const;
 	virtual void	InnerRender() const;
-	void			SetPos(float x, float y, float z);
-	void			SetRotation(float angle, const vec3 &u);
-	void			Scale(float x, float y, float z);
 	PrimitiveTypes	GetType() const;
 
 public:
 	
 	Color color;
 	mat4x4 transform;
-	bool axis,wire;
+	bool axis;
 	uint id_for_buffer;
 	uint id_for_vertex;
 
 protected:
 	PrimitiveTypes type;
+	vec3 pos, sizes;
 };
 
 // ============================================
@@ -45,11 +44,8 @@ class Cube : public Primitive
 {
 public :
 	Cube();
-	Cube(float sizeX, float sizeY, float sizeZ, float posX, float posY, float posZ);
-	void InnerRender() const;
-	void Size(float x, float y, float z);
-public:
-	vec3 size, pos;
+	Cube(vec3 position, vec3 size);
+	void InnerRender(vec4 rotation) const;
 };
 
 // ============================================
@@ -57,9 +53,18 @@ class Sphere : public Primitive
 {
 public:
 	Sphere();
-	Sphere(float radius);
+	Sphere(vec3 position, float radius, int num_sectors, int num_stacks);
+	void InnerRender(vec4 rotation) const;
 public:
-	float radius;
+	float rad;
+	int sectorCount, stackCount;
+	std::vector<float> vertices;
+	std::vector<float> normals;
+	std::vector<float> texCoords;
+	std::vector<int> indices;
+
+	int numvertex;
+	int numindices;
 };
 
 // ============================================
@@ -67,10 +72,8 @@ class Pyramid : public Primitive
 {
 public:
 	Pyramid();
-	Pyramid(float sizeX, float sizeY, float sizeZ, float posX, float posY, float posZ);
-	void InnerRender() const;
-public:
-	vec3 size, pos;
+	Pyramid(vec3 position, vec3 size);
+	void InnerRender(vec4 rotation) const;
 };
 
 // ============================================
@@ -78,11 +81,18 @@ class Cylinder : public Primitive
 {
 public:
 	Cylinder();
-	Cylinder(float radius, float height);
-	void InnerRender() const;
+	Cylinder(vec3 position, float radius, float height, int num_sectors);
+	void InnerRender(vec4 rotation) const;
 public:
-	float radius;
+	float rad;
 	float height;
+	int sectorCount;
+
+	std::vector<float> vertices;
+	std::vector<int>	indices;
+
+	int numvertex;
+	int numindices;
 };
 
 // ============================================

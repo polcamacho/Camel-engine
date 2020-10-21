@@ -10,7 +10,6 @@ ModuleInput::ModuleInput(Application* app, bool start_enabled) : Module(app, sta
 	memset(keyboard, KEY_IDLE, sizeof(KEY_STATE) * MAX_KEYS);
 	memset(mouse_buttons, KEY_IDLE, sizeof(KEY_STATE) * MAX_MOUSE_BUTTONS);
 }
-
 // Destructor
 ModuleInput::~ModuleInput()
 {
@@ -29,6 +28,10 @@ bool ModuleInput::Init()
 		LOG("SDL_EVENTS could not initialize! SDL_Error: %s\n", SDL_GetError());
 		ret = false;
 	}
+
+	is_static = true;
+	is_moving_backward = false;
+	is_moving_forward = false;
 
 	return ret;
 }
@@ -92,6 +95,17 @@ update_status ModuleInput::PreUpdate(float dt)
 		{
 			case SDL_MOUSEWHEEL:
 			mouse_z = e.wheel.y;
+			if (mouse_z > 0) {
+				is_moving_forward = true;
+				is_static = false;
+			}
+			else if	(mouse_z < 0){
+				is_moving_backward = true;
+				is_static = false;
+			}
+			else {
+				is_static = true;
+			}
 			break;
 
 			case SDL_MOUSEMOTION:

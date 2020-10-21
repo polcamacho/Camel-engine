@@ -23,7 +23,11 @@ bool ModuleSceneIntro::Start()
 	App->camera->Move(vec3(1.0f, 1.0f, 0.0f));
 	App->camera->LookAt(vec3(0, 0, 0));
 
-	
+	// Creating primitives
+	c = new Cube({ 12,0,0 }, { 2,2,2 });
+	s = new Sphere({ 2,0,2 }, 1.0f, 10, 10);
+	pyr = new Pyramid({ 5,0,0 }, { 2,10,2 });
+	cyl = new Cylinder({ 5,0,0 }, 1.0f, 5.0f, 10);
 
 	return ret;
 }
@@ -32,8 +36,10 @@ bool ModuleSceneIntro::Start()
 bool ModuleSceneIntro::CleanUp()
 {
 	LOG("Unloading Intro scene");
-
-
+	delete c;
+	delete s;
+	delete pyr;
+	delete cyl;
 	return true;
 }
 
@@ -44,10 +50,13 @@ update_status ModuleSceneIntro::Update(float dt)
 	p.axis = true;
 	p.Render();
 
-	Cube c(1.5f, 1.5f, 1.5f, -2.0f, 0.0f, 2.0f);
-	c.InnerRender();
-	Pyramid pyr(2.0f, 2.0f, 2.0f, 0.0f, 0.0f, 1.0f);
-	pyr.InnerRender();
+	// Primitives render
+
+	c->InnerRender({ 1,1,0,45 });
+	pyr->InnerRender({ 0,0,0,45 });
+	s->InnerRender({ 0,0,0,0 });
+	cyl->InnerRender({ 0,0,0,270 });
+	//c->wire = true;
 
 	return UPDATE_CONTINUE;
 }

@@ -10,7 +10,7 @@
 class EngineUI : public Module
 {
 private:
-	bool is_fullscreen = false, is_resizable = true, is_borderless = false;
+	bool is_fullscreen, is_resizable, is_borderless, wireframe;
 	char name[30] = "Camel Engine";
 	char name2[30] = "UPC CITM";
 

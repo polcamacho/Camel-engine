@@ -6,7 +6,7 @@
 #include "Primitive.h"
 
 // ------------------------------------------------------------
-Primitive::Primitive() : transform(IdentityMatrix), color(White), wire(false), axis(false), type(PrimitiveTypes::Primitive_Point)
+Primitive::Primitive() : transform(IdentityMatrix), color(White), axis(false), type(PrimitiveTypes::Primitive_Point)
 {
 	id_for_buffer = 0;
 	id_for_vertex = 0;
@@ -57,10 +57,10 @@ void Primitive::Render() const
 
 	glColor3f(color.r, color.g, color.b);
 
-	if(wire)
+	/*if(wire)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	else
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);*/
 
 	InnerRender();
 
@@ -81,96 +81,38 @@ void Primitive::InnerRender() const
 	glPointSize(1.0f);
 }
 
-// ------------------------------------------------------------
-void Primitive::SetPos(float x, float y, float z)
-{
-	transform.translate(x, y, z);
-}
-
-// ------------------------------------------------------------
-void Primitive::SetRotation(float angle, const vec3 &u)
-{
-	transform.rotate(angle, u);
-}
-
-// ------------------------------------------------------------
-void Primitive::Scale(float x, float y, float z)
-{
-	transform.scale(x, y, z);
-}
-
 // CUBE ============================================
 Cube::Cube() :Primitive()
 {
 	type = PrimitiveTypes::Primitive_Cube;
 }
 
-Cube::Cube(float sizeX, float sizeY, float sizeZ, float posX, float posY, float posZ) : Primitive(), size(sizeX, sizeY, sizeZ), pos(posX, posY, posZ)
+Cube::Cube(vec3 position, vec3 size) : Primitive()
 {
 	type = PrimitiveTypes::Primitive_Cube;
-}
-
-
-void Cube::InnerRender() const
-{	
-	/*float sx = size.x * 0.5f;
-	float sy = size.y * 0.5f;
-	float sz = size.z * 0.5f;
-
-	glBegin(GL_QUADS);
-
-	glNormal3f(0.0f, 0.0f, 1.0f);
-	glVertex3f(-sx, -sy, sz);
-	glVertex3f( sx, -sy, sz);
-	glVertex3f( sx,  sy, sz);
-	glVertex3f(-sx,  sy, sz);
-
-	glNormal3f(0.0f, 0.0f, -1.0f);
-	glVertex3f( sx, -sy, -sz);
-	glVertex3f(-sx, -sy, -sz);
-	glVertex3f(-sx,  sy, -sz);
-	glVertex3f( sx,  sy, -sz);
-
-	glNormal3f(1.0f, 0.0f, 0.0f);
-	glVertex3f(sx, -sy,  sz);
-	glVertex3f(sx, -sy, -sz);
-	glVertex3f(sx,  sy, -sz);
-	glVertex3f(sx,  sy,  sz);
-
-	glNormal3f(-1.0f, 0.0f, 0.0f);
-	glVertex3f(-sx, -sy, -sz);
-	glVertex3f(-sx, -sy,  sz);
-	glVertex3f(-sx,  sy,  sz);
-	glVertex3f(-sx,  sy, -sz);
-
-	glNormal3f(0.0f, 1.0f, 0.0f);
-	glVertex3f(-sx, sy,  sz);
-	glVertex3f( sx, sy,  sz);
-	glVertex3f( sx, sy, -sz);
-	glVertex3f(-sx, sy, -sz);
-
-	glNormal3f(0.0f, -1.0f, 0.0f);
-	glVertex3f(-sx, -sy, -sz);
-	glVertex3f( sx, -sy, -sz);
-	glVertex3f( sx, -sy,  sz);
-	glVertex3f(-sx, -sy,  sz);
-
-	glEnd();*/
 	
+	pos.x = position.x;
+	pos.y = position.y;
+	pos.z = position.z;
+
+	sizes.x = size.x;
+	sizes.y = size.y;
+	sizes.z = size.z;
+
 	float vertex[24]{
 
-			(size.x * 0.0f) + pos.x, (size.y * 0.0f) + pos.y, (size.z * 0.0f) + pos.z,
-			(size.x * 0.0f) + pos.x, (size.y * 0.0f) + pos.y, (size.z * 1.0f) + pos.z,
-			(size.x * 0.0f) + pos.x, (size.y * 1.0f) + pos.y, (size.z * 1.0f) + pos.z,
-			(size.x * 0.0f) + pos.x, (size.y * 1.0f) + pos.y, (size.z * 0.0f) + pos.z,
-			(size.x * 1.0f) + pos.x, (size.y * 0.0f) + pos.y, (size.z * 0.0f) + pos.z,
-			(size.x * 1.0f) + pos.x, (size.y * 0.0f) + pos.y, (size.z * 1.0f) + pos.z,
-			(size.x * 1.0f) + pos.x, (size.y * 1.0f) + pos.y, (size.z * 0.0f) + pos.z,
-			(size.x * 1.0f) + pos.x, (size.y * 1.0f) + pos.y, (size.z * 1.0f) + pos.z,
-	};																				
+			(sizes.x * 0.0f) + pos.x, (sizes.y * 0.0f) + pos.y, (sizes.z * 0.0f) + pos.z,
+			(sizes.x * 0.0f) + pos.x, (sizes.y * 0.0f) + pos.y, (sizes.z * 1.0f) + pos.z,
+			(sizes.x * 0.0f) + pos.x, (sizes.y * 1.0f) + pos.y, (sizes.z * 1.0f) + pos.z,
+			(sizes.x * 0.0f) + pos.x, (sizes.y * 1.0f) + pos.y, (sizes.z * 0.0f) + pos.z,
+			(sizes.x * 1.0f) + pos.x, (sizes.y * 0.0f) + pos.y, (sizes.z * 0.0f) + pos.z,
+			(sizes.x * 1.0f) + pos.x, (sizes.y * 0.0f) + pos.y, (sizes.z * 1.0f) + pos.z,
+			(sizes.x * 1.0f) + pos.x, (sizes.y * 1.0f) + pos.y, (sizes.z * 0.0f) + pos.z,
+			(sizes.x * 1.0f) + pos.x, (sizes.y * 1.0f) + pos.y, (sizes.z * 1.0f) + pos.z,
+	};
 
 	int indices[36]{
-		
+
 		//front
 		0, 1, 2,
 		2, 3, 0,
@@ -203,34 +145,152 @@ void Cube::InnerRender() const
 	glGenBuffers(1, (GLuint*)&(id_for_buffer));
 	glBindBuffer(GL_ARRAY_BUFFER, id_for_buffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(int) * 36, indices, GL_STATIC_DRAW);
+}
 
+
+void Cube::InnerRender(vec4 rotation) const
+{	
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glBindBuffer(GL_ARRAY_BUFFER, id_for_vertex);
 	glVertexPointer(3, GL_FLOAT, 0, NULL);
-
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id_for_buffer);
 	glColor4f(0.0f, 1.0f, 1.0f, 1.0f);
+	//glRotatef(rotation.w, rotation.x, rotation.y, rotation.z);
 	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, NULL);
 	glDisableClientState(GL_VERTEX_ARRAY);
-
-}
-
-void Cube::Size(float x, float y, float z)
-{
-	size.x = x;
-	size.y = y;
-	size.z = z;
 }
 
 // SPHERE ============================================
-Sphere::Sphere() : Primitive(), radius(1.0f)
+Sphere::Sphere() : Primitive()
 {
 	type = PrimitiveTypes::Primitive_Sphere;
 }
 
-Sphere::Sphere(float radius) : Primitive(), radius(radius)
+Sphere::Sphere(vec3 position, float radius, int num_sectors, int num_stacks) : Primitive(), rad(radius), sectorCount (num_sectors), stackCount (num_stacks)
 {
+	pos.x = position.x;
+	pos.y = position.y;
+	pos.z = position.z;
+
+	sectorCount = num_sectors;
+	stackCount = num_stacks;
+	rad = radius;
+
 	type = PrimitiveTypes::Primitive_Sphere;
+	// CREATING VERTICES =============================================
+
+	std::vector<float>().swap(vertices);
+	std::vector<float>().swap(normals);
+	std::vector<float>().swap(texCoords);
+	float x, y, z, xy;                              // vertex position
+	float nx, ny, nz, lengthInv = 1.0f / rad;    // vertex normal
+	float s, t;                                     // vertex texCoord
+
+	float sectorStep = 2 * PI / sectorCount;
+	float stackStep = PI / stackCount;
+	float sectorAngle, stackAngle;
+
+	for (int i = 0; i <= stackCount; ++i)
+	{
+		stackAngle = PI / 2 - (i * stackStep);        // starting from pi/2 to -pi/2
+		xy = rad * cosf(stackAngle);             // r * cos(u)
+		z = rad * sinf(stackAngle);              // r * sin(u)
+
+		// add (sectorCount+1) vertices per stack
+		// the first and last vertices have same position and normal, but different tex coords
+		for (int j = 0; j <= sectorCount; ++j)
+		{
+			sectorAngle = j * sectorStep;           // starting from 0 to 2pi
+
+			// vertex position (x, y, z)
+			x = xy * cosf(sectorAngle);             // r * cos(u) * cos(v)
+			y = xy * sinf(sectorAngle);             // r * cos(u) * sin(v)
+			vertices.push_back(x + pos.x);
+			vertices.push_back(y + pos.y);
+			vertices.push_back(z + pos.z);
+
+			// normalized vertex normal (nx, ny, nz)
+			nx = x * lengthInv;
+			ny = y * lengthInv;
+			nz = z * lengthInv;
+			normals.push_back(nx);
+			normals.push_back(ny);
+			normals.push_back(nz);
+
+			// vertex tex coord (s, t) range between [0, 1]
+			s = (float)j / sectorCount;
+			t = (float)i / stackCount;
+			texCoords.push_back(s);
+			texCoords.push_back(t);
+		}
+	}
+
+	// CREATING INDICES =============================================
+
+	int k1, k2;
+	for (int i = 0; i < stackCount; ++i)
+	{
+		k1 = i * (sectorCount + 1);     // beginning of current stack
+		k2 = k1 + sectorCount + 1;      // beginning of next stack
+
+		for (int j = 0; j < sectorCount; ++j, ++k1, ++k2)
+		{
+			// 2 triangles per sector excluding first and last stacks
+			// k1 => k2 => k1+1
+			if (i != 0)
+			{
+				indices.push_back(k1);
+				indices.push_back(k2);
+				indices.push_back(k1 + 1);
+			}
+
+			// k1+1 => k2 => k2+1
+			if (i != (stackCount - 1))
+			{
+				indices.push_back(k1 + 1);
+				indices.push_back(k2);
+				indices.push_back(k2 + 1);
+			}
+		}
+	}
+
+	// Transform indices and vertices to float,
+	// so that buffers can manage them
+
+	numvertex = vertices.size();
+	float* new_vertices = new float[numvertex];
+	numindices = indices.size();
+	int* new_indices = new int[numindices];
+
+	for (size_t i = 0; i < numvertex; i++)
+	{
+		new_vertices[i] = vertices[i];
+	}
+
+	for (size_t i = 0; i < numindices; i++)
+	{
+		new_indices[i] = indices[i];
+	}
+
+	glGenBuffers(1, (GLuint*)&(id_for_vertex));
+	glBindBuffer(GL_ARRAY_BUFFER, id_for_vertex);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * numvertex, new_vertices, GL_STATIC_DRAW);
+
+	glGenBuffers(1, (GLuint*)&(id_for_buffer));
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id_for_buffer);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * numindices, new_indices, GL_STATIC_DRAW);
+}
+
+void Sphere::InnerRender(vec4 rotation) const
+{
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glBindBuffer(GL_ARRAY_BUFFER, id_for_vertex);
+	glVertexPointer(3, GL_FLOAT, 0, NULL);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id_for_buffer);
+	glColor4f(0.0f, 1.0f, 0.0f, 1.0f);
+	//glRotatef(rotation.w, rotation.x, rotation.y, rotation.z);
+	glDrawElements(GL_TRIANGLES, numindices, GL_UNSIGNED_INT, NULL);
+	glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 // PYRAMID ==================================
@@ -240,38 +300,42 @@ Pyramid::Pyramid(): Primitive()
 	type = Primitive_Pyramid;
 }
 
-Pyramid::Pyramid(float sizeX, float sizeY, float sizeZ, float posX, float posY, float posZ) :Primitive(), size(sizeX, sizeY, sizeZ), pos(posX, posY, posZ)
+Pyramid::Pyramid(vec3 position, vec3 size) :Primitive()
 {
 	type = Primitive_Pyramid;
-}
+	sizes.x = size.x;
+	sizes.y = size.y;
+	sizes.z = size.z;
 
-void Pyramid::InnerRender() const 
-{
+	pos.x = position.x;
+	pos.y = position.y;
+	pos.z = position.z;
+
 	float vertex2[15]{
-		
+
 		// base
-		(size.x * 0.0f) + pos.x, (size.y * 0.0f) + pos.y, (size.z * 0.0f) + pos.z,
-		(size.x * 1.0f) + pos.x, (size.y * 0.0f) + pos.y, (size.z * 0.0f) + pos.z,
-		(size.x * 0.0f) + pos.x, (size.y * 0.0f) + pos.y, (size.z * -1.0f) + pos.z,
-		(size.x * 1.0f) + pos.x, (size.y * 0.0f) + pos.y, (size.z * -1.0f) + pos.z,
+		(sizes.x * 0.0f) + pos.x, (sizes.y * 0.0f) + pos.y, (sizes.z * 0.0f) + pos.z,
+		(sizes.x * 1.0f) + pos.x, (sizes.y * 0.0f) + pos.y, (sizes.z * 0.0f) + pos.z,
+		(sizes.x * 0.0f) + pos.x, (sizes.y * 0.0f) + pos.y, (sizes.z * -1.0f) + pos.z,
+		(sizes.x * 1.0f) + pos.x, (sizes.y * 0.0f) + pos.y, (sizes.z * -1.0f) + pos.z,
 
 		// up vertex
-		(size.x * 0.5f) + pos.x, (size.y * 1.0f) + pos.y, (size.z * -0.5f) + pos.z,
+		(sizes.x * 0.5f) + pos.x, (sizes.y * 1.0f) + pos.y, (sizes.z * -0.5f) + pos.z,
 	};
 
 	uint indices2[18]{
 
 		//Front
-		0,1,4, 
+		0,1,4,
 
 		//Right
-		2,0,4, 
+		2,0,4,
 
 		//Left
-		1,3,4, 
+		1,3,4,
 
 		//Back
-		3,2,4, 
+		3,2,4,
 
 		//Down
 		0,3,1,
@@ -284,63 +348,192 @@ void Pyramid::InnerRender() const
 	glGenBuffers(1, (GLuint*)&(id_for_buffer));
 	glBindBuffer(GL_ARRAY_BUFFER, id_for_buffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(int) * 36, indices2, GL_STATIC_DRAW);
+}
 
+void Pyramid::InnerRender(vec4 rotation) const
+{
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glBindBuffer(GL_ARRAY_BUFFER, id_for_vertex);
 	glVertexPointer(3, GL_FLOAT, 0, NULL);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id_for_buffer);
 	glColor4f(1.0f, 0.0f, 1.0f, 1.0f);
+	//glRotatef(rotation.w, rotation.x, rotation.y, rotation.z);
 	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, NULL);
 	glDisableClientState(GL_VERTEX_ARRAY);
 
 }
 
 // CYLINDER ============================================
-Cylinder::Cylinder() : Primitive(), radius(1.0f), height(1.0f)
+Cylinder::Cylinder() : Primitive()
 {
 	type = PrimitiveTypes::Primitive_Cylinder;
 }
 
-Cylinder::Cylinder(float radius, float height) : Primitive(), radius(radius), height(height)
+Cylinder::Cylinder(vec3 position, float radius, float height, int num_sectors) : Primitive(), rad(radius), height(height), sectorCount(num_sectors)
 {
 	type = PrimitiveTypes::Primitive_Cylinder;
-}
 
-void Cylinder::InnerRender() const
-{
-	int n = 30;
+	pos.x = position.x;
+	pos.y = position.y;
+	pos.z = position.z;
 
-	// Cylinder Bottom
-	glBegin(GL_POLYGON);
+	// GENERATE CIRCLE FROM XY PLANE
 	
-	for(int i = 360; i >= 0; i -= (360 / n))
-	{
-		float a = i * M_PI / 180; // degrees to radians
-		glVertex3f(-height*0.5f, radius * cos(a), radius * sin(a));
-	}
-	glEnd();
+	float sectorStep = 2 * PI / sectorCount;
+	float sectorAngle;  // radian
 
-	// Cylinder Top
-	glBegin(GL_POLYGON);
-	glNormal3f(0.0f, 0.0f, 1.0f);
-	for(int i = 0; i <= 360; i += (360 / n))
+	std::vector<float> unitCircleVertices;
+	for (int i = 0; i <= sectorCount; ++i)
 	{
-		float a = i * M_PI / 180; // degrees to radians
-		glVertex3f(height * 0.5f, radius * cos(a), radius * sin(a));
+		sectorAngle = i * sectorStep;
+		unitCircleVertices.push_back(cos(sectorAngle)); // x
+		unitCircleVertices.push_back(sin(sectorAngle)); // y
+		unitCircleVertices.push_back(0);                // z
 	}
-	glEnd();
 
-	// Cylinder "Cover"
-	glBegin(GL_QUAD_STRIP);
-	for(int i = 0; i < 480; i += (360 / n))
+	// clear memory of prev arrays
+	std::vector<float>().swap(vertices);
+
+	// get unit circle vectors on XY-plane
+	std::vector<float> unitVertices = unitCircleVertices;
+
+	// put side vertices to arrays
+	for (int i = 0; i < 2; ++i)
 	{
-		float a = i * M_PI / 180; // degrees to radians
+		float h = -height / 2.0f + i * height;           // z value; -h/2 to h/2
+		float t = 1.0f - i;                              // vertical tex coord; 1 to 0
 
-		glVertex3f(height*0.5f,  radius * cos(a), radius * sin(a) );
-		glVertex3f(-height*0.5f, radius * cos(a), radius * sin(a) );
+		for (int j = 0, k = 0; j <= sectorCount; ++j, k += 3)
+		{
+			float ux = unitVertices[k];
+			float uy = unitVertices[k + 1];
+			float uz = unitVertices[k + 2];
+			// position vector
+			vertices.push_back((ux * rad)+pos.x);             // vx
+			vertices.push_back((uy * rad)+pos.y);             // vy
+			vertices.push_back(h + pos.z);                       // vz
+
+		}
 	}
-	glEnd();
+
+	// the starting index for the base/top surface
+	//NOTE: it is used for generating indices later
+	int baseCenterIndex = (int)vertices.size() / 3;
+	int topCenterIndex = baseCenterIndex + sectorCount + 1; // include center vertex
+
+	// put base and top vertices to arrays
+	for (int i = 0; i < 2; ++i)
+	{
+		float h = -height / 2.0f + i * height;           // z value; -h/2 to h/2
+		float nz = -1 + i * 2;                           // z value of normal; -1 to 1
+
+		// center point
+		vertices.push_back(0 + pos.x);     vertices.push_back(0 + pos.y);     vertices.push_back(h + pos.z);
+
+
+		for (int j = 0, k = 0; j < sectorCount; ++j, k += 3)
+		{
+			float ux = unitVertices[k];
+			float uy = unitVertices[k + 1];
+			// position vector
+			vertices.push_back((ux * rad) + pos.x);             // vx
+			vertices.push_back((uy * rad) + pos.y);             // vy
+			vertices.push_back(h + pos.z);                       // vz
+
+		}
+	}
+
+	int k1 = 0;                         // 1st vertex index at base
+	int k2 = sectorCount + 1;           // 1st vertex index at top
+
+	// indices for the side surface
+	for (int i = 0; i < sectorCount; ++i, ++k1, ++k2)
+	{
+		// 2 triangles per sector
+		// k1 => k1+1 => k2
+		indices.push_back(k1);
+		indices.push_back(k1 + 1);
+		indices.push_back(k2);
+
+		// k2 => k1+1 => k2+1
+		indices.push_back(k2);
+		indices.push_back(k1 + 1);
+		indices.push_back(k2 + 1);
+	}
+
+	// indices for the base surface
+	//NOTE: baseCenterIndex and topCenterIndices are pre-computed during vertex generation
+	//      please see the previous code snippet
+	for (int i = 0, k = baseCenterIndex + 1; i < sectorCount; ++i, ++k)
+	{
+		if (i < sectorCount - 1)
+		{
+			indices.push_back(baseCenterIndex);
+			indices.push_back(k + 1);
+			indices.push_back(k);
+		}
+		else // last triangle
+		{
+			indices.push_back(baseCenterIndex);
+			indices.push_back(baseCenterIndex + 1);
+			indices.push_back(k);
+		}
+	}
+
+	// indices for the top surface
+	for (int i = 0, k = topCenterIndex + 1; i < sectorCount; ++i, ++k)
+	{
+		if (i < sectorCount - 1)
+		{
+			indices.push_back(topCenterIndex);
+			indices.push_back(k);
+			indices.push_back(k + 1);
+		}
+		else // last triangle
+		{
+			indices.push_back(topCenterIndex);
+			indices.push_back(k);
+			indices.push_back(topCenterIndex + 1);
+		}
+	}
+
+	numvertex = vertices.size();
+	float* new_vertices = new float[numvertex];
+	numindices = indices.size();
+	int* new_indices = new int[numindices];
+
+	for (size_t i = 0; i < numvertex; i++)
+	{
+		new_vertices[i] = vertices[i];
+	}
+
+	for (size_t i = 0; i < numindices; i++)
+	{
+		new_indices[i] = indices[i];
+	}
+
+
+	glGenBuffers(1, (GLuint*)&(id_for_vertex));
+	glBindBuffer(GL_ARRAY_BUFFER, id_for_vertex);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * numvertex, new_vertices, GL_STATIC_DRAW);
+
+	glGenBuffers(1, (GLuint*)&(id_for_buffer));
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id_for_buffer);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * numindices, new_indices, GL_STATIC_DRAW);
+}
+
+void Cylinder::InnerRender(vec4 rotation) const
+{
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glBindBuffer(GL_ARRAY_BUFFER, id_for_vertex);
+	glVertexPointer(3, GL_FLOAT, 0, NULL);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id_for_buffer);
+	glColor4f(1.0f, 1.0f, 0.0f, 1.0f);
+	//glRotatef(270.0f, 1.0f, 0.0f, 0.0f);
+	glTranslatef(pos.x, pos.y, pos.z);
+	glDrawElements(GL_TRIANGLES, numindices, GL_UNSIGNED_INT, NULL);
+	glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 // LINE ==================================================
