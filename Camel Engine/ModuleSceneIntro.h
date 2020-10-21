@@ -14,5 +14,6 @@ public:
 	bool CleanUp();
 
 public:
-
+	Cube* c;
+	Sphere* s;
 };

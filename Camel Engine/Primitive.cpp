@@ -105,28 +105,32 @@ Cube::Cube() :Primitive()
 	type = PrimitiveTypes::Primitive_Cube;
 }
 
-Cube::Cube(int posX, int posY, int posZ, int sizeX, int sizeY, int sizeZ) : Primitive(), pos(posX, posY, posZ), size(sizeX, sizeY, sizeZ)
+Cube::Cube(vec3 position, vec3 size) : Primitive()
 {
 	type = PrimitiveTypes::Primitive_Cube;
-}
+	
+	pos.x = position.x;
+	pos.y = position.y;
+	pos.z = position.z;
 
+	sizes.x = size.x;
+	sizes.y = size.y;
+	sizes.z = size.z;
 
-void Cube::InnerRender() const
-{	
 	float vertex[24]{
 
-			(size.x * 0.0f) + pos.x, (size.y * 0.0f) + pos.y, (size.z * 0.0f) + pos.z,
-			(size.x * 0.0f) + pos.x, (size.y * 0.0f) + pos.y, (size.z * 1.0f) + pos.z,
-			(size.x * 0.0f) + pos.x, (size.y * 1.0f) + pos.y, (size.z * 1.0f) + pos.z,
-			(size.x * 0.0f) + pos.x, (size.y * 1.0f) + pos.y, (size.z * 0.0f) + pos.z,
-			(size.x * 1.0f) + pos.x, (size.y * 0.0f) + pos.y, (size.z * 0.0f) + pos.z,
-			(size.x * 1.0f) + pos.x, (size.y * 0.0f) + pos.y, (size.z * 1.0f) + pos.z,
-			(size.x * 1.0f) + pos.x, (size.y * 1.0f) + pos.y, (size.z * 0.0f) + pos.z,
-			(size.x * 1.0f) + pos.x, (size.y * 1.0f) + pos.y, (size.z * 1.0f) + pos.z,
-	};																				
+			(sizes.x * 0.0f) + pos.x, (sizes.y * 0.0f) + pos.y, (sizes.z * 0.0f) + pos.z,
+			(sizes.x * 0.0f) + pos.x, (sizes.y * 0.0f) + pos.y, (sizes.z * 1.0f) + pos.z,
+			(sizes.x * 0.0f) + pos.x, (sizes.y * 1.0f) + pos.y, (sizes.z * 1.0f) + pos.z,
+			(sizes.x * 0.0f) + pos.x, (sizes.y * 1.0f) + pos.y, (sizes.z * 0.0f) + pos.z,
+			(sizes.x * 1.0f) + pos.x, (sizes.y * 0.0f) + pos.y, (sizes.z * 0.0f) + pos.z,
+			(sizes.x * 1.0f) + pos.x, (sizes.y * 0.0f) + pos.y, (sizes.z * 1.0f) + pos.z,
+			(sizes.x * 1.0f) + pos.x, (sizes.y * 1.0f) + pos.y, (sizes.z * 0.0f) + pos.z,
+			(sizes.x * 1.0f) + pos.x, (sizes.y * 1.0f) + pos.y, (sizes.z * 1.0f) + pos.z,
+	};
 
 	int indices[36]{
-		
+
 		//front
 		0, 1, 2,
 		2, 3, 0,
@@ -159,23 +163,19 @@ void Cube::InnerRender() const
 	glGenBuffers(1, (GLuint*)&(id_for_buffer));
 	glBindBuffer(GL_ARRAY_BUFFER, id_for_buffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(int) * 36, indices, GL_STATIC_DRAW);
+}
 
+
+void Cube::InnerRender(vec4 rotation) const
+{	
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glBindBuffer(GL_ARRAY_BUFFER, id_for_vertex);
 	glVertexPointer(3, GL_FLOAT, 0, NULL);
-
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id_for_buffer);
 	glColor4f(0.0f, 1.0f, 1.0f, 1.0f);
+	//glRotatef(rotation.w, rotation.x, rotation.y, rotation.z);
 	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, NULL);
 	glDisableClientState(GL_VERTEX_ARRAY);
-
-}
-
-void Cube::Size(float x, float y, float z)
-{
-	size.x = x;
-	size.y = y;
-	size.z = z;
 }
 
 // SPHERE ============================================
@@ -184,23 +184,24 @@ Sphere::Sphere() : Primitive()
 	type = PrimitiveTypes::Primitive_Sphere;
 }
 
-Sphere::Sphere(int posX, int posY, int posZ, float radius, int num_sectors, int num_stacks) : Primitive(), pos(posX, posY, posZ), radius(radius), sectorCount (num_sectors), stackCount (num_stacks)
+Sphere::Sphere(vec3 position, float radius, int num_sectors, int num_stacks) : Primitive(), rad(radius), sectorCount (num_sectors), stackCount (num_stacks)
 {
-	type = PrimitiveTypes::Primitive_Sphere;
-}
+	pos.x = position.x;
+	pos.y = position.y;
+	pos.z = position.z;
 
-void Sphere::InnerRender() const
-{
+	sectorCount = num_sectors;
+	stackCount = num_stacks;
+	rad = radius;
+
+	type = PrimitiveTypes::Primitive_Sphere;
 	// CREATING VERTICES =============================================
 
-	std::vector<float> vertices;
-	std::vector<float> normals;
-	std::vector<float> texCoords;
 	std::vector<float>().swap(vertices);
 	std::vector<float>().swap(normals);
 	std::vector<float>().swap(texCoords);
 	float x, y, z, xy;                              // vertex position
-	float nx, ny, nz, lengthInv = 1.0f / radius;    // vertex normal
+	float nx, ny, nz, lengthInv = 1.0f / rad;    // vertex normal
 	float s, t;                                     // vertex texCoord
 
 	float sectorStep = 2 * PI / sectorCount;
@@ -210,8 +211,8 @@ void Sphere::InnerRender() const
 	for (int i = 0; i <= stackCount; ++i)
 	{
 		stackAngle = PI / 2 - (i * stackStep);        // starting from pi/2 to -pi/2
-		xy = radius * cosf(stackAngle);             // r * cos(u)
-		z = radius * sinf(stackAngle);              // r * sin(u)
+		xy = rad * cosf(stackAngle);             // r * cos(u)
+		z = rad * sinf(stackAngle);              // r * sin(u)
 
 		// add (sectorCount+1) vertices per stack
 		// the first and last vertices have same position and normal, but different tex coords
@@ -222,9 +223,9 @@ void Sphere::InnerRender() const
 			// vertex position (x, y, z)
 			x = xy * cosf(sectorAngle);             // r * cos(u) * cos(v)
 			y = xy * sinf(sectorAngle);             // r * cos(u) * sin(v)
-			vertices.push_back(x);
-			vertices.push_back(y);
-			vertices.push_back(z);
+			vertices.push_back(x + pos.x);
+			vertices.push_back(y + pos.y);
+			vertices.push_back(z + pos.z);
 
 			// normalized vertex normal (nx, ny, nz)
 			nx = x * lengthInv;
@@ -244,7 +245,6 @@ void Sphere::InnerRender() const
 
 	// CREATING INDICES =============================================
 
-	std::vector<int> indices;
 	int k1, k2;
 	for (int i = 0; i < stackCount; ++i)
 	{
@@ -275,9 +275,9 @@ void Sphere::InnerRender() const
 	// Transform indices and vertices to float,
 	// so that buffers can manage them
 
-	int numvertex = vertices.size();
-	float *new_vertices = new float[numvertex];
-	int numindices = indices.size();
+	numvertex = vertices.size();
+	float* new_vertices = new float[numvertex];
+	numindices = indices.size();
 	int* new_indices = new int[numindices];
 
 	for (size_t i = 0; i < numvertex; i++)
@@ -289,7 +289,7 @@ void Sphere::InnerRender() const
 	{
 		new_indices[i] = indices[i];
 	}
-	
+
 	glGenBuffers(1, (GLuint*)&(id_for_vertex));
 	glBindBuffer(GL_ARRAY_BUFFER, id_for_vertex);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * numvertex, new_vertices, GL_STATIC_DRAW);
@@ -297,14 +297,16 @@ void Sphere::InnerRender() const
 	glGenBuffers(1, (GLuint*)&(id_for_buffer));
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id_for_buffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * numindices, new_indices, GL_STATIC_DRAW);
+}
 
+void Sphere::InnerRender(vec4 rotation) const
+{
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glBindBuffer(GL_ARRAY_BUFFER, id_for_vertex);
 	glVertexPointer(3, GL_FLOAT, 0, NULL);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id_for_buffer);
 	glColor4f(0.0f, 1.0f, 0.0f, 1.0f);
-
-	glTranslatef(pos.x, pos.y, pos.z);
+	//glRotatef(rotation.w, rotation.x, rotation.y, rotation.z);
 	glDrawElements(GL_TRIANGLES, numindices, GL_UNSIGNED_INT, NULL);
 	glDisableClientState(GL_VERTEX_ARRAY);
 }

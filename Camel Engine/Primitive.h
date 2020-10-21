@@ -40,6 +40,7 @@ public:
 
 protected:
 	PrimitiveTypes type;
+	vec3 pos, sizes;
 };
 
 // ============================================
@@ -47,11 +48,8 @@ class Cube : public Primitive
 {
 public :
 	Cube();
-	Cube(int posX, int posY, int posZ, int sizeX, int sizeY, int sizeZ);
-	void InnerRender() const;
-	void Size(float x, float y, float z);
-public:
-	vec3 size, pos;
+	Cube(vec3 position, vec3 size);
+	void InnerRender(vec4 rotation) const;
 };
 
 // ============================================
@@ -59,12 +57,18 @@ class Sphere : public Primitive
 {
 public:
 	Sphere();
-	Sphere(int posX, int posY, int posZ, float radius, int num_sectors, int num_stacks);
-	void InnerRender() const;
+	Sphere(vec3 position, float radius, int num_sectors, int num_stacks);
+	void InnerRender(vec4 rotation) const;
 public:
-	float radius;
+	float rad;
 	int sectorCount, stackCount;
-	vec3 pos;
+	std::vector<float> vertices;
+	std::vector<float> normals;
+	std::vector<float> texCoords;
+	std::vector<int> indices;
+
+	int numvertex;
+	int numindices;
 };
 
 // ============================================
