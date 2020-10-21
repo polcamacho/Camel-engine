@@ -6,7 +6,7 @@
 #include "Primitive.h"
 
 // ------------------------------------------------------------
-Primitive::Primitive() : transform(IdentityMatrix), color(White), wire(false), axis(false), type(PrimitiveTypes::Primitive_Point)
+Primitive::Primitive() : transform(IdentityMatrix), color(White), axis(false), type(PrimitiveTypes::Primitive_Point)
 {
 	id_for_buffer = 0;
 	id_for_vertex = 0;
@@ -57,10 +57,10 @@ void Primitive::Render() const
 
 	glColor3f(color.r, color.g, color.b);
 
-	if(wire)
+	/*if(wire)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	else
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);*/
 
 	InnerRender();
 

@@ -30,7 +30,7 @@ public:
 	
 	Color color;
 	mat4x4 transform;
-	bool axis,wire;
+	bool axis;
 	uint id_for_buffer;
 	uint id_for_vertex;
 

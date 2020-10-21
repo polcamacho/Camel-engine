@@ -10,6 +10,7 @@
 EngineUI::EngineUI(Application* app, bool start_enabled) : Module(app, start_enabled) {
 	width = SCREEN_WIDTH;
 	height = SCREEN_HEIGHT;
+	is_fullscreen = false, is_resizable = true, is_borderless = false, wireframe = false;
 }
 
 EngineUI::~EngineUI() {}
@@ -113,6 +114,20 @@ void EngineUI::MainMenu()
 			HardwareDisplay();
 			ImGui::TreePop();
 		}
+
+		if (ImGui::TreeNode("Object options")) {
+
+			if (ImGui::Checkbox("Wireframe", &wireframe)) {
+				if (wireframe) {
+					glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+				}
+				else {
+					glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+				}
+			}
+			ImGui::TreePop();
+		}
+		//
 	}
 	ImGui::End();
 	if (ImGui::BeginMainMenuBar())
