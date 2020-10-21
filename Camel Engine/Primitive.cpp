@@ -81,24 +81,6 @@ void Primitive::InnerRender() const
 	glPointSize(1.0f);
 }
 
-// ------------------------------------------------------------
-void Primitive::SetPos(float x, float y, float z)
-{
-	transform.translate(x, y, z);
-}
-
-// ------------------------------------------------------------
-void Primitive::SetRotation(float angle, const vec3 &u)
-{
-	transform.rotate(angle, u);
-}
-
-// ------------------------------------------------------------
-void Primitive::Scale(float x, float y, float z)
-{
-	transform.scale(x, y, z);
-}
-
 // CUBE ============================================
 Cube::Cube() :Primitive()
 {
@@ -318,38 +300,42 @@ Pyramid::Pyramid(): Primitive()
 	type = Primitive_Pyramid;
 }
 
-Pyramid::Pyramid(int posX, int posY, int posZ, int sizeX, int sizeY, int sizeZ) :Primitive(), pos(posX, posY, posZ), size(sizeX, sizeY, sizeZ)
+Pyramid::Pyramid(vec3 position, vec3 size) :Primitive()
 {
 	type = Primitive_Pyramid;
-}
+	sizes.x = size.x;
+	sizes.y = size.y;
+	sizes.z = size.z;
 
-void Pyramid::InnerRender() const 
-{
+	pos.x = position.x;
+	pos.y = position.y;
+	pos.z = position.z;
+
 	float vertex2[15]{
-		
+
 		// base
-		(size.x * 0.0f) + pos.x, (size.y * 0.0f) + pos.y, (size.z * 0.0f) + pos.z,
-		(size.x * 1.0f) + pos.x, (size.y * 0.0f) + pos.y, (size.z * 0.0f) + pos.z,
-		(size.x * 0.0f) + pos.x, (size.y * 0.0f) + pos.y, (size.z * -1.0f) + pos.z,
-		(size.x * 1.0f) + pos.x, (size.y * 0.0f) + pos.y, (size.z * -1.0f) + pos.z,
+		(sizes.x * 0.0f) + pos.x, (sizes.y * 0.0f) + pos.y, (sizes.z * 0.0f) + pos.z,
+		(sizes.x * 1.0f) + pos.x, (sizes.y * 0.0f) + pos.y, (sizes.z * 0.0f) + pos.z,
+		(sizes.x * 0.0f) + pos.x, (sizes.y * 0.0f) + pos.y, (sizes.z * -1.0f) + pos.z,
+		(sizes.x * 1.0f) + pos.x, (sizes.y * 0.0f) + pos.y, (sizes.z * -1.0f) + pos.z,
 
 		// up vertex
-		(size.x * 0.5f) + pos.x, (size.y * 1.0f) + pos.y, (size.z * -0.5f) + pos.z,
+		(sizes.x * 0.5f) + pos.x, (sizes.y * 1.0f) + pos.y, (sizes.z * -0.5f) + pos.z,
 	};
 
 	uint indices2[18]{
 
 		//Front
-		0,1,4, 
+		0,1,4,
 
 		//Right
-		2,0,4, 
+		2,0,4,
 
 		//Left
-		1,3,4, 
+		1,3,4,
 
 		//Back
-		3,2,4, 
+		3,2,4,
 
 		//Down
 		0,3,1,
@@ -362,13 +348,17 @@ void Pyramid::InnerRender() const
 	glGenBuffers(1, (GLuint*)&(id_for_buffer));
 	glBindBuffer(GL_ARRAY_BUFFER, id_for_buffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(int) * 36, indices2, GL_STATIC_DRAW);
+}
 
+void Pyramid::InnerRender(vec4 rotation) const
+{
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glBindBuffer(GL_ARRAY_BUFFER, id_for_vertex);
 	glVertexPointer(3, GL_FLOAT, 0, NULL);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id_for_buffer);
 	glColor4f(1.0f, 0.0f, 1.0f, 1.0f);
+	//glRotatef(rotation.w, rotation.x, rotation.y, rotation.z);
 	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, NULL);
 	glDisableClientState(GL_VERTEX_ARRAY);
 
@@ -380,17 +370,16 @@ Cylinder::Cylinder() : Primitive()
 	type = PrimitiveTypes::Primitive_Cylinder;
 }
 
-Cylinder::Cylinder(float posX, float posY, float posZ, float radius, float height, int num_sectors) : Primitive(), pos(posX, posY, posZ), radius(radius), height(height), sectorCount(num_sectors)
+Cylinder::Cylinder(vec3 position, float radius, float height, int num_sectors) : Primitive(), rad(radius), height(height), sectorCount(num_sectors)
 {
 	type = PrimitiveTypes::Primitive_Cylinder;
-}
 
-void Cylinder::InnerRender() const
-{
+	pos.x = position.x;
+	pos.y = position.y;
+	pos.z = position.z;
+
 	// GENERATE CIRCLE FROM XY PLANE
-	std::vector<float> vertices;
-	std::vector<int>	indices;
-
+	
 	float sectorStep = 2 * PI / sectorCount;
 	float sectorAngle;  // radian
 
@@ -421,9 +410,9 @@ void Cylinder::InnerRender() const
 			float uy = unitVertices[k + 1];
 			float uz = unitVertices[k + 2];
 			// position vector
-			vertices.push_back(ux * radius);             // vx
-			vertices.push_back(uy * radius);             // vy
-			vertices.push_back(h);                       // vz
+			vertices.push_back((ux * rad)+pos.x);             // vx
+			vertices.push_back((uy * rad)+pos.y);             // vy
+			vertices.push_back(h + pos.z);                       // vz
 
 		}
 	}
@@ -440,7 +429,7 @@ void Cylinder::InnerRender() const
 		float nz = -1 + i * 2;                           // z value of normal; -1 to 1
 
 		// center point
-		vertices.push_back(0);     vertices.push_back(0);     vertices.push_back(h);
+		vertices.push_back(0 + pos.x);     vertices.push_back(0 + pos.y);     vertices.push_back(h + pos.z);
 
 
 		for (int j = 0, k = 0; j < sectorCount; ++j, k += 3)
@@ -448,9 +437,9 @@ void Cylinder::InnerRender() const
 			float ux = unitVertices[k];
 			float uy = unitVertices[k + 1];
 			// position vector
-			vertices.push_back(ux * radius);             // vx
-			vertices.push_back(uy * radius);             // vy
-			vertices.push_back(h);                       // vz
+			vertices.push_back((ux * rad) + pos.x);             // vx
+			vertices.push_back((uy * rad) + pos.y);             // vy
+			vertices.push_back(h + pos.z);                       // vz
 
 		}
 	}
@@ -509,9 +498,9 @@ void Cylinder::InnerRender() const
 		}
 	}
 
-	int numvertex = vertices.size();
+	numvertex = vertices.size();
 	float* new_vertices = new float[numvertex];
-	int numindices = indices.size();
+	numindices = indices.size();
 	int* new_indices = new int[numindices];
 
 	for (size_t i = 0; i < numvertex; i++)
@@ -527,18 +516,21 @@ void Cylinder::InnerRender() const
 
 	glGenBuffers(1, (GLuint*)&(id_for_vertex));
 	glBindBuffer(GL_ARRAY_BUFFER, id_for_vertex);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float)* numvertex, new_vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * numvertex, new_vertices, GL_STATIC_DRAW);
 
 	glGenBuffers(1, (GLuint*)&(id_for_buffer));
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id_for_buffer);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int)* numindices, new_indices, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * numindices, new_indices, GL_STATIC_DRAW);
+}
 
+void Cylinder::InnerRender(vec4 rotation) const
+{
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glBindBuffer(GL_ARRAY_BUFFER, id_for_vertex);
 	glVertexPointer(3, GL_FLOAT, 0, NULL);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id_for_buffer);
 	glColor4f(1.0f, 1.0f, 0.0f, 1.0f);
-	glRotatef(270.0f, 1.0f, 0.0f, 0.0f);
+	//glRotatef(270.0f, 1.0f, 0.0f, 0.0f);
 	glTranslatef(pos.x, pos.y, pos.z);
 	glDrawElements(GL_TRIANGLES, numindices, GL_UNSIGNED_INT, NULL);
 	glDisableClientState(GL_VERTEX_ARRAY);

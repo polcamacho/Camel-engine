@@ -12,7 +12,6 @@ enum PrimitiveTypes
 	Primitive_Plane,
 	Primitive_Cube,
 	Primitive_Sphere,
-	Primitive_Triangle_pyramid,
 	Primitive_Pyramid,
 	Primitive_Cylinder
 };
@@ -25,9 +24,6 @@ public:
 
 	virtual void	Render() const;
 	virtual void	InnerRender() const;
-	void			SetPos(float x, float y, float z);
-	void			SetRotation(float angle, const vec3 &u);
-	void			Scale(float x, float y, float z);
 	PrimitiveTypes	GetType() const;
 
 public:
@@ -76,10 +72,8 @@ class Pyramid : public Primitive
 {
 public:
 	Pyramid();
-	Pyramid(int posX, int posY, int posZ, int sizeX, int sizeY, int sizeZ);
-	void InnerRender() const;
-public:
-	vec3 size, pos;
+	Pyramid(vec3 position, vec3 size);
+	void InnerRender(vec4 rotation) const;
 };
 
 // ============================================
@@ -87,13 +81,18 @@ class Cylinder : public Primitive
 {
 public:
 	Cylinder();
-	Cylinder(float posX, float posY, float posZ, float radius, float height, int num_sectors);
-	void InnerRender() const;
+	Cylinder(vec3 position, float radius, float height, int num_sectors);
+	void InnerRender(vec4 rotation) const;
 public:
-	float radius;
+	float rad;
 	float height;
 	int sectorCount;
-	vec3 pos;
+
+	std::vector<float> vertices;
+	std::vector<int>	indices;
+
+	int numvertex;
+	int numindices;
 };
 
 // ============================================
