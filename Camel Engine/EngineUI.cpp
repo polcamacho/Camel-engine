@@ -4,8 +4,10 @@
 #include "ModuleWindow.h"
 
 #include "imgui/imgui_internal.h"
-
+#include "Assimp/Assimp/include/version.h"
 #include <gl/GL.h>
+
+#pragma comment (lib, "Assimp/Assimp/libx86/Assimp.lib")
 
 EngineUI::EngineUI(Application* app, bool start_enabled) : Module(app, start_enabled) {
 	width = SCREEN_WIDTH;
@@ -218,7 +220,8 @@ void EngineUI::ScrollBarOptions()
 void EngineUI::HardwareDisplay()
 {
 	int SDL_major_version = SDL_MAJOR_VERSION, SDL_minor_version = SDL_MINOR_VERSION, SDL_pach_level = SDL_PATCHLEVEL;
-	int GL_major_version = GL_MAJOR_VERSION, GL_minor_version = GL_MINOR_VERSION, GL_pach_level = GL_NUM_EXTENSIONS;
+	int GL_major_version = GLEW_VERSION_MAJOR, GL_minor_version = GLEW_VERSION_MINOR, GL_pach_level = GLEW_VERSION_MICRO;
+	int Assimp_major_version = aiGetVersionMajor(), Assimp_minor_version = aiGetVersionMinor(), Assimp_revision = aiGetVersionRevision();
 	ImGui::Text("SDL Version: ");
 	ImGui::SameLine(200);
 	ImGui::TextColored({ 1, 1, 0, 100 }, "%d.%d.%d", SDL_major_version, SDL_minor_version, SDL_pach_level);

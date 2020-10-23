@@ -453,6 +453,9 @@
     <ClInclude Include="Assimp\Assimp\include\port\AndroidJNI\AndroidJNIIOSystem.h">
       <Filter>External Libraries\Assimp\Port</Filter>
     </ClInclude>
+    <ClInclude Include="ModuleLoadObject.h">
+      <Filter>Source Code\Modules\Internal Engine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="glmath.cpp">
@@ -619,6 +622,9 @@
     </ClCompile>
     <ClCompile Include="MathGeoLib\include\Time\Clock.cpp">
       <Filter>External Libraries\MatGeoLib\Time</Filter>
+    </ClCompile>
+    <ClCompile Include="ModuleLoadObject.cpp">
+      <Filter>Source Code\Modules\Internal Engine</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

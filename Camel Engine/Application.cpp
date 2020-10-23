@@ -12,6 +12,7 @@ Application::Application()
 	renderer3D = new ModuleRenderer3D(this);
 	camera = new ModuleCamera3D(this);
 	engine_ui = new EngineUI(this, true);
+	load_object = new ModuleLoadObject(this, true);
 
 	// The order of calls is very important!
 	// Modules will Init() Start() and Update in this order
