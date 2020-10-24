@@ -23,6 +23,8 @@ bool ModuleSceneIntro::Start()
 	App->camera->Move(vec3(1.0f, 1.0f, 0.0f));
 	App->camera->LookAt(vec3(0, 0, 0));
 
+	App->load_object->LoadObjectData("Assets/warrior.FBX");
+
 	// Creating primitives
 	c = new Cube({ 12,0,0 }, { 2,2,2 });
 	s = new Sphere({ 2,0,2 }, 1.0f, 10, 10);

@@ -28,6 +28,9 @@ Application::Application()
 
 	//Engine UI
 	AddModule(engine_ui);
+
+	// Load Object
+	AddModule(load_object);
 	
 	// Renderer last!
 	AddModule(renderer3D);
