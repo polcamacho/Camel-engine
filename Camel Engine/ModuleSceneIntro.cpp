@@ -54,11 +54,10 @@ update_status ModuleSceneIntro::Update(float dt)
 
 	// Primitives render
 
-	c->InnerRender({ 1,1,0,45 });
+	/*c->InnerRender({ 1,1,0,45 });
 	pyr->InnerRender({ 0,0,0,45 });
 	s->InnerRender({ 0,0,0,0 });
-	cyl->InnerRender({ 0,0,0,270 });
-	//c->wire = true;
+	cyl->InnerRender({ 0,0,0,270 });*/
 
 	return UPDATE_CONTINUE;
 }

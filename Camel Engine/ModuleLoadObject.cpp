@@ -55,29 +55,32 @@ void ModuleLoadObject::LoadObjectData(const char* path)
 	// Load FBX
 	const aiScene* scene = aiImportFile(path, aiProcessPreset_TargetRealtime_MaxQuality);
 	if (scene != nullptr && scene->HasMeshes())
-	{		
-		//Creating reference to game object mesh
-		aiMesh* Object_mesh = scene->mMeshes[0];
-
-		// Load / copy vertices
-		m.num_vertex = Object_mesh->mNumVertices;
-		m.vertex = new float[m.num_vertex * 3];
-		memcpy(m.vertex, Object_mesh->mVertices, sizeof(float) * m.num_vertex * 3);
-		LOG("New mesh with %d vertices", m.num_vertex);
-
-		// Load / copy faces
-		if (Object_mesh->HasFaces())
+	{
+		for (int num_meshes = 0; num_meshes < scene->mNumMeshes; ++num_meshes)
 		{
-			m.num_index = Object_mesh->mNumFaces * 3;
-			m.index = new uint[m.num_index]; // assume each face is a triangle
-			for (uint i = 0; i < Object_mesh->mNumFaces; ++i)
+			//Creating reference to game object mesh
+			aiMesh* Object_mesh = scene->mMeshes[num_meshes];
+
+			// Load / copy vertices
+			m.num_vertex = Object_mesh->mNumVertices;
+			m.vertex = new float[m.num_vertex * 3];
+			memcpy(m.vertex, Object_mesh->mVertices, sizeof(float) * m.num_vertex * 3);
+			LOG("New mesh with %d vertices", m.num_vertex);
+
+			// Load / copy faces
+			if (Object_mesh->HasFaces())
 			{
-				if (Object_mesh->mFaces[i].mNumIndices != 3)
+				m.num_index = Object_mesh->mNumFaces * 3;
+				m.index = new uint[m.num_index]; // assume each face is a triangle
+				for (uint i = 0; i < Object_mesh->mNumFaces; ++i)
 				{
-					LOG("WARNING, geometry face with != 3 indices!");
-				}
-				else {
-					memcpy(&m.index[i * 3], Object_mesh->mFaces[i].mIndices, 3 * sizeof(uint));
+					if (Object_mesh->mFaces[i].mNumIndices != 3)
+					{
+						LOG("WARNING, geometry face with != 3 indices!");
+					}
+					else {
+						memcpy(&m.index[i * 3], Object_mesh->mFaces[i].mIndices, 3 * sizeof(uint));
+					}
 				}
 			}
 		}
