@@ -87,6 +87,8 @@ update_status ModuleInput::PreUpdate(float dt)
 
 	mouse_x_motion = mouse_y_motion = 0;
 
+	SDL_EventState(SDL_DROPFILE, SDL_ENABLE);
+
 	bool quit = false;
 	SDL_Event e;
 	while(SDL_PollEvent(&e))
@@ -124,7 +126,23 @@ update_status ModuleInput::PreUpdate(float dt)
 			{
 				if(e.window.event == SDL_WINDOWEVENT_RESIZED)
 					App->renderer3D->OnResize(e.window.data1, e.window.data2);
+				break;
 			}
+			case SDL_DROPFILE:
+			{
+				const char* drop_file_path;
+				drop_file_path = e.drop.file;
+				std::string file_path(drop_file_path);
+				// Shows directory of dropped file
+				if (file_path.substr(file_path.find_last_of(".")) == ".fbx" || file_path.substr(file_path.find_last_of(".")) == ".FBX") {
+
+					App->load_object->LoadObjectData(drop_file_path);
+				}
+				SDL_free(&drop_file_path);    // Free dropped_filedir memory
+
+				break;
+			}
+			
 		}
 	}
 
