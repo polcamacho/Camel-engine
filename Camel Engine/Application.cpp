@@ -23,15 +23,15 @@ Application::Application()
 	AddModule(camera);
 	AddModule(input);
 
+	// Load Object
+	AddModule(load_object);
+
 	//Scene
 	AddModule(scene_intro);
 
 	//Engine UI
 	AddModule(engine_ui);
 
-	// Load Object
-	AddModule(load_object);
-	
 	// Renderer last!
 	AddModule(renderer3D);
 

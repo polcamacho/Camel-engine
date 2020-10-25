@@ -5,6 +5,7 @@
 #include "Light.h"
 #include "glew/include/glew.h"
 
+class Mesh;
 #define MAX_LIGHTS 8
 
 class ModuleRenderer3D : public Module
@@ -17,7 +18,7 @@ public:
 	update_status PreUpdate(float dt);
 	update_status PostUpdate(float dt);
 	bool CleanUp();
-
+	void RenderMesh(Mesh* mesh);
 	void OnResize(int width, int height);
 
 public:

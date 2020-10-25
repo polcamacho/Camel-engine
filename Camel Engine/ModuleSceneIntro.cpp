@@ -23,13 +23,13 @@ bool ModuleSceneIntro::Start()
 	App->camera->Move(vec3(1.0f, 1.0f, 0.0f));
 	App->camera->LookAt(vec3(0, 0, 0));
 
-	App->load_object->LoadObjectData("Assets/warrior.FBX");
-
+	//App->load_object->LoadObjectData("Assets/warrior.FBX"); 
+	App->load_object->LoadObjectData("Assets/BakerHouse.fbx");
 	// Creating primitives
-	c = new Cube({ 12,0,0 }, { 2,2,2 });
+	/*c = new Cube({ 12,0,0 }, { 2,2,2 });
 	s = new Sphere({ 2,0,2 }, 1.0f, 10, 10);
 	pyr = new Pyramid({ 5,0,0 }, { 2,10,2 });
-	cyl = new Cylinder({ 5,0,0 }, 1.0f, 5.0f, 10);
+	cyl = new Cylinder({ 5,0,0 }, 1.0f, 5.0f, 10);*/
 
 	return ret;
 }
@@ -38,10 +38,6 @@ bool ModuleSceneIntro::Start()
 bool ModuleSceneIntro::CleanUp()
 {
 	LOG("Unloading Intro scene");
-	delete c;
-	delete s;
-	delete pyr;
-	delete cyl;
 	return true;
 }
 
@@ -51,13 +47,6 @@ update_status ModuleSceneIntro::Update(float dt)
 	Plane p(0, 1, 0, 0);
 	p.axis = true;
 	p.Render();
-
-	// Primitives render
-
-	/*c->InnerRender({ 1,1,0,45 });
-	pyr->InnerRender({ 0,0,0,45 });
-	s->InnerRender({ 0,0,0,0 });
-	cyl->InnerRender({ 0,0,0,270 });*/
 
 	return UPDATE_CONTINUE;
 }

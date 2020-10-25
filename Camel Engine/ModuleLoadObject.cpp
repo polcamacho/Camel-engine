@@ -14,13 +14,14 @@
 
 ModuleLoadObject::ModuleLoadObject(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
-	m.id_index = 0;
-	m.num_index = 0;
-	m.index = nullptr;
+	m = new Mesh();
+	m->id_index = 0;
+	m->num_index = 0;
+	m->index = nullptr;
 
-	m.id_vertex = 0;
-	m.num_vertex = 0;
-	m.vertex = nullptr;
+	m->id_vertex = 0;
+	m->num_vertex = 0;
+	m->vertex = nullptr;
 }
 
 ModuleLoadObject::~ModuleLoadObject()
@@ -62,16 +63,16 @@ void ModuleLoadObject::LoadObjectData(const char* path)
 			aiMesh* Object_mesh = scene->mMeshes[num_meshes];
 
 			// Load / copy vertices
-			m.num_vertex = Object_mesh->mNumVertices;
-			m.vertex = new float[m.num_vertex * 3];
-			memcpy(m.vertex, Object_mesh->mVertices, sizeof(float) * m.num_vertex * 3);
-			LOG("New mesh with %d vertices", m.num_vertex);
+			m->num_vertex = Object_mesh->mNumVertices;
+			m->vertex = new float[m->num_vertex * 3];
+			memcpy(m->vertex, Object_mesh->mVertices, sizeof(float) * m->num_vertex * 3);
+			LOG("New mesh with %d vertices", m->num_vertex);
 
 			// Load / copy faces
 			if (Object_mesh->HasFaces())
 			{
-				m.num_index = Object_mesh->mNumFaces * 3;
-				m.index = new uint[m.num_index]; // assume each face is a triangle
+				m->num_index = Object_mesh->mNumFaces * 3;
+				m->index = new uint[m->num_index]; // assume each face is a triangle
 				for (uint i = 0; i < Object_mesh->mNumFaces; ++i)
 				{
 					if (Object_mesh->mFaces[i].mNumIndices != 3)
@@ -79,11 +80,19 @@ void ModuleLoadObject::LoadObjectData(const char* path)
 						LOG("WARNING, geometry face with != 3 indices!");
 					}
 					else {
-						memcpy(&m.index[i * 3], Object_mesh->mFaces[i].mIndices, 3 * sizeof(uint));
+						memcpy(&m->index[i * 3], Object_mesh->mFaces[i].mIndices, 3 * sizeof(uint));
 					}
 				}
 			}
 		}
+
+		glGenBuffers(1, (GLuint*)&(m->id_vertex));
+		glBindBuffer(GL_ARRAY_BUFFER, m->id_vertex);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * m->num_vertex * 3, m->vertex, GL_STATIC_DRAW);
+
+		glGenBuffers(1, (GLuint*)&(m->id_index));
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m->id_index);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint) * m->num_index, m->index, GL_STATIC_DRAW);
 
 		// Call after import data
 		aiReleaseImport(scene);

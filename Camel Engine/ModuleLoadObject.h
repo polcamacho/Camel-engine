@@ -26,7 +26,7 @@ public:
     void LoadObjectData(const char* path);
 
 public:
-    Mesh m;
+    Mesh *m;
    
 };
 #endif // !__MODULELOADOBJECT_H__
