@@ -85,6 +85,12 @@
     <Filter Include="Source Code\Components">
       <UniqueIdentifier>{e9b9ce88-c82e-4862-acd5-386ac6434154}</UniqueIdentifier>
     </Filter>
+    <Filter Include="External Libraries\Physfs">
+      <UniqueIdentifier>{bfd34899-49c4-4cf1-9b9a-8b399615141f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External Libraries\Devil">
+      <UniqueIdentifier>{bd152624-45cb-4a41-9088-baa8631da1a8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="glmath.h">
@@ -468,6 +474,36 @@
     <ClInclude Include="ComponentMesh.h">
       <Filter>Source Code\Components</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\Desktop\Thor-Engine-0.0.5\Source Code\External Libraries\PhysFS\include\physfs.h">
+      <Filter>External Libraries\Physfs</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystem.h">
+      <Filter>Source Code\Modules\Internal Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Devil\include\devil_internal_exports.h">
+      <Filter>External Libraries\Devil</Filter>
+    </ClInclude>
+    <ClInclude Include="Devil\include\il.h">
+      <Filter>External Libraries\Devil</Filter>
+    </ClInclude>
+    <ClInclude Include="Devil\include\il_wrap.h">
+      <Filter>External Libraries\Devil</Filter>
+    </ClInclude>
+    <ClInclude Include="Devil\include\ilu.h">
+      <Filter>External Libraries\Devil</Filter>
+    </ClInclude>
+    <ClInclude Include="Devil\include\ilu_region.h">
+      <Filter>External Libraries\Devil</Filter>
+    </ClInclude>
+    <ClInclude Include="Devil\include\ilut.h">
+      <Filter>External Libraries\Devil</Filter>
+    </ClInclude>
+    <ClInclude Include="Devil\include\ilut_config.h">
+      <Filter>External Libraries\Devil</Filter>
+    </ClInclude>
+    <ClInclude Include="Devil\include\config.h">
+      <Filter>External Libraries\Devil</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="glmath.cpp">
@@ -647,6 +683,9 @@
     <ClCompile Include="Component.cpp">
       <Filter>Source Code\Components</Filter>
     </ClCompile>
+    <ClCompile Include="FileSystem.cpp">
+      <Filter>Source Code\Modules\Internal Engine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="MathGeoLib\include\Geometry\TriangleMesh_IntersectRay_AVX.inl">
@@ -690,6 +729,9 @@
     </None>
     <None Include="Assimp\Assimp\include\vector3.inl">
       <Filter>External Libraries\Assimp</Filter>
+    </None>
+    <None Include="Devil\include\config.h.win">
+      <Filter>External Libraries\Devil</Filter>
     </None>
   </ItemGroup>
 </Project>
