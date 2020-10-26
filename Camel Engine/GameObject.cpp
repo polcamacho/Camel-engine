@@ -1,4 +1,6 @@
 #include "GameObject.h"
+#include "ComponentMesh.h"
+#include "Component.h"
 
 GameObject::GameObject(std::string& name, GameObject* parent, bool active) :name(name), parent(parent), active(active) {}
 
@@ -97,10 +99,34 @@ void GameObject::DeleteChild(GameObject* child)
 	}
 }
 
-//void GameObject::AddComponent(Component::COMPONENT_TYPE type)
-//{
-//	components.push_back(new Component(type));
-//}
+void GameObject::CreateComponent(Component::COMPONENT_TYPE type)
+{
+	switch (type)
+	{
+	/*case Component::COMPONENT_TYPE::TRANSFORM:
+		components.push_back(new ComponentTransform(type));
+		break;*/
+	case Component::COMPONENT_TYPE::MESH:
+		ComponentMesh* cMesh = new ComponentMesh(this);
+		CheckAddComponent(cMesh);
+		break;
+	//case Component::COMPONENT_TYPE::MATERIAL:
+	//	components.push_back(new ComponentMaterial(type));
+	//	break;
+	//case Component::COMPONENT_TYPE::NONE:
+	//	components.push_back(new Component(type));
+	//	break;
+	}
+}
+
+void GameObject::CheckAddComponent(Component* new_comp)
+{
+	for (auto it = components.begin(); it != components.end(); ++it)
+	{
+		if (*it != nullptr && *it == new_comp)return;
+	}
+	components.push_back(new_comp);
+}
 
 std::vector<Component*>* const GameObject::GetComponents()
 {

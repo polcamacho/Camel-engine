@@ -5,6 +5,8 @@
 #include "Light.h"
 #include "glew/include/glew.h"
 
+#include <vector>
+
 class Mesh;
 #define MAX_LIGHTS 8
 
@@ -18,7 +20,7 @@ public:
 	update_status PreUpdate(float dt);
 	update_status PostUpdate(float dt);
 	bool CleanUp();
-	void RenderMesh(Mesh* mesh);
+	void RenderMesh(std::vector<Mesh*>& mesh);
 	void OnResize(int width, int height);
 
 public:

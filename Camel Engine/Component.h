@@ -5,7 +5,10 @@
 class GameObject;
 
 class Component {
+
 public:
+	
+	//Type enum
 	static enum class COMPONENT_TYPE{
 		TRANSFORM,
 		MESH,
@@ -13,19 +16,37 @@ public:
 		NONE
 	};
 
-	Component(COMPONENT_TYPE type);
+public:
+
+	//Constructor
+	Component(COMPONENT_TYPE type, GameObject* owner, bool active = true);
+
+	//Destructor
 	~Component();
 
-	virtual void Update();
-	virtual void Enable();
-	virtual void Disable();
-	virtual void IsEnabled();
 
-	void GetComponentType();
+	//Update
+	virtual void Update();
+
+	//Enable component
+	virtual void Enable();
+
+	//Disable component
+	virtual void Disable();
+
+	//Check if component is enabled
+	virtual bool IsEnabled();
+
+
+	//Get component type
+	COMPONENT_TYPE GetComponentType();
+
+public:
+
+	bool			active;
 
 private:
 	COMPONENT_TYPE	type;
-	bool			active;
 	GameObject*		owner;
 };
 

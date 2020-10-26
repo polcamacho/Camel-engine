@@ -137,21 +137,26 @@ update_status ModuleRenderer3D::PostUpdate(float dt)
 bool ModuleRenderer3D::CleanUp()
 {
 	LOG("Destroying 3D Renderer");
-	delete App->load_object->m;
+	//Clean mesh vector
+
+
 	SDL_GL_DeleteContext(context);
 
 	return true;
 }
 
-void ModuleRenderer3D::RenderMesh(Mesh* mesh)
+void ModuleRenderer3D::RenderMesh(std::vector<Mesh*>& mesh)
 {
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glBindBuffer(GL_ARRAY_BUFFER, mesh->id_vertex);
-	glVertexPointer(3, GL_FLOAT, 0, NULL);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->id_index);
-	glRotatef(0, 1, 0, 0);
-	glDrawElements(GL_TRIANGLES, mesh->num_index, GL_UNSIGNED_INT, NULL);
-	glDisableClientState(GL_VERTEX_ARRAY);
+	std::vector<Mesh*>::iterator it = mesh.begin();
+	for (; it != mesh.end(); ++it) {
+		glEnableClientState(GL_VERTEX_ARRAY);
+		glBindBuffer(GL_ARRAY_BUFFER, (*it)->id_vertex);
+		glVertexPointer(3, GL_FLOAT, 0, NULL);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, (*it)->id_index);
+		glRotatef(0, 1, 0, 0);
+		glDrawElements(GL_TRIANGLES, (*it)->num_index, GL_UNSIGNED_INT, NULL);
+		glDisableClientState(GL_VERTEX_ARRAY);
+	}
 }
 
 

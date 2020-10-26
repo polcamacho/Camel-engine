@@ -59,7 +59,10 @@ public:
 
 
 	//Add a component to this game object. Enter type!
-	void AddComponent(Component::COMPONENT_TYPE type);
+	void CreateComponent(Component::COMPONENT_TYPE type);
+
+	//Check and add component
+	void CheckAddComponent(Component* new_comp);
 
 	//Get a pointer to this game object components vector
 	std::vector<Component*>* const GetComponents();

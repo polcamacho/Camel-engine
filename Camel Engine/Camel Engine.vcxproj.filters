@@ -465,6 +465,9 @@
     <ClInclude Include="Component.h">
       <Filter>Source Code\Components</Filter>
     </ClInclude>
+    <ClInclude Include="ComponentMesh.h">
+      <Filter>Source Code\Components</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="glmath.cpp">
@@ -637,6 +640,12 @@
     </ClCompile>
     <ClCompile Include="GameObject.cpp">
       <Filter>Source Code\3D bodies</Filter>
+    </ClCompile>
+    <ClCompile Include="ComponentMesh.cpp">
+      <Filter>Source Code\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Component.cpp">
+      <Filter>Source Code\Components</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
