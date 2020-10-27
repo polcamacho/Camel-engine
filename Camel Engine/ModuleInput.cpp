@@ -97,17 +97,6 @@ update_status ModuleInput::PreUpdate(float dt)
 		{
 			case SDL_MOUSEWHEEL:
 			mouse_z = e.wheel.y;
-			if (mouse_z > 0) {
-				is_moving_forward = true;
-				is_static = false;
-			}
-			else if	(mouse_z < 0){
-				is_moving_backward = true;
-				is_static = false;
-			}
-			else {
-				is_static = true;
-			}
 			break;
 
 			case SDL_MOUSEMOTION:
