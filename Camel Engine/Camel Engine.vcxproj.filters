@@ -82,6 +82,9 @@
     <Filter Include="External Libraries\Assimp\Port">
       <UniqueIdentifier>{c6830009-b3ae-454d-a93b-90c40a750e0d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Code\Modules\Internal Engine\Editor">
+      <UniqueIdentifier>{ed486cda-8dad-458b-85aa-105add3d5e64}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="glmath.h">
@@ -452,6 +455,9 @@
     </ClInclude>
     <ClInclude Include="Assimp\Assimp\include\port\AndroidJNI\AndroidJNIIOSystem.h">
       <Filter>External Libraries\Assimp\Port</Filter>
+    </ClInclude>
+    <ClInclude Include="Panel.h">
+      <Filter>Source Code\Modules\Internal Engine\Editor</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
