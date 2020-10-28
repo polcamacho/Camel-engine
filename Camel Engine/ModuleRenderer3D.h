@@ -3,11 +3,11 @@
 #include "Globals.h"
 #include "glmath.h"
 #include "Light.h"
+#include "MeshHandler.h"
 #include "glew/include/glew.h"
 
 #include <vector>
 
-class Mesh;
 #define MAX_LIGHTS 8
 
 class ModuleRenderer3D : public Module
@@ -20,7 +20,7 @@ public:
 	update_status PreUpdate(float dt);
 	update_status PostUpdate(float dt);
 	bool CleanUp();
-	void RenderMesh(std::vector<Mesh*>& mesh);
+	void RenderMesh(std::vector<MeshPart*>& mesh);
 	void OnResize(int width, int height);
 
 public:

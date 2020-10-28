@@ -128,7 +128,7 @@ update_status ModuleRenderer3D::PreUpdate(float dt)
 // PostUpdate present buffer to screen
 update_status ModuleRenderer3D::PostUpdate(float dt)
 {
-	RenderMesh(App->load_object->m);
+	RenderMesh(App->scene_intro->meshes[0]->parts);
 	SDL_GL_SwapWindow(App->window->window);
 	return UPDATE_CONTINUE;
 }
@@ -145,9 +145,9 @@ bool ModuleRenderer3D::CleanUp()
 	return true;
 }
 
-void ModuleRenderer3D::RenderMesh(std::vector<Mesh*>& mesh)
+void ModuleRenderer3D::RenderMesh(std::vector<MeshPart*>& mesh)
 {
-	std::vector<Mesh*>::iterator it = mesh.begin();
+	std::vector<MeshPart*>::iterator it = mesh.begin();
 	for (; it != mesh.end(); ++it) {
 		glEnableClientState(GL_VERTEX_ARRAY);
 		glBindBuffer(GL_ARRAY_BUFFER, (*it)->id_vertex);

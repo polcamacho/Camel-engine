@@ -504,6 +504,9 @@
     <ClInclude Include="Devil\include\config.h">
       <Filter>External Libraries\Devil</Filter>
     </ClInclude>
+    <ClInclude Include="MeshHandler.h">
+      <Filter>Source Code\Modules\Internal Engine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="glmath.cpp">

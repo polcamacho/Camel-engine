@@ -52,21 +52,23 @@ update_status ModuleLoadObject::Update(float dt)
 	return UPDATE_CONTINUE;
 }
 
-void ModuleLoadObject::LoadObjectData(const char* path)
+FullMesh* ModuleLoadObject::LoadObjectData(const char* path)
 {
 	// Load FBX
 	const aiScene* scene = aiImportFile(path, aiProcessPreset_TargetRealtime_MaxQuality);
+	FullMesh* ret = new FullMesh;
+	ret->id = path;
 	if (scene != nullptr && scene->HasMeshes())
 	{
+		// TODO: change m from MeshData array to a single MeshData
+		MeshData* m = new MeshData[];
 		for (int num_meshes = 0; num_meshes < scene->mNumMeshes; ++num_meshes)
 		{
-			m.push_back(new Mesh());
-			std::vector<Mesh*>::iterator it = m.begin() + num_meshes;
 			//Creating reference to game object mesh
 			aiMesh* Object_mesh = scene->mMeshes[num_meshes];
 
 			// Load / copy vertices
-			(*it)->num_vertex = Object_mesh->mNumVertices;
+			m[num_meshes]->num_vertex = Object_mesh->mNumVertices;
 			(*it)->vertex = new float[m[num_meshes]->num_vertex * 3];
 			memcpy((*it)->vertex, Object_mesh->mVertices, sizeof(float) * (*it)->num_vertex * 3);
 			LOG("New mesh with %d vertices", m[num_meshes]->num_vertex);
@@ -96,6 +98,11 @@ void ModuleLoadObject::LoadObjectData(const char* path)
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, (*it)->id_index);
 			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint) * (*it)->num_index, (*it)->index, GL_STATIC_DRAW);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+			MeshPart* p = new MeshPart;
+			p->id_index = (*it)->id_index;
+			p->id_vertex = (*it)->id_vertex;
+			p->num_index = (*it)->num_index;
+			ret->parts.push_back(p);
 		}
 
 		// Call after import data
@@ -104,5 +111,8 @@ void ModuleLoadObject::LoadObjectData(const char* path)
 	else
 		LOG("Error loading scene % s", scene);
 
+	App->scene_intro->meshes.push_back(ret);
+
+	return ret;
 	
 }
