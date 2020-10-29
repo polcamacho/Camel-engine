@@ -3,6 +3,7 @@
 
 #include "Component.h"
 #include "GameObject.h"
+#include "MeshHandler.h"
 
 class ComponentMesh : public Component {
 public:
@@ -28,8 +29,15 @@ public:
 
 	
 	//Own mesh functions ----------
-
+	std::vector<MeshPart*>* GetMesh();
 	//-----------------------------
+
+public:
+	bool requesting_mesh;
+
+private:
+	std::vector<MeshPart*>* mesh;
+	char* path;
 };
 
 #endif // !__COMPONENT_MESH_H__

@@ -4,6 +4,7 @@
 #include "Primitive.h"
 #include "ModuleLoadObject.h"
 #include "MeshHandler.h"
+#include "GameObject.h"
 #include <vector>
 
 class ModuleSceneIntro : public Module
@@ -16,7 +17,7 @@ public:
 	update_status Update(float dt);
 	bool CleanUp();
 
-	FullMesh* AddMesh(const char* path);
+	std::vector<MeshPart*>* AddMesh(const char* path);
 
 public:
 	Cube* c;
@@ -27,4 +28,6 @@ public:
 	//Meshes--
 	std::vector<FullMesh*> meshes;
 	//--------
+
+	std::vector<MeshPart*>* a;
 };

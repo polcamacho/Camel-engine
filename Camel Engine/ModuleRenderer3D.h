@@ -20,7 +20,7 @@ public:
 	update_status PreUpdate(float dt);
 	update_status PostUpdate(float dt);
 	bool CleanUp();
-	void RenderMesh(std::vector<MeshPart*>& mesh);
+	void RenderMesh(std::vector<MeshPart*>* mesh);
 	void OnResize(int width, int height);
 
 public:

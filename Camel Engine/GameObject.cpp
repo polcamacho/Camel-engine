@@ -6,17 +6,17 @@ GameObject::GameObject(std::string& name, GameObject* parent, bool active) :name
 
 GameObject::~GameObject()
 {
-	////Empty components
-	//std::vector<Component*>::iterator comp = components.begin();
-	//for (; comp != components.end();++comp)delete* comp;
-	//components.clear();
+	//Empty components
+	std::vector<Component*>::iterator comp = components.begin();
+	for (; comp != components.end();++comp)delete* comp;
+	components.clear();
 
-	////Empty childs
-	//if (childs.size() != 0)
-	//	GetChildsNewParent();
+	//Empty childs
+	if (childs.size() != 0)
+		GetChildsNewParent();
 
-	////Deletes gameobject pointer from its parent
-	//parent->EraseChildPointer(this);
+	//Deletes gameobject pointer from its parent
+	parent->EraseChildPointer(this);
 }
 
 void GameObject::Enable()
@@ -118,6 +118,7 @@ void GameObject::CreateComponent(Component::COMPONENT_TYPE type)
 	//	break;
 	}
 }
+
 
 void GameObject::CheckAddComponent(Component* new_comp)
 {

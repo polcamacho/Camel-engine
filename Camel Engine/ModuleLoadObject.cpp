@@ -14,14 +14,6 @@
 
 ModuleLoadObject::ModuleLoadObject(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
-	//m[] = new Mesh();
-	//m[]->id_index = 0;
-	//m[]->num_index = 0;
-	//m[]->index = nullptr;
-
-	//m[]->id_vertex = 0;
-	//m[]->num_vertex = 0;
-	//m[]->vertex = nullptr;
 }
 
 ModuleLoadObject::~ModuleLoadObject()
@@ -52,7 +44,7 @@ update_status ModuleLoadObject::Update(float dt)
 	return UPDATE_CONTINUE;
 }
 
-FullMesh* ModuleLoadObject::LoadObjectData(const char* path)
+std::vector<MeshPart*>* ModuleLoadObject::LoadObjectData(const char* path)
 {
 	// Load FBX
 	const aiScene* scene = aiImportFile(path, aiProcessPreset_TargetRealtime_MaxQuality);
@@ -60,24 +52,24 @@ FullMesh* ModuleLoadObject::LoadObjectData(const char* path)
 	ret->id = path;
 	if (scene != nullptr && scene->HasMeshes())
 	{
-		// TODO: change m from MeshData array to a single MeshData
-		MeshData* m = new MeshData[];
 		for (int num_meshes = 0; num_meshes < scene->mNumMeshes; ++num_meshes)
 		{
+			MeshData m;
+
 			//Creating reference to game object mesh
 			aiMesh* Object_mesh = scene->mMeshes[num_meshes];
 
 			// Load / copy vertices
-			m[num_meshes]->num_vertex = Object_mesh->mNumVertices;
-			(*it)->vertex = new float[m[num_meshes]->num_vertex * 3];
-			memcpy((*it)->vertex, Object_mesh->mVertices, sizeof(float) * (*it)->num_vertex * 3);
-			LOG("New mesh with %d vertices", m[num_meshes]->num_vertex);
+			m.num_vertex = Object_mesh->mNumVertices;
+			m.vertex = new float[m.num_vertex * 3];
+			memcpy(m.vertex, Object_mesh->mVertices, sizeof(float) * m.num_vertex * 3);
+			LOG("New mesh with %d vertices", m.num_vertex);
 
 			// Load / copy faces
 			if (Object_mesh->HasFaces())
 			{
-				(*it)->num_index = Object_mesh->mNumFaces * 3;
-				(*it)->index = new uint[(*it)->num_index]; // assume each face is a triangle
+				m.num_index = Object_mesh->mNumFaces * 3;
+				m.index = new uint[m.num_index]; // assume each face is a triangle
 				for (uint i = 0; i < Object_mesh->mNumFaces; ++i)
 				{
 					if (Object_mesh->mFaces[i].mNumIndices != 3)
@@ -85,23 +77,23 @@ FullMesh* ModuleLoadObject::LoadObjectData(const char* path)
 						LOG("WARNING, geometry face with != 3 indices!");
 					}
 					else {
-						memcpy(&(*it)->index[i * 3], Object_mesh->mFaces[i].mIndices, 3 * sizeof(uint));
+						memcpy(&m.index[i * 3], Object_mesh->mFaces[i].mIndices, 3 * sizeof(uint));
 					}
 				}
 			}
-			glGenBuffers(1, (GLuint*)&((*it)->id_vertex));
-			glBindBuffer(GL_ARRAY_BUFFER, (*it)->id_vertex);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(float) * (*it)->num_vertex * 3, (*it)->vertex, GL_STATIC_DRAW);
+			glGenBuffers(1, (GLuint*)&(m.id_vertex));
+			glBindBuffer(GL_ARRAY_BUFFER, m.id_vertex);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(float) * m.num_vertex * 3, m.vertex, GL_STATIC_DRAW);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-			glGenBuffers(1, (GLuint*)&((*it)->id_index));
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, (*it)->id_index);
-			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint) * (*it)->num_index, (*it)->index, GL_STATIC_DRAW);
+			glGenBuffers(1, (GLuint*)&(m.id_index));
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m.id_index);
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint) * m.num_index, m.index, GL_STATIC_DRAW);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 			MeshPart* p = new MeshPart;
-			p->id_index = (*it)->id_index;
-			p->id_vertex = (*it)->id_vertex;
-			p->num_index = (*it)->num_index;
+			p->id_index = m.id_index;
+			p->id_vertex = m.id_vertex;
+			p->num_index = m.num_index;
 			ret->parts.push_back(p);
 		}
 
@@ -113,6 +105,6 @@ FullMesh* ModuleLoadObject::LoadObjectData(const char* path)
 
 	App->scene_intro->meshes.push_back(ret);
 
-	return ret;
+	return &ret->parts;
 	
 }

@@ -15,7 +15,7 @@ public:
     bool Start();
     update_status Update(float dt);
     bool CleanUp();
-    FullMesh* LoadObjectData(const char* path);
+    std::vector<MeshPart*>* LoadObjectData(const char* path);
 
 public:
    

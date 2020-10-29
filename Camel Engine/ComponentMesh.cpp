@@ -3,7 +3,7 @@
 
 ComponentMesh::ComponentMesh(GameObject* owner, bool active) : Component(COMPONENT_TYPE::MESH, owner, active)
 {
-
+	requesting_mesh = false;
 }
 
 ComponentMesh::~ComponentMesh()
@@ -30,3 +30,7 @@ bool ComponentMesh::IsEnabled()
 	return active;
 }
 
+std::vector<MeshPart*>* ComponentMesh::GetMesh()
+{
+	return mesh;
+}
