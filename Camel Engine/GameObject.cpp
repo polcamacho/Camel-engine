@@ -34,12 +34,12 @@ void GameObject::Update()
 	//Update components
 	std::vector<Component*>::iterator comp = components.begin();
 
-	for (; comp != components.end(); ++comp)(*comp)->Update();
+	for (; comp != components.end() && components.size()> 0; ++comp)(*comp)->Update();
 
 	//Update childs
 	std::vector<GameObject*>::iterator g_o = childs.begin();
 
-	for (; g_o != childs.end();++g_o)(*g_o)->Update();
+	for (; g_o != childs.end() && childs.size()>0;++g_o)(*g_o)->Update();
 }
 
 bool GameObject::IsEnabled()

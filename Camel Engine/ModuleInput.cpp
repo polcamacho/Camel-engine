@@ -4,7 +4,7 @@
 
 #define MAX_KEYS 300
 
-ModuleInput::ModuleInput(Application* app, bool start_enabled) : Module(app, start_enabled)
+ModuleInput::ModuleInput(bool start_enabled) : Module(start_enabled)
 {
 	keyboard = new KEY_STATE[MAX_KEYS];
 	memset(keyboard, KEY_IDLE, sizeof(KEY_STATE) * MAX_KEYS);
@@ -125,7 +125,7 @@ update_status ModuleInput::PreUpdate(float dt)
 				// Shows directory of dropped file
 				if (file_path.substr(file_path.find_last_of(".")) == ".fbx" || file_path.substr(file_path.find_last_of(".")) == ".FBX") {
 
-					App->load_object->LoadObjectData(drop_file_path);
+					// Trigger function load object and assign to create game object and mesh component
 				}
 				SDL_free(&drop_file_path);    // Free dropped_filedir memory
 

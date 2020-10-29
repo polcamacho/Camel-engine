@@ -6,13 +6,13 @@
 
 Application::Application()
 {
-	window = new ModuleWindow(this);
-	input = new ModuleInput(this);
-	scene_intro = new ModuleSceneIntro(this);
-	renderer3D = new ModuleRenderer3D(this);
-	camera = new ModuleCamera3D(this);
-	engine_ui = new EngineUI(this, true);
-	load_object = new ModuleLoadObject(this, true);
+	window = new ModuleWindow(true);
+	input = new ModuleInput(true);
+	scene_intro = new ModuleSceneIntro(true);
+	renderer3D = new ModuleRenderer3D(true);
+	camera = new ModuleCamera3D(true);
+	engine_ui = new EngineUI(true);
+	load_object = new ModuleLoadObject(true);
 
 	// The order of calls is very important!
 	// Modules will Init() Start() and Update in this order

@@ -12,7 +12,7 @@
 
 #pragma comment (lib, "Assimp/Assimp/libx86/assimp.lib")
 
-ModuleLoadObject::ModuleLoadObject(Application* app, bool start_enabled) : Module(app, start_enabled)
+ModuleLoadObject::ModuleLoadObject(bool start_enabled) : Module(start_enabled)
 {
 }
 

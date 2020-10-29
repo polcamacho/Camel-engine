@@ -12,7 +12,7 @@
 #pragma comment (lib, "Assimp/Assimp/libx86/Assimp.lib")
 #pragma comment (lib, "Devil/libx86/DevIL.lib")
 
-EngineUI::EngineUI(Application* app, bool start_enabled) : Module(app, start_enabled) {
+EngineUI::EngineUI(bool start_enabled) : Module(start_enabled) {
 	width = SCREEN_WIDTH;
 	height = SCREEN_HEIGHT;
 	is_fullscreen = false, is_resizable = true, is_borderless = false, wireframe = false;

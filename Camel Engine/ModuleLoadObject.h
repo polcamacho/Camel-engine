@@ -9,7 +9,7 @@
 class ModuleLoadObject : public Module
 {
 public:
-    ModuleLoadObject(Application* app, bool start_enabled);
+    ModuleLoadObject(bool start_enabled);
     ~ModuleLoadObject();
 
     bool Start();
