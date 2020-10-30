@@ -24,10 +24,11 @@ public:
 	Sphere* s;
 	Pyramid* pyr;
 	Cylinder* cyl;
+	GameObject* root;
 
 	//Meshes--
 	std::vector<FullMesh*> meshes;
 	//--------
 
-	std::vector<MeshPart*>* a;
+	//std::vector<MeshPart*>* a;
 };

@@ -2,7 +2,10 @@
 #include "ComponentMesh.h"
 #include "Component.h"
 
-GameObject::GameObject(std::string& name, GameObject* parent, bool active) :name(name), parent(parent), active(active) {}
+GameObject::GameObject(std::string& name, GameObject* parent, bool active) :name(name), parent(parent), active(active) 
+{
+	comp_mesh = nullptr;
+}
 
 GameObject::~GameObject()
 {
@@ -109,6 +112,7 @@ void GameObject::CreateComponent(Component::COMPONENT_TYPE type)
 	case Component::COMPONENT_TYPE::MESH:
 		ComponentMesh* cMesh = new ComponentMesh(this);
 		CheckAddComponent(cMesh);
+		comp_mesh = cMesh;
 		break;
 	//case Component::COMPONENT_TYPE::MATERIAL:
 	//	components.push_back(new ComponentMaterial(type));
@@ -132,6 +136,11 @@ void GameObject::CheckAddComponent(Component* new_comp)
 std::vector<Component*>* const GameObject::GetComponents()
 {
 	return &components;
+}
+
+ComponentMesh* GameObject::GetComponentMesh()
+{
+	return comp_mesh;
 }
 
 std::string& const GameObject::GetName()

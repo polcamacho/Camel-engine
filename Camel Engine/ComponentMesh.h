@@ -29,15 +29,11 @@ public:
 
 	
 	//Own mesh functions ----------
-	std::vector<MeshPart*>* GetMesh();
+	void AssignMesh(const char* path);
 	//-----------------------------
-
-public:
-	bool requesting_mesh;
 
 private:
 	std::vector<MeshPart*>* mesh;
-	char* path;
 };
 
 #endif // !__COMPONENT_MESH_H__

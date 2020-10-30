@@ -1,18 +1,20 @@
 #include "ComponentMesh.h"
 #include "Component.h"
+#include "Application.h"
+#include "ModuleRenderer3D.h"
 
 ComponentMesh::ComponentMesh(GameObject* owner, bool active) : Component(COMPONENT_TYPE::MESH, owner, active)
 {
-	requesting_mesh = false;
+	mesh = nullptr;
 }
 
 ComponentMesh::~ComponentMesh()
 {
-
 }
 
 void ComponentMesh::Update()
 {
+	App->renderer3D->RenderMesh(mesh);
 }
 
 void ComponentMesh::Enable()
@@ -30,7 +32,7 @@ bool ComponentMesh::IsEnabled()
 	return active;
 }
 
-std::vector<MeshPart*>* ComponentMesh::GetMesh()
+void ComponentMesh::AssignMesh(const char* path)
 {
-	return mesh;
+	mesh = App->scene_intro->AddMesh(path);
 }

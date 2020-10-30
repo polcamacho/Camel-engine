@@ -4,14 +4,18 @@
 
 #include <string>
 #include <vector>
+
+//Component Include needed, error if declared as -> class Component;
+//because of enum class COMPONENT_TYPE;
 #include "Component.h"
+
+class ComponentMesh;
 
 /// ///////////////////////////////////////// ///
 /// The first game object in scene, aka root, ///
 /// must have root as name, and recieve		  ///
 /// nullpointer as parent					  ///
 /// /////////////////////////////////////////////
-
 
 class GameObject
 {
@@ -67,6 +71,8 @@ public:
 	//Get a pointer to this game object components vector
 	std::vector<Component*>* const GetComponents();
 
+	ComponentMesh* GetComponentMesh();
+
 
 	//Get a reference to this game object name
 	std::string& const GetName();
@@ -80,6 +86,9 @@ private:
 	std::string					name;
 	std::vector<Component*>		components;
 	std::vector<GameObject*>	childs;
+	
+	//Components:
+	ComponentMesh*				comp_mesh;
 };
 
 #endif // !__GAMEOBJECT_H__

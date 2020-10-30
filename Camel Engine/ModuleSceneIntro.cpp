@@ -9,6 +9,11 @@
 
 ModuleSceneIntro::ModuleSceneIntro(bool start_enabled) : Module(start_enabled)
 {
+	c = nullptr;
+	s = nullptr;
+	pyr = nullptr;
+	cyl = nullptr;
+	root = nullptr;
 }
 
 ModuleSceneIntro::~ModuleSceneIntro()
@@ -23,7 +28,21 @@ bool ModuleSceneIntro::Start()
 
 	App->camera->Move(vec3(1.0f, 1.0f, 0.0f));
 	App->camera->LookAt(vec3(0, 0, 0));
-	a = AddMesh("Assets/BakerHouse.fbx");
+	//a = AddMesh("Assets/BakerHouse.fbx");
+
+	//Testing
+	root = new GameObject(std::string("root"), nullptr);
+	root->AddGameObjectAsChild(new GameObject(std::string("test"), root));
+	std::vector<GameObject*>::iterator it = root->GetChilds()->begin();
+	for (; it != root->GetChilds()->end(); ++it)
+	{
+		if ((*it)->GetName() == std::string("test"))
+		{
+			(*it)->CreateComponent(Component::COMPONENT_TYPE::MESH);
+			(*it)->GetComponentMesh()->AssignMesh("Assets/BakerHouse.fbx");
+			return ret;
+		}
+	}
 	return ret;
 }
 
@@ -49,7 +68,8 @@ update_status ModuleSceneIntro::Update(float dt)
 	Plane p(0, 1, 0, 0);
 	p.axis = true;
 	p.Render();
-	App->renderer3D->RenderMesh(a);
+	//App->renderer3D->RenderMesh(a);
+	root->Update();
 
 	return UPDATE_CONTINUE;
 }

@@ -9,7 +9,7 @@ class Component {
 public:
 	
 	//Type enum
-	static enum class COMPONENT_TYPE{
+	enum class COMPONENT_TYPE{
 		TRANSFORM,
 		MESH,
 		MATERIAL,
