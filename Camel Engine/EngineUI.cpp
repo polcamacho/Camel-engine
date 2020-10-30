@@ -169,6 +169,14 @@ void EngineUI::SystemWindow()
 
 }
 
+void EngineUI::ConsoleWindow()
+
+{
+	ImGui::Begin("Console");
+	ImGui::End();
+
+}
+
 void EngineUI::TextNames()
 {
 	ImGui::InputText("App name", name, 30);

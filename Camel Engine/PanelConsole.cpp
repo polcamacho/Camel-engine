@@ -6,14 +6,14 @@
 #include "EngineUI.h"
 update_status PanelConsole::Draw()
 {
-	if (App->engine_ui->console_window)DisplayConsole();
+	//if (App->engine_ui->console_window)DisplayConsole();
 	return UPDATE_CONTINUE;
 }
 
 
 void PanelConsole::DisplayConsole()
 {
-	ImGui::Begin("Console", & App->engine_ui->console_window);
+	//ImGui::Begin("Console", & App->engine_ui->console_window);
 
 	if (ImGui::Button("Clear")) Clear();
 	ImGui::SameLine();

@@ -30,6 +30,7 @@ public:
 	void AboutWindow();
 	void SystemWindow();
 	void ConfigWindow();
+	void ConsoleWindow();
 
 	void CheckBoxOptions();
 	void TextNames();
