@@ -147,15 +147,29 @@ bool ModuleRenderer3D::CleanUp()
 void ModuleRenderer3D::RenderMesh(std::vector<MeshPart*>* mesh)
 {
 	std::vector<MeshPart*>::iterator it = (*mesh).begin();
+
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 	for (; it != (*mesh).end(); ++it) {
-		glEnableClientState(GL_VERTEX_ARRAY);
+
+		
+		glBindTexture(GL_TEXTURE_2D, App->scene_intro->checkers_id);
 		glBindBuffer(GL_ARRAY_BUFFER, (*it)->id_vertex);
 		glVertexPointer(3, GL_FLOAT, 0, NULL);
+
+		glBindBuffer(GL_ARRAY_BUFFER, (*it)->id_tex_coords);
+		glTexCoordPointer(2, GL_FLOAT, 0, NULL);
+
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, (*it)->id_index);
-		glRotatef(0, 1, 0, 0);
+
 		glDrawElements(GL_TRIANGLES, (*it)->num_index, GL_UNSIGNED_INT, NULL);
-		glDisableClientState(GL_VERTEX_ARRAY);
+
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		glBindTexture(GL_TEXTURE_2D, 0);
 	}
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 

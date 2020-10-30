@@ -29,7 +29,8 @@ bool ModuleSceneIntro::Start()
 	App->camera->Move(vec3(1.0f, 1.0f, 0.0f));
 	App->camera->LookAt(vec3(0, 0, 0));
 	//a = AddMesh("Assets/BakerHouse.fbx");
-
+	
+	
 	//Testing
 	root = new GameObject(std::string("root"), nullptr);
 	root->AddGameObjectAsChild(new GameObject(std::string("test"), root));
@@ -39,7 +40,8 @@ bool ModuleSceneIntro::Start()
 		if ((*it)->GetName() == std::string("test"))
 		{
 			(*it)->CreateComponent(Component::COMPONENT_TYPE::MESH);
-			(*it)->GetComponentMesh()->AssignMesh("Assets/BakerHouse.fbx");
+			(*it)->GetComponentMesh()->AssignMesh("Assets/warrior.fbx");
+			CreateCheckersImage();
 			return ret;
 		}
 	}
@@ -82,4 +84,25 @@ std::vector<MeshPart*>* ModuleSceneIntro::AddMesh(const char* path)
 		if (path == (*it)->id) return &(*it)->parts;
 	}
 	return App->load_object->LoadObjectData(path);
+}
+
+void ModuleSceneIntro::CreateCheckersImage()
+{
+	for (int i = 0; i < 64; i++) {
+		for (int j = 0; j < 64; j++) {
+			int c = ((((i & 0x8) == 0) ^ (((j & 0x8)) == 0))) * 255;
+			checkerImage[i][j][0] = (GLubyte)c;
+			checkerImage[i][j][1] = (GLubyte)c;
+			checkerImage[i][j][2] = (GLubyte)c;
+			checkerImage[i][j][3] = (GLubyte)255;
+		}
+	}
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	glGenTextures(1, &checkers_id);
+	glBindTexture(GL_TEXTURE_2D, checkers_id);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 64, 64, 0, GL_RGBA, GL_UNSIGNED_BYTE, checkerImage);
 }

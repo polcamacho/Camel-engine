@@ -9,6 +9,9 @@
 #include "Assimp/Assimp/include/cimport.h"
 #include "Assimp/Assimp/include/scene.h"
 #include "Assimp/Assimp/include/postprocess.h"
+#include "Devil/include/il.h"
+#include "Devil/include/ilut.h"
+#include "Devil/include/ilu.h"
 
 #pragma comment (lib, "Assimp/Assimp/libx86/assimp.lib")
 
@@ -58,7 +61,6 @@ std::vector<MeshPart*>* ModuleLoadObject::LoadObjectData(const char* path)
 
 			//Creating reference to game object mesh
 			aiMesh* Object_mesh = scene->mMeshes[num_meshes];
-
 			// Load / copy vertices
 			m.num_vertex = Object_mesh->mNumVertices;
 			m.vertex = new float[m.num_vertex * 3];
@@ -78,9 +80,27 @@ std::vector<MeshPart*>* ModuleLoadObject::LoadObjectData(const char* path)
 					}
 					else {
 						memcpy(&m.index[i * 3], Object_mesh->mFaces[i].mIndices, 3 * sizeof(uint));
+						
 					}
 				}
 			}
+			LOG("New mesh with %d faces", m.num_index / 3);
+			
+			//Load / copy texture coords
+
+			if (Object_mesh->HasTextureCoords(0)) {
+				m.num_tex_coords = Object_mesh->mNumVertices;
+				m.tex_coords = new float[m.num_tex_coords * 2];
+
+				for (uint coords = 0; coords < Object_mesh->mNumVertices; ++coords)
+				{
+					memcpy(&m.tex_coords[coords * 2], &Object_mesh->mTextureCoords[0][coords].x, sizeof(float));
+					memcpy(&m.tex_coords[(coords * 2) + 1], &Object_mesh->mTextureCoords[0][coords].y, sizeof(float));
+					
+				}
+			}
+			LOG("New mesh with %d texture coords:", m.num_tex_coords);
+
 			glGenBuffers(1, (GLuint*)&(m.id_vertex));
 			glBindBuffer(GL_ARRAY_BUFFER, m.id_vertex);
 			glBufferData(GL_ARRAY_BUFFER, sizeof(float) * m.num_vertex * 3, m.vertex, GL_STATIC_DRAW);
@@ -90,16 +110,29 @@ std::vector<MeshPart*>* ModuleLoadObject::LoadObjectData(const char* path)
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m.id_index);
 			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint) * m.num_index, m.index, GL_STATIC_DRAW);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+
+			//glTexCoord2f(0.0f, 0.0f);
+			glGenBuffers(1, (GLuint*)&(m.id_tex_coords));
+			glBindBuffer(GL_ARRAY_BUFFER, m.id_tex_coords);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(float) * m.num_tex_coords * 2, m.tex_coords, GL_STATIC_DRAW);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+			
+
 			MeshPart* p = new MeshPart;
 			p->id_index = m.id_index;
 			p->id_vertex = m.id_vertex;
 			p->num_index = m.num_index;
+			p->id_tex_coords = m.num_tex_coords;
 			ret->parts.push_back(p);
 		}
 
 		// Call after import data
 		aiReleaseImport(scene);
 	}
+
+	
 	else
 		LOG("Error loading scene % s", scene);
 
