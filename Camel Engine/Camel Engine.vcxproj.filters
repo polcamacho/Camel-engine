@@ -459,6 +459,9 @@
     <ClInclude Include="Panel.h">
       <Filter>Source Code\Modules\Internal Engine\Editor</Filter>
     </ClInclude>
+    <ClInclude Include="PanelConsole.h">
+      <Filter>Source Code\Modules\Internal Engine\Editor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="glmath.cpp">
@@ -625,6 +628,9 @@
     </ClCompile>
     <ClCompile Include="MathGeoLib\include\Time\Clock.cpp">
       <Filter>External Libraries\MatGeoLib\Time</Filter>
+    </ClCompile>
+    <ClCompile Include="PanelConsole.cpp">
+      <Filter>Source Code\Modules\Internal Engine\Editor</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

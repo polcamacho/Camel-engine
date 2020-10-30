@@ -30,6 +30,7 @@ public:
 	int caps_fps_ideal;
 	int caps_fps_real;
 
+
 private:
 
 	Timer	ms_timer;
