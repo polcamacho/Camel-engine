@@ -129,6 +129,10 @@ void EngineUI::MainMenu()
 		}
 		//
 	}
+	if (ImGui::CollapsingHeader("Console"))
+	{
+		
+	}
 	ImGui::End();
 	if (ImGui::BeginMainMenuBar())
 	{
