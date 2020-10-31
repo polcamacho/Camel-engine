@@ -2,7 +2,7 @@
 #include "Application.h"
 #include "ModuleCamera3D.h"
 
-ModuleCamera3D::ModuleCamera3D(Application* app, bool start_enabled) : Module(app, start_enabled)
+ModuleCamera3D::ModuleCamera3D(bool start_enabled) : Module(start_enabled)
 {
 	CalculateViewMatrix();
 
@@ -44,9 +44,11 @@ update_status ModuleCamera3D::Update(float dt)
 	float speed = 10.0f * dt;
 	if(App->input->GetKey(SDL_SCANCODE_LSHIFT) == KEY_REPEAT)
 		speed = 25.0f * dt;
-	/*if (App->input->is_moving_forward==true)newPos.x += speed;
-	if (App->input->is_moving_backward == true)newPos.x -= speed;
-	if (App->input->is_static==true)speed = 0;*/
+	if (App->input->GetMouseZ() > 0)
+		newPos -= Z * speed;
+	if (App->input->GetMouseZ() < 0)
+		newPos += Z * speed;
+
 	if(App->input->GetKey(SDL_SCANCODE_R) == KEY_REPEAT) newPos.y += speed;
 	if(App->input->GetKey(SDL_SCANCODE_F) == KEY_REPEAT) newPos.y -= speed;
 

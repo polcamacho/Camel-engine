@@ -16,7 +16,7 @@ private:
 
 	int width, height;
 public: 
-	EngineUI(Application* app, bool start_enabled = true);
+	EngineUI(bool start_enabled = true);
 	~EngineUI();
 
 	bool Start();
