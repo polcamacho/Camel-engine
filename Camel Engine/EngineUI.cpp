@@ -2,6 +2,8 @@
 #include "Globals.h"
 #include "EngineUI.h"
 #include "ModuleWindow.h"
+#include "PanelConsole.h"
+#include "Panel.h"
 
 #include "imgui/imgui_internal.h"
 #include "Assimp/Assimp/include/version.h"
@@ -16,6 +18,8 @@ EngineUI::EngineUI(bool start_enabled) : Module(start_enabled) {
 	width = SCREEN_WIDTH;
 	height = SCREEN_HEIGHT;
 	is_fullscreen = false, is_resizable = true, is_borderless = false, wireframe = false;
+	console_p = nullptr;
+	console_window = true;
 }
 
 EngineUI::~EngineUI() {}
@@ -43,7 +47,7 @@ bool EngineUI::Start()
 	// Setup Platform/Renderer bindings
 	ImGui_ImplOpenGL3_Init();
 	ImGui_ImplSDL2_InitForOpenGL(App->window->window, App->renderer3D->context);
-
+	panel_list.push_back(console_p = new PanelConsole("Console"));
 	return ret;
 }
 
@@ -53,6 +57,15 @@ bool EngineUI::CleanUp()
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplSDL2_Shutdown();
 	ImGui::DestroyContext();
+	std::vector<Panel*>::iterator item = panel_list.begin();
+	
+	while (item != panel_list.end())
+	{
+		++item;
+	}
+	panel_list.clear();
+	console_p->Clear();
+	console_p = nullptr;
 
 	return true;
 }
@@ -80,6 +93,7 @@ update_status EngineUI::Update(float dt)
 
 update_status EngineUI::PostUpdate(float dt)
 {
+	update_status ret = UPDATE_CONTINUE;
 
 	ImGui::Render();
 
@@ -87,6 +101,11 @@ update_status EngineUI::PostUpdate(float dt)
 
 	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 	glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
+
+	for (std::vector<Panel*>::iterator item = panel_list.begin(); item != panel_list.end(); ++item)
+	{
+		ret = (*item)->Draw();
+	}
 	//glClear(GL_COLOR_BUFFER_BIT);
 
 	// If you are using this code with non-legacy OpenGL header/contexts (which you should not, prefer using imgui_impl_opengl3.cpp!!), 
@@ -97,7 +116,7 @@ update_status EngineUI::PostUpdate(float dt)
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 	//glUseProgram(last_program);
 
-	return UPDATE_CONTINUE;
+	return ret;
 }
 
 void EngineUI::MainMenu()
@@ -176,6 +195,15 @@ void EngineUI::ConfigWindow()
 void EngineUI::SystemWindow()
 {
 
+}
+
+
+void EngineUI::Log(const char* fmt, ...)
+{
+	if (console_p != nullptr && console_window)
+	{
+		console_p->AddLog(fmt);
+	}
 }
 
 void EngineUI::ConsoleWindow()

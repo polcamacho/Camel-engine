@@ -6,13 +6,14 @@
 #include "Module.h"
 #include "Application.h"
 #include "ImGui/imgui.h"
+#include "imgui/imgui_internal.h"
 
 class PanelConsole : public Panel
 {
 public:
 	PanelConsole() {};
 
-	PanelConsole(const char* name) :Panel(name) { };
+	PanelConsole(const char* name) :Panel(name) { App->saveLog("Console Panel Created"); };
 	~PanelConsole() {};
 
 	update_status Draw();

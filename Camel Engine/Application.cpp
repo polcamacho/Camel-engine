@@ -1,6 +1,9 @@
 #include "Application.h"
 #include "JSONDataController.h"
 
+
+
+
 #include "MathGeoLib/include/MathBuildConfig.h"
 #include "MathGeoLib/include/MathGeoLib.h"
 
@@ -144,6 +147,11 @@ update_status Application::Update()
 
 	FinishUpdate();
 	return ret;
+}
+
+void Application::saveLog(const char* fmt, ...)
+{
+	log_saves.push_back(fmt);
 }
 
 bool Application::CleanUp()

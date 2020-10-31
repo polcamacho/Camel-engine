@@ -56,8 +56,11 @@ public:
 
 	bool Init();
 	update_status Update();
+	void saveLog(const char* fmt, ...);
 	bool CleanUp();
 
+	std::vector
+<const char*> log_saves;
 	void DrawEngineGraphics();
 	void QuitEngine();
 	void SetVsync();
