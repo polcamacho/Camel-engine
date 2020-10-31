@@ -194,6 +194,11 @@ void Application::DrawEngineGraphics()
 	ImGui::PlotHistogram("##framerate", &fps_vec[0], fps_vec.size(), 0, graph_variable, 0.0f, 100.0f, ImVec2(310, 100));
 }
 
+void Application::Log(const char* fmt, ...)
+{
+	engine_ui->Log(fmt);
+}
+
 void Application::SetVsync()
 {
 	caps_fps_real = (1 / caps_fps_ideal) * 1000;

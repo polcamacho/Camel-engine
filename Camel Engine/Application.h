@@ -62,6 +62,7 @@ public:
 	std::vector
 <const char*> log_saves;
 	void DrawEngineGraphics();
+	void Log(const char* fmt, ...);
 	void QuitEngine();
 	void SetVsync();
 
