@@ -17,10 +17,10 @@ void PanelAbout::DisplayAbout()
 
 	ImGui::Separator();
 
-	ImGui::Text("Kuma Engine %s", App->GetAppVersion());
-	ImGui::Text("The new oriental engine");
-	if (ImGui::Button("By Pol Recasens & Gerard Clotet"))
-		App->OpenWebsite("https://github.com/GerardClotet/Kuma-Engine");
+	ImGui::Text("Camel Engine %s", App->GetAppVersion());
+	ImGui::Text("The old-new smoking engine");
+	if (ImGui::Button("By Alexandru Cercel, Pol Camacho & Marc Rosell"))
+		App->OpenWebsite("https://github.com/polcamacho/Camel-engine");
 
 	ImGui::NewLine();
 
