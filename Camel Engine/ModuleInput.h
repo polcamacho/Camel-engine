@@ -16,7 +16,7 @@ class ModuleInput : public Module
 {
 public:
 	
-	ModuleInput(Application* app, bool start_enabled = true);
+	ModuleInput(bool start_enabled = true);
 	~ModuleInput();
 
 	bool Init();
@@ -57,13 +57,16 @@ public:
 	{
 		return mouse_y_motion;
 	}
-
+	bool is_moving_forward;
+	bool is_moving_backward;
+	bool is_static;
+	int mouse_z;
 private:
 	KEY_STATE* keyboard;
 	KEY_STATE mouse_buttons[MAX_MOUSE_BUTTONS];
 	int mouse_x;
 	int mouse_y;
-	int mouse_z;
+	
 	int mouse_x_motion;
 	int mouse_y_motion;
 	//int mouse_z_motion;

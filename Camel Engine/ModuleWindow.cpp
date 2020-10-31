@@ -2,10 +2,11 @@
 #include "Application.h"
 #include "ModuleWindow.h"
 
-ModuleWindow::ModuleWindow(Application* app, bool start_enabled) : Module(app, start_enabled)
+ModuleWindow::ModuleWindow(bool start_enabled) : Module(start_enabled)
 {
 	window = NULL;
 	screen_surface = NULL;
+	brightness_value = 1.0f;
 }
 
 // Destructor
@@ -68,6 +69,7 @@ bool ModuleWindow::Init()
 			screen_surface = SDL_GetWindowSurface(window);
 		}
 	}
+
 
 	return ret;
 }

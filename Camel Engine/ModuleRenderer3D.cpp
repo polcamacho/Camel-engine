@@ -2,6 +2,8 @@
 #include "Application.h"
 #include "ModuleRenderer3D.h"
 #include "SDL\include\SDL_opengl.h"
+
+#include "ModuleLoadObject.h"
 #include <gl/GL.h>
 #include <gl/GLU.h>
 
@@ -9,7 +11,7 @@
 #pragma comment (lib, "opengl32.lib") /* link Microsoft OpenGL lib   */
 #pragma comment (lib, "glew/libx86/glew32.lib")
 
-ModuleRenderer3D::ModuleRenderer3D(Application* app, bool start_enabled) : Module(app, start_enabled)
+ModuleRenderer3D::ModuleRenderer3D(bool start_enabled) : Module(start_enabled)
 {
 }
 
@@ -97,6 +99,7 @@ bool ModuleRenderer3D::Init()
 		lights[0].Active(true);
 		glEnable(GL_LIGHTING);
 		glEnable(GL_COLOR_MATERIAL);
+		glEnable(GL_TEXTURE_2D);
 	}
 
 	// Projection matrix for
@@ -134,10 +137,40 @@ update_status ModuleRenderer3D::PostUpdate(float dt)
 bool ModuleRenderer3D::CleanUp()
 {
 	LOG("Destroying 3D Renderer");
+	//Clean mesh vector
+
 
 	SDL_GL_DeleteContext(context);
 
 	return true;
+}
+
+void ModuleRenderer3D::RenderMesh(std::vector<MeshPart*>* mesh)
+{
+	std::vector<MeshPart*>::iterator it = (*mesh).begin();
+
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	for (; it != (*mesh).end(); ++it) {
+
+		
+		glBindBuffer(GL_ARRAY_BUFFER, (*it)->id_vertex);
+		glVertexPointer(3, GL_FLOAT, 0, NULL);
+
+		glBindBuffer(GL_ARRAY_BUFFER, (*it)->id_tex_coords);
+		glTexCoordPointer(2, GL_FLOAT, 0, NULL);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, (*it)->id_index);
+
+		glBindTexture(GL_TEXTURE_2D, (*it)->checkers_id);
+		glDrawElements(GL_TRIANGLES, (*it)->num_index, GL_UNSIGNED_INT, NULL);
+
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 

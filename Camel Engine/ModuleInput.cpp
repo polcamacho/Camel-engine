@@ -4,13 +4,12 @@
 
 #define MAX_KEYS 300
 
-ModuleInput::ModuleInput(Application* app, bool start_enabled) : Module(app, start_enabled)
+ModuleInput::ModuleInput(bool start_enabled) : Module(start_enabled)
 {
 	keyboard = new KEY_STATE[MAX_KEYS];
 	memset(keyboard, KEY_IDLE, sizeof(KEY_STATE) * MAX_KEYS);
 	memset(mouse_buttons, KEY_IDLE, sizeof(KEY_STATE) * MAX_MOUSE_BUTTONS);
 }
-
 // Destructor
 ModuleInput::~ModuleInput()
 {
@@ -29,6 +28,10 @@ bool ModuleInput::Init()
 		LOG("SDL_EVENTS could not initialize! SDL_Error: %s\n", SDL_GetError());
 		ret = false;
 	}
+
+	is_static = true;
+	is_moving_backward = false;
+	is_moving_forward = false;
 
 	return ret;
 }
@@ -84,6 +87,8 @@ update_status ModuleInput::PreUpdate(float dt)
 
 	mouse_x_motion = mouse_y_motion = 0;
 
+	SDL_EventState(SDL_DROPFILE, SDL_ENABLE);
+
 	bool quit = false;
 	SDL_Event e;
 	while(SDL_PollEvent(&e))
@@ -110,7 +115,23 @@ update_status ModuleInput::PreUpdate(float dt)
 			{
 				if(e.window.event == SDL_WINDOWEVENT_RESIZED)
 					App->renderer3D->OnResize(e.window.data1, e.window.data2);
+				break;
 			}
+			case SDL_DROPFILE:
+			{
+				const char* drop_file_path;
+				drop_file_path = e.drop.file;
+				std::string file_path(drop_file_path);
+				// Shows directory of dropped file
+				if (file_path.substr(file_path.find_last_of(".")) == ".fbx" || file_path.substr(file_path.find_last_of(".")) == ".FBX") {
+					App->scene_intro->CreateGameObjectByDragging(file_path.c_str());
+					// Trigger function load object and assign to create game object and mesh component
+				}
+				SDL_free(&drop_file_path);    // Free dropped_filedir memory
+
+				break;
+			}
+			
 		}
 	}
 

@@ -1,5 +1,7 @@
 #pragma once
 
+
+// TODO: We may change all current info here and save it in another file
 // Warning disabled ---
 #pragma warning( disable : 4577 ) // Warning that exceptions are disabled
 #pragma warning( disable : 4530 )
@@ -16,6 +18,7 @@ void log(const char file[], int line, const char* format, ...);
 #define DEGTORAD 0.0174532925199432957f
 #define RADTODEG 57.295779513082320876f
 #define HAVE_M_PI
+#define PI 3.141592
 
 
 typedef unsigned int uint;
@@ -36,4 +39,4 @@ enum update_status
 #define WIN_BORDERLESS false
 #define WIN_FULLSCREEN_DESKTOP false
 #define VSYNC true
-#define TITLE "3D Physics Playground"
+#define TITLE "Camel Engine"

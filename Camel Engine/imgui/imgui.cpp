@@ -1,6 +1,9 @@
 // dear imgui, v1.79 WIP
 // (main code and documentation)
 
+//#define IMGUI_HAS_DOCK
+//bool show_docking_nodes = true;
+
 // Help:
 // - Read FAQ at http://dearimgui.org/faq
 // - Newcomers, read 'Programmer guide' below for notes on how to setup Dear ImGui in your codebase.

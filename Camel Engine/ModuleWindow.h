@@ -4,13 +4,11 @@
 #include "Module.h"
 #include "SDL/include/SDL.h"
 
-class Application;
-
 class ModuleWindow : public Module
 {
 public:
 
-	ModuleWindow(Application* app, bool start_enabled = true);
+	ModuleWindow(bool start_enabled = true);
 
 	// Destructor
 	virtual ~ModuleWindow();
@@ -26,6 +24,8 @@ public:
 
 	//The surface contained by the window
 	SDL_Surface* screen_surface;
+
+	float brightness_value;
 };
 
 #endif // __ModuleWindow_H__
