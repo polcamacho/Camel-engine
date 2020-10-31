@@ -153,6 +153,21 @@ update_status Application::Update()
 	return ret;
 }
 
+void Application::OpenWebsite(const std::string& link)
+{
+	ShellExecuteA(NULL, "open", link.c_str(), NULL, NULL, SW_SHOWNORMAL);
+}
+
+const char* Application::GetLicense()
+{
+	return license.c_str();
+}
+
+const char* Application::GetAppVersion()
+{
+	return version.c_str();
+}
+
 void Application::saveLog(const char* fmt, ...)
 {
 	log_saves.push_back(fmt);
