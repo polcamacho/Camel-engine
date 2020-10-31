@@ -203,7 +203,6 @@
     <ClInclude Include="MathGeoLib\include\Time\Clock.h" />
     <ClInclude Include="MeshHandler.h" />
     <ClInclude Include="ModuleCamera3D.h" />
-    <ClInclude Include="ModuleHardware.h" />
     <ClInclude Include="ModuleLoadObject.h" />
     <ClInclude Include="ModuleRenderer3D.h" />
     <ClInclude Include="ModuleSceneIntro.h" />
@@ -271,7 +270,6 @@
     <ClCompile Include="MathGeoLib\include\Math\TransformOps.cpp" />
     <ClCompile Include="MathGeoLib\include\Time\Clock.cpp" />
     <ClCompile Include="ModuleCamera3D.cpp" />
-    <ClCompile Include="ModuleHardware.cpp" />
     <ClCompile Include="ModuleInput.cpp" />
     <ClCompile Include="ModuleLoadObject.cpp" />
     <ClCompile Include="ModuleRenderer3D.cpp" />

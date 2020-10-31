@@ -519,9 +519,6 @@
     <ClInclude Include="PanelAbout.h">
       <Filter>Source Code\Modules\Internal Engine\UI\Editor</Filter>
     </ClInclude>
-    <ClInclude Include="ModuleHardware.h">
-      <Filter>Source Code\Modules</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="glmath.cpp">
@@ -710,7 +707,6 @@
     <ClCompile Include="PanelAbout.cpp">
       <Filter>Source Code\Modules\Internal Engine\UI\Editor</Filter>
     </ClCompile>
-    <ClCompile Include="ModuleHardware.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="MathGeoLib\include\Geometry\TriangleMesh_IntersectRay_AVX.inl">

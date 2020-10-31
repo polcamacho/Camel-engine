@@ -10,7 +10,6 @@
 #include "EngineUI.h"
 #include "ModuleLoadObject.h"
 #include "parson/parson.h"
-#include  "ModuleHardware.h"
 
 #include <list>
 #include <string>
@@ -26,7 +25,6 @@ public:
 	EngineUI* engine_ui;
 	ModuleCamera3D* camera;
 	ModuleLoadObject* load_object;
-	ModuleHardware* hardware;
 	JSON_Value* main_root;
 
 	bool is_vsync;
