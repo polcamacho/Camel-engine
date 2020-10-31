@@ -77,6 +77,7 @@ update_status ModuleSceneIntro::Update(float dt)
 	return UPDATE_CONTINUE;
 }
 
+//TODO: Review non copy method
 std::vector<MeshPart*>* ModuleSceneIntro::AddMesh(const char* path)
 {
 	std::vector<FullMesh*>::iterator it = meshes.begin();
@@ -88,24 +89,23 @@ std::vector<MeshPart*>* ModuleSceneIntro::AddMesh(const char* path)
 }
 
 void ModuleSceneIntro::CreateCheckersImage()
-{
+{	
 	for (int i = 0; i < 64; i++) {
 		for (int j = 0; j < 64; j++) {
-			int c = ((((i & 0x8) == 0) ^ (((j & 0x8)) == 0))) * 255;
+			int c = ((((i & 0x2) == 0) ^ (((j & 0x2)) == 0))) * 255;
 			checkerImage[i][j][0] = (GLubyte)c;
 			checkerImage[i][j][1] = (GLubyte)c;
 			checkerImage[i][j][2] = (GLubyte)c;
 			checkerImage[i][j][3] = (GLubyte)255;
 		}
 	}
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	glGenTextures(1, &checkers_id);
-	glBindTexture(GL_TEXTURE_2D, checkers_id);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+}
+
+void ModuleSceneIntro::CreateCheckerBuffer(uint& id)
+{
+	glBindTexture(GL_TEXTURE_2D, id);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 64, 64, 0, GL_RGBA, GL_UNSIGNED_BYTE, checkerImage);
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void ModuleSceneIntro::CreateGameObjectByDragging(const char* path)

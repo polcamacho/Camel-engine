@@ -11,7 +11,7 @@ struct MeshPart {   //all the data needed to print a mesh
     uint id_tex_coords;
     uint id_texture;
     uint num_index;
-    //uint checkers_id;
+    uint checkers_id;
 };
 
 struct FullMesh {

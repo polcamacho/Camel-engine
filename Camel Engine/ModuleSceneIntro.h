@@ -19,6 +19,7 @@ public:
 
 	std::vector<MeshPart*>* AddMesh(const char* path);
 	void CreateCheckersImage();
+	void CreateCheckerBuffer(uint& id);
 
 	void CreateGameObjectByDragging(const char* path);
 
@@ -33,6 +34,5 @@ public:
 	//Meshes--
 	std::vector<FullMesh*> meshes;
 	//--------
-	uint checkers_id;
 	//std::vector<MeshPart*>* a;
 };

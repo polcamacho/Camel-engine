@@ -80,7 +80,6 @@ std::vector<MeshPart*>* ModuleLoadObject::LoadObjectData(const char* path)
 					}
 					else {
 						memcpy(&m.index[i * 3], Object_mesh->mFaces[i].mIndices, 3 * sizeof(uint));
-						
 					}
 				}
 			}
@@ -89,14 +88,15 @@ std::vector<MeshPart*>* ModuleLoadObject::LoadObjectData(const char* path)
 			//Load / copy texture coords
 
 			if (Object_mesh->HasTextureCoords(0)) {
-				m.num_tex_coords = Object_mesh->mNumVertices;
-				m.tex_coords = new float[m.num_tex_coords * 2];
+				m.num_tex_coords = Object_mesh->mNumVertices * 2;
+				m.tex_coords = new float[m.num_tex_coords];
 
 				for (uint coords = 0; coords < Object_mesh->mNumVertices; ++coords)
 				{
-					memcpy(&m.tex_coords[coords * 2], &Object_mesh->mTextureCoords[0][coords].x, sizeof(float));
-					memcpy(&m.tex_coords[(coords * 2) + 1], &Object_mesh->mTextureCoords[0][coords].y, sizeof(float));
-					
+					m.tex_coords[coords * 2] = Object_mesh->mTextureCoords[0][coords].x;
+					m.tex_coords[(coords * 2)+1] = Object_mesh->mTextureCoords[0][coords].y;
+					//memcpy(&m.tex_coords[coords * 2], &Object_mesh->mTextureCoords[0][coords].x, sizeof(float));
+					//memcpy(&m.tex_coords[(coords * 2) + 1], &Object_mesh->mTextureCoords[0][coords].y, sizeof(float));
 				}
 			}
 			LOG("New mesh with %d texture coords:", m.num_tex_coords);
@@ -106,25 +106,33 @@ std::vector<MeshPart*>* ModuleLoadObject::LoadObjectData(const char* path)
 			glBufferData(GL_ARRAY_BUFFER, sizeof(float) * m.num_vertex * 3, m.vertex, GL_STATIC_DRAW);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+			glGenBuffers(1, (GLuint*)&(m.id_tex_coords));
+			glBindBuffer(GL_ARRAY_BUFFER, m.id_tex_coords);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(float) * m.num_tex_coords, m.tex_coords, GL_STATIC_DRAW);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+
 			glGenBuffers(1, (GLuint*)&(m.id_index));
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m.id_index);
 			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint) * m.num_index, m.index, GL_STATIC_DRAW);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
+			uint checkers_id;
+			glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+			glGenTextures(1, &checkers_id);
+			glBindTexture(GL_TEXTURE_2D, checkers_id);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
-			//glTexCoord2f(0.0f, 0.0f);
-			glGenBuffers(1, (GLuint*)&(m.id_tex_coords));
-			glBindBuffer(GL_ARRAY_BUFFER, m.id_tex_coords);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(float) * m.num_tex_coords * 2, m.tex_coords, GL_STATIC_DRAW);
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-			
+			App->scene_intro->CreateCheckerBuffer(checkers_id);
 
 			MeshPart* p = new MeshPart;
 			p->id_index = m.id_index;
 			p->id_vertex = m.id_vertex;
 			p->num_index = m.num_index;
-			p->id_tex_coords = m.num_tex_coords;
+			p->id_tex_coords = m.id_tex_coords;
+			p->checkers_id = checkers_id;
 			ret->parts.push_back(p);
 		}
 
