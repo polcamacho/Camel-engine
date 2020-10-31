@@ -8,6 +8,7 @@
 #include "ModuleSceneIntro.h"
 #include "ModuleCamera3D.h"
 #include "EngineUI.h"
+#include "ModuleLoadObject.h"
 #include "parson/parson.h"
 
 #include <list>
@@ -23,6 +24,7 @@ public:
 	ModuleSceneIntro* scene_intro;
 	EngineUI* engine_ui;
 	ModuleCamera3D* camera;
+	ModuleLoadObject* load_object;
 
 	JSON_Value* main_root;
 
@@ -66,3 +68,5 @@ private:
 	void PrepareUpdate();
 	void FinishUpdate();
 };
+
+extern Application* App;

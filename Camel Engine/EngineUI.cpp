@@ -4,10 +4,15 @@
 #include "ModuleWindow.h"
 
 #include "imgui/imgui_internal.h"
+#include "Assimp/Assimp/include/version.h"
+#include "Devil/include/il.h"
 
 #include <gl/GL.h>
 
-EngineUI::EngineUI(Application* app, bool start_enabled) : Module(app, start_enabled) {
+#pragma comment (lib, "Assimp/Assimp/libx86/Assimp.lib")
+#pragma comment (lib, "Devil/libx86/DevIL.lib")
+
+EngineUI::EngineUI(bool start_enabled) : Module(start_enabled) {
 	width = SCREEN_WIDTH;
 	height = SCREEN_HEIGHT;
 	is_fullscreen = false, is_resizable = true, is_borderless = false, wireframe = false;
@@ -230,14 +235,25 @@ void EngineUI::ScrollBarOptions()
 void EngineUI::HardwareDisplay()
 {
 	int SDL_major_version = SDL_MAJOR_VERSION, SDL_minor_version = SDL_MINOR_VERSION, SDL_pach_level = SDL_PATCHLEVEL;
-	int GL_major_version = GL_MAJOR_VERSION, GL_minor_version = GL_MINOR_VERSION, GL_pach_level = GL_NUM_EXTENSIONS;
+	int GL_major_version = GLEW_VERSION_MAJOR, GL_minor_version = GLEW_VERSION_MINOR, GL_pach_level = GLEW_VERSION_MICRO;
+	int Assimp_major_version = aiGetVersionMajor(), Assimp_minor_version = aiGetVersionMinor(), Assimp_revision = aiGetVersionRevision();
+	int Devil_version = ilGetInteger(IL_VERSION_NUM);
+
 	ImGui::Text("SDL Version: ");
 	ImGui::SameLine(200);
 	ImGui::TextColored({ 1, 1, 0, 100 }, "%d.%d.%d", SDL_major_version, SDL_minor_version, SDL_pach_level);
 
-	ImGui::Text("GL Version: ");
+	ImGui::Text("OpenGL Version: ");
 	ImGui::SameLine(200);
 	ImGui::TextColored({ 1, 1, 0, 100 }, "%d.%d.%d", GL_major_version, GL_minor_version, GL_pach_level);
+
+	ImGui::Text("Assimp Version: ");
+	ImGui::SameLine(200);
+	ImGui::TextColored({ 1, 1, 0, 100 }, "%d.%d.%d", Assimp_major_version, Assimp_minor_version, Assimp_revision);
+
+	ImGui::Text("Devil Version: ");
+	ImGui::SameLine(200);
+	ImGui::TextColored({ 1, 1, 0, 100 }, "%d.%d.%d", (Devil_version / 100), (Devil_version / 10) - ((Devil_version / 100) * 10), Devil_version- ((Devil_version / 10) * 10));
 
 	ImGui::Text("CPU cores: ");
 	ImGui::SameLine(200);

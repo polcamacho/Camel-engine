@@ -3,21 +3,24 @@
 #include "Globals.h"
 #include "glmath.h"
 #include "Light.h"
+#include "MeshHandler.h"
 #include "glew/include/glew.h"
+
+#include <vector>
 
 #define MAX_LIGHTS 8
 
 class ModuleRenderer3D : public Module
 {
 public:
-	ModuleRenderer3D(Application* app, bool start_enabled = true);
+	ModuleRenderer3D(bool start_enabled = true);
 	~ModuleRenderer3D();
 
 	bool Init();
 	update_status PreUpdate(float dt);
 	update_status PostUpdate(float dt);
 	bool CleanUp();
-
+	void RenderMesh(std::vector<MeshPart*>* mesh);
 	void OnResize(int width, int height);
 
 public:
@@ -26,4 +29,5 @@ public:
 	SDL_GLContext context;
 	mat3x3 NormalMatrix;
 	mat4x4 ModelMatrix, ViewMatrix, ProjectionMatrix;
+	
 };

@@ -76,6 +76,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\Desktop\Thor-Engine-0.0.5\Source Code\External Libraries\PhysFS\include\physfs.h" />
     <ClInclude Include="Application.h" />
     <ClInclude Include="Assimp\Assimp\include\ai_assert.h" />
     <ClInclude Include="Assimp\Assimp\include\anim.h" />
@@ -115,7 +116,19 @@
     <ClInclude Include="Assimp\Assimp\include\vector3.h" />
     <ClInclude Include="Assimp\Assimp\include\version.h" />
     <ClInclude Include="Color.h" />
+    <ClInclude Include="Component.h" />
+    <ClInclude Include="ComponentMesh.h" />
+    <ClInclude Include="Devil\include\config.h" />
+    <ClInclude Include="Devil\include\devil_internal_exports.h" />
+    <ClInclude Include="Devil\include\il.h" />
+    <ClInclude Include="Devil\include\ilu.h" />
+    <ClInclude Include="Devil\include\ilut.h" />
+    <ClInclude Include="Devil\include\ilut_config.h" />
+    <ClInclude Include="Devil\include\ilu_region.h" />
+    <ClInclude Include="Devil\include\il_wrap.h" />
     <ClInclude Include="EngineUI.h" />
+    <ClInclude Include="FileSystem.h" />
+    <ClInclude Include="GameObject.h" />
     <ClInclude Include="glmath.h" />
     <ClInclude Include="Globals.h" />
     <ClInclude Include="imgui\examples\imgui_impl_opengl3.h" />
@@ -188,7 +201,9 @@
     <ClInclude Include="MathGeoLib\include\Math\sse_mathfun.h" />
     <ClInclude Include="MathGeoLib\include\Math\TransformOps.h" />
     <ClInclude Include="MathGeoLib\include\Time\Clock.h" />
+    <ClInclude Include="MeshHandler.h" />
     <ClInclude Include="ModuleCamera3D.h" />
+    <ClInclude Include="ModuleLoadObject.h" />
     <ClInclude Include="ModuleRenderer3D.h" />
     <ClInclude Include="ModuleSceneIntro.h" />
     <ClInclude Include="Module.h" />
@@ -205,7 +220,11 @@
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="Color.cpp" />
+    <ClCompile Include="Component.cpp" />
+    <ClCompile Include="ComponentMesh.cpp" />
     <ClCompile Include="EngineUI.cpp" />
+    <ClCompile Include="FileSystem.cpp" />
+    <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="glmath.cpp" />
     <ClCompile Include="imgui\examples\imgui_impl_opengl3.cpp" />
     <ClCompile Include="imgui\examples\imgui_impl_sdl.cpp" />
@@ -251,6 +270,7 @@
     <ClCompile Include="MathGeoLib\include\Time\Clock.cpp" />
     <ClCompile Include="ModuleCamera3D.cpp" />
     <ClCompile Include="ModuleInput.cpp" />
+    <ClCompile Include="ModuleLoadObject.cpp" />
     <ClCompile Include="ModuleRenderer3D.cpp" />
     <ClCompile Include="ModuleSceneIntro.cpp" />
     <ClCompile Include="ModuleWindow.cpp" />
@@ -269,6 +289,7 @@
     <None Include="Assimp\Assimp\include\quaternion.inl" />
     <None Include="Assimp\Assimp\include\vector2.inl" />
     <None Include="Assimp\Assimp\include\vector3.inl" />
+    <None Include="Devil\include\config.h.win" />
     <None Include="MathGeoLib\include\Geometry\KDTree.inl" />
     <None Include="MathGeoLib\include\Geometry\QuadTree.inl" />
     <None Include="MathGeoLib\include\Geometry\TriangleMesh_IntersectRay_AVX.inl" />
