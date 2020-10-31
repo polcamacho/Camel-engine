@@ -2,10 +2,9 @@
 #include "Globals.h"
 #include "EngineUI.h"
 #include "ModuleWindow.h"
-
-#include "Panel.h"
 #include "PanelConsole.h"
-#include "PanelAbout.h"
+#include "Panel.h"
+
 #include "imgui/imgui.h"
 
 #include "Assimp/Assimp/include/version.h"
@@ -21,7 +20,6 @@ EngineUI::EngineUI(bool start_enabled) : Module(start_enabled) {
 	height = SCREEN_HEIGHT;
 	is_fullscreen = false, is_resizable = true, is_borderless = false, wireframe = false;
 	console_p = nullptr;
-	about_panel = nullptr;
 	console_window = true;
 }
 
@@ -52,7 +50,6 @@ bool EngineUI::Start()
 	ImGui_ImplOpenGL3_Init();
 
 	panel_list.push_back(console_p = new PanelConsole("Console"));
-	panel_list.push_back(about_panel = new PanelAbout("About"));
 
 	std::vector<const char*>::iterator item = App->log_saves.begin();
 

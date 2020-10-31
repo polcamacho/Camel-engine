@@ -47,9 +47,6 @@ private:
 
 	bool quit_engine;
 	Uint32 flags;
-	std::string license;
-	std::string version;
-
 
 public:
 
@@ -58,9 +55,6 @@ public:
 
 	bool Init();
 	update_status Update();
-	void OpenWebsite(const std::string& link);
-	const char* GetLicense();
-	const char* GetAppVersion();
 	void saveLog(const char* fmt, ...);
 	bool CleanUp();
 

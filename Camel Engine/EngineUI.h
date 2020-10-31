@@ -13,7 +13,6 @@
 
 class Panel;
 class PanelConsole;
-class PanelAbout;
 
 class EngineUI : public Module
 {
@@ -49,11 +48,8 @@ public:
 public:
 
 	PanelConsole* console_p;
-	PanelAbout* about_panel;
 
 	bool console_window = false;
-	bool about_window = false;
-
 	std::vector<Panel*> panel_list;
 
 
