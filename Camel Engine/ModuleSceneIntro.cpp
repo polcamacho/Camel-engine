@@ -45,8 +45,8 @@ bool ModuleSceneIntro::Start()
 			return ret;
 		}
 	}*/
-	//App->load_object->CreateCheckersImage();
-	App->load_object->LoadTexture("Assets/Textures/Lenna.png");
+	App->load_object->CreateCheckersImage();
+	//App->load_object->LoadTexture("Assets/Textures/Lenna.png");
 	return ret;
 }
 
@@ -102,5 +102,17 @@ void ModuleSceneIntro::CreateGameObjectByDragging(const char* path)
 			(*it)->CreateComponent(Component::COMPONENT_TYPE::MESH);
 			(*it)->GetComponentMesh()->AssignMesh(path);
 		}
+	}
+}
+
+void ModuleSceneIntro::SetTextureDragging(uint& tex_id)
+{
+	std::vector<FullMesh*>::iterator im = meshes.begin();
+	for (; im != meshes.end(); ++im) {
+		std::vector<MeshPart*>::iterator ip = (*im)->parts.begin();
+		for (; ip != (*im)->parts.end(); ++ip) {
+			(*ip)->texture_id = tex_id;
+		}
+
 	}
 }

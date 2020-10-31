@@ -121,11 +121,18 @@ update_status ModuleInput::PreUpdate(float dt)
 			{
 				const char* drop_file_path;
 				drop_file_path = e.drop.file;
+				uint tex_id;
 				std::string file_path(drop_file_path);
 				// Shows directory of dropped file
 				if (file_path.substr(file_path.find_last_of(".")) == ".fbx" || file_path.substr(file_path.find_last_of(".")) == ".FBX") {
 					App->scene_intro->CreateGameObjectByDragging(file_path.c_str());
 					// Trigger function load object and assign to create game object and mesh component
+				}
+				else if (file_path.substr(file_path.find_last_of(".")) == ".png" || file_path.substr(file_path.find_last_of(".")) == ".PNG" ||
+					file_path.substr(file_path.find_last_of(".")) == ".dds" || file_path.substr(file_path.find_last_of(".")) == ".DDS") {
+					App->load_object->LoadTexture(file_path.c_str());
+					App->load_object->CreateTextureBuffer(tex_id);
+					App->scene_intro->SetTextureDragging(tex_id);
 				}
 				SDL_free(&drop_file_path);    // Free dropped_filedir memory
 

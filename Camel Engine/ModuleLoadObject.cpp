@@ -125,10 +125,8 @@ std::vector<MeshPart*>* ModuleLoadObject::LoadObjectData(const char* path)
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 			uint texture_id = 0;
-			/*glGenBuffers(1, (GLuint*)&(texture_id));
-			glBindBuffer(GL_TEXTURE_BUFFER, texture_id);*/
-			//CreateCheckerBuffer(texture_id);
-			CreateTextureBuffer(texture_id);
+			CreateCheckerBuffer(texture_id);
+			//CreateTextureBuffer(texture_id);
 			MeshPart* p = new MeshPart;
 			p->id_index = m.id_index;
 			p->id_vertex = m.id_vertex;
