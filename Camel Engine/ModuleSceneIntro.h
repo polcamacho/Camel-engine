@@ -18,8 +18,6 @@ public:
 	bool CleanUp();
 
 	std::vector<MeshPart*>* AddMesh(const char* path);
-	void CreateCheckersImage();
-	void CreateCheckerBuffer(uint& id);
 
 	void CreateGameObjectByDragging(const char* path);
 
@@ -30,7 +28,6 @@ public:
 	Cylinder* cyl;
 	GameObject* root;
 
-	GLubyte checkerImage[64][64][4];
 	//Meshes--
 	std::vector<FullMesh*> meshes;
 	//--------

@@ -40,12 +40,13 @@ bool ModuleSceneIntro::Start()
 		if ((*it)->GetName() == std::string("test"))
 		{
 			(*it)->CreateComponent(Component::COMPONENT_TYPE::MESH);
-			(*it)->GetComponentMesh()->AssignMesh("Assets/warrior.fbx");
+			(*it)->GetComponentMesh()->AssignMesh("Assets/Models/warrior.fbx");
 			CreateCheckersImage();
 			return ret;
 		}
 	}*/
-	CreateCheckersImage();
+	//App->load_object->CreateCheckersImage();
+	App->load_object->LoadTexture("Assets/Textures/Lenna.png");
 	return ret;
 }
 
@@ -88,25 +89,7 @@ std::vector<MeshPart*>* ModuleSceneIntro::AddMesh(const char* path)
 	return App->load_object->LoadObjectData(path);
 }
 
-void ModuleSceneIntro::CreateCheckersImage()
-{	
-	for (int i = 0; i < 64; i++) {
-		for (int j = 0; j < 64; j++) {
-			int c = ((((i & 0x2) == 0) ^ (((j & 0x2)) == 0))) * 255;
-			checkerImage[i][j][0] = (GLubyte)c;
-			checkerImage[i][j][1] = (GLubyte)c;
-			checkerImage[i][j][2] = (GLubyte)c;
-			checkerImage[i][j][3] = (GLubyte)255;
-		}
-	}
-}
 
-void ModuleSceneIntro::CreateCheckerBuffer(uint& id)
-{
-	glBindTexture(GL_TEXTURE_2D, id);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 64, 64, 0, GL_RGBA, GL_UNSIGNED_BYTE, checkerImage);
-	glBindTexture(GL_TEXTURE_2D, 0);
-}
 
 void ModuleSceneIntro::CreateGameObjectByDragging(const char* path)
 {

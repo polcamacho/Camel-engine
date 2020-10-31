@@ -10,7 +10,6 @@
 #include <gl/GL.h>
 
 #pragma comment (lib, "Assimp/Assimp/libx86/Assimp.lib")
-#pragma comment (lib, "Devil/libx86/DevIL.lib")
 
 EngineUI::EngineUI(bool start_enabled) : Module(start_enabled) {
 	width = SCREEN_WIDTH;
