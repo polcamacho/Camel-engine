@@ -20,6 +20,8 @@ public:
 	std::vector<MeshPart*>* AddMesh(const char* path);
 	void CreateCheckersImage();
 
+	void CreateGameObjectByDragging(const char* path);
+
 public:
 	Cube* c;
 	Sphere* s;

@@ -33,7 +33,7 @@ bool ModuleSceneIntro::Start()
 	
 	//Testing
 	root = new GameObject(std::string("root"), nullptr);
-	root->AddGameObjectAsChild(new GameObject(std::string("test"), root));
+	/*root->AddGameObjectAsChild(new GameObject(std::string("test"), root));
 	std::vector<GameObject*>::iterator it = root->GetChilds()->begin();
 	for (; it != root->GetChilds()->end(); ++it)
 	{
@@ -44,7 +44,8 @@ bool ModuleSceneIntro::Start()
 			CreateCheckersImage();
 			return ret;
 		}
-	}
+	}*/
+	CreateCheckersImage();
 	return ret;
 }
 
@@ -105,4 +106,18 @@ void ModuleSceneIntro::CreateCheckersImage()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 64, 64, 0, GL_RGBA, GL_UNSIGNED_BYTE, checkerImage);
+}
+
+void ModuleSceneIntro::CreateGameObjectByDragging(const char* path)
+{
+	root->AddGameObjectAsChild(new GameObject(std::string(path), root));
+	std::vector<GameObject*>::iterator it = root->GetChilds()->begin();
+	for (; it != root->GetChilds()->end(); ++it)
+	{
+		if ((*it)->GetName() == std::string(path))
+		{
+			(*it)->CreateComponent(Component::COMPONENT_TYPE::MESH);
+			(*it)->GetComponentMesh()->AssignMesh(path);
+		}
+	}
 }

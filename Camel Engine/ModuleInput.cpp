@@ -124,7 +124,7 @@ update_status ModuleInput::PreUpdate(float dt)
 				std::string file_path(drop_file_path);
 				// Shows directory of dropped file
 				if (file_path.substr(file_path.find_last_of(".")) == ".fbx" || file_path.substr(file_path.find_last_of(".")) == ".FBX") {
-
+					App->scene_intro->CreateGameObjectByDragging(file_path.c_str());
 					// Trigger function load object and assign to create game object and mesh component
 				}
 				SDL_free(&drop_file_path);    // Free dropped_filedir memory
