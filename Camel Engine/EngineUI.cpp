@@ -85,6 +85,7 @@ bool EngineUI::CleanUp()
 	panel_list.clear();
 	console_p->Clear();
 	console_p = nullptr;
+	about_panel = nullptr;
 
 	return true;
 }
@@ -197,8 +198,8 @@ void EngineUI::MainMenu()
 		{
 			if (ImGui::MenuItem("About"))
 			{
-				ImGui::Begin("About", (bool*)0);
-				ImGui::End();
+				about_window = (about_window == false) ? true : false;
+
 			}
 
 			ImGui::EndMenu();

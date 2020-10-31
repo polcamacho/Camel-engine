@@ -25,10 +25,10 @@ void PanelAbout::DisplayAbout()
 	ImGui::NewLine();
 
 	ImGui::Text("3rd Party Libraries used");
-	ImGui::BulletText("Glew 2.1.0");
-	ImGui::BulletText("PCG Random Number Generation 0.98");
+	ImGui::BulletText("Glew");
+	ImGui::BulletText("PCG Random Number Generation");
 	ImGui::BulletText("MathGeoLib");
-	ImGui::BulletText("ImGui 1.73");
+	ImGui::BulletText("ImGui");
 	ImGui::BulletText("mmgr");
 	ImGui::BulletText("gpudetect");
 	ImGui::NewLine();
