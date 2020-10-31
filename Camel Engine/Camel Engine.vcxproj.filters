@@ -82,9 +82,6 @@
     <Filter Include="External Libraries\Assimp\Port">
       <UniqueIdentifier>{c6830009-b3ae-454d-a93b-90c40a750e0d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Code\Modules\Internal Engine\Editor">
-      <UniqueIdentifier>{ed486cda-8dad-458b-85aa-105add3d5e64}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Code\Components">
       <UniqueIdentifier>{e9b9ce88-c82e-4862-acd5-386ac6434154}</UniqueIdentifier>
     </Filter>
@@ -93,6 +90,9 @@
     </Filter>
     <Filter Include="External Libraries\Devil">
       <UniqueIdentifier>{bd152624-45cb-4a41-9088-baa8631da1a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Code\Modules\Internal Engine\UI\Editor">
+      <UniqueIdentifier>{ed486cda-8dad-458b-85aa-105add3d5e64}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -466,10 +466,10 @@
       <Filter>External Libraries\Assimp\Port</Filter>
     </ClInclude>
     <ClInclude Include="Panel.h">
-      <Filter>Source Code\Modules\Internal Engine\Editor</Filter>
+      <Filter>Source Code\Modules\Internal Engine\UI\Editor</Filter>
     </ClInclude>
     <ClInclude Include="PanelConsole.h">
-      <Filter>Source Code\Modules\Internal Engine\Editor</Filter>
+      <Filter>Source Code\Modules\Internal Engine\UI\Editor</Filter>
     </ClInclude>
     <ClInclude Include="ModuleLoadObject.h">
       <Filter>Source Code\Modules\Internal Engine</Filter>
@@ -515,6 +515,12 @@
     </ClInclude>
     <ClInclude Include="MeshHandler.h">
       <Filter>Source Code\Modules\Internal Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="PanelAbout.h">
+      <Filter>Source Code\Modules\Internal Engine\UI\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="ModuleHardware.h">
+      <Filter>Source Code\Modules</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -684,8 +690,8 @@
       <Filter>External Libraries\MatGeoLib\Time</Filter>
     </ClCompile>
     <ClCompile Include="PanelConsole.cpp">
-      <Filter>Source Code\Modules\Internal Engine\Editor</Filter>
-      </ClCompile>
+      <Filter>Source Code\Modules\Internal Engine\UI\Editor</Filter>
+    </ClCompile>
     <ClCompile Include="ModuleLoadObject.cpp">
       <Filter>Source Code\Modules\Internal Engine</Filter>
     </ClCompile>
@@ -701,6 +707,10 @@
     <ClCompile Include="FileSystem.cpp">
       <Filter>Source Code\Modules\Internal Engine</Filter>
     </ClCompile>
+    <ClCompile Include="PanelAbout.cpp">
+      <Filter>Source Code\Modules\Internal Engine\UI\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="ModuleHardware.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="MathGeoLib\include\Geometry\TriangleMesh_IntersectRay_AVX.inl">

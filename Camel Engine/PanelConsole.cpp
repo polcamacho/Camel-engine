@@ -12,7 +12,7 @@ update_status PanelConsole::Draw()
 void PanelConsole::DisplayConsole()
 {
 	ImGui::Begin("Console",  &App->engine_ui->console_window);
-	LOG("POLLA");
+	//LOG("POLLA");
 	if (ImGui::Button("Clear")) Clear();
 	ImGui::SameLine();
 	bool copy = ImGui::Button("Copy");
@@ -31,6 +31,8 @@ void PanelConsole::DisplayConsole()
 	ScrollToBottom = false;
 	ImGui::EndChild();
 	ImGui::End();
+
+	
 
 }
 
