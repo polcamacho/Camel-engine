@@ -5,7 +5,8 @@
 #include "PanelConsole.h"
 #include "Panel.h"
 
-#include "imgui/imgui_internal.h"
+#include "imgui/imgui.h"
+
 #include "Assimp/Assimp/include/version.h"
 #include "Devil/include/il.h"
 
@@ -33,9 +34,9 @@ bool EngineUI::Start()
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
-	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls ImGuiWindowFlags_MenuBar
-
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls ImGuiWindowFlags_MenuBar
+	
 	io.DisplaySize.x = 1280.0f;
 	io.DisplaySize.y = 720.0f;
 	io.IniFilename = "imgui.ini";
@@ -45,9 +46,19 @@ bool EngineUI::Start()
 	//ImGui::StyleColorsClassic();
 
 	// Setup Platform/Renderer bindings
-	ImGui_ImplOpenGL3_Init();
 	ImGui_ImplSDL2_InitForOpenGL(App->window->window, App->renderer3D->context);
+	ImGui_ImplOpenGL3_Init();
+
 	panel_list.push_back(console_p = new PanelConsole("Console"));
+
+	std::vector<const char*>::iterator item = App->log_saves.begin();
+
+	for (item; item != App->log_saves.end(); ++item)
+	{
+		const char* logs = (*item);
+
+		LOG("%s", logs);
+	}
 	return ret;
 }
 
@@ -95,9 +106,14 @@ update_status EngineUI::PostUpdate(float dt)
 {
 	update_status ret = UPDATE_CONTINUE;
 
-	ImGui::Render();
-
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
 	ImVec4 clear_color = ImVec4(0.0f, 0.0f, 0.0f, 0.64f);
+
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplSDL2_NewFrame(App->window->window);
+	//ImGui::NewFrame();
+
+	
 
 	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 	glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
@@ -113,8 +129,10 @@ update_status EngineUI::PostUpdate(float dt)
 	//GLint last_program; 
 	//glGetIntegerv(GL_CURRENT_PROGRAM, &last_program);
 	//glUseProgram(0);
-	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+	
 	//glUseProgram(last_program);
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 	return ret;
 }
