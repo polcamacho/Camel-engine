@@ -197,6 +197,21 @@ void EngineUI::MainMenu()
 
 			ImGui::EndMenu();
 		}
+
+		if (ImGui::BeginMenu("View"))
+		{
+			if (ImGui::MenuItem("Hierarchy"))
+			{
+				hierarchy_window = (hierarchy_window == false) ? true : false;
+			}
+
+			if (ImGui::MenuItem("Console"))
+			{
+				console_window = (console_window == false) ? true : false;
+			}
+
+			ImGui::EndMenu();
+		}
 		
 		if (ImGui::BeginMenu("Help"))
 		{
