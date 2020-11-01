@@ -76,9 +76,29 @@ update_status ModuleSceneIntro::Update(float dt)
 	PlaneP p(0, 1, 0, 0);
 	p.axis = true;
 
-
 	p.Render();
 	root->Update();
+
+	std::vector<CubeP*>::iterator ic = cubes.begin();
+	for (; ic != cubes.end(); ++ic)
+	{
+		(*ic)->InnerRender(vec4(0,0,0,0));
+	}
+	std::vector<SphereP*>::iterator is = spheres.begin();
+	for (; is != spheres.end(); ++is)
+	{
+		(*is)->InnerRender(vec4(0, 0, 0, 0));
+	}
+	std::vector<PyramidP*>::iterator ip = pyramids.begin();
+	for (; ip != pyramids.end(); ++ip)
+	{
+		(*ip)->InnerRender(vec4(0, 0, 0, 0));
+	}
+	std::vector<CylinderP*>::iterator it = cylinders.begin();
+	for (; it != cylinders.end(); ++it)
+	{
+		(*it)->InnerRender(vec4(0, 0, 0, 0));
+	}
 
 	return UPDATE_CONTINUE;
 }
@@ -145,5 +165,24 @@ void ModuleSceneIntro::SetTextureDragging(uint& tex_id)
 		}
 
 
+	}
+}
+
+void ModuleSceneIntro::CreatePrimitive(PrimitiveTypes type)
+{
+	switch (type)
+	{
+	case Primitive_Cube:
+		cubes.push_back(new CubeP({ 12,0,0 }, { 2,2,2 }));
+		break;
+	case Primitive_Sphere:
+		spheres.push_back(new SphereP({ 2,0,2 }, 1.0f, 10, 10));
+		break;
+	case Primitive_Pyramid:
+		pyramids.push_back(new PyramidP({ 5,0,0 }, { 2,10,2 }));
+		break;
+	case Primitive_Cylinder:
+		cylinders.push_back(new CylinderP({ 5,0,0 }, 1.0f, 5.0f, 10));
+		break;
 	}
 }

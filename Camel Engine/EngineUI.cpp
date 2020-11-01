@@ -233,6 +233,28 @@ void EngineUI::MainMenu()
 
 			ImGui::EndMenu();
 		}
+
+		if (ImGui::BeginMenu("Create Primitive"))
+		{
+			if (ImGui::MenuItem("Cube"))
+			{
+				App->scene_intro->CreatePrimitive(PrimitiveTypes::Primitive_Cube);
+			}
+			if (ImGui::MenuItem("Sphere"))
+			{
+				App->scene_intro->CreatePrimitive(PrimitiveTypes::Primitive_Sphere);
+			}
+			if (ImGui::MenuItem("Pyramid"))
+			{
+				App->scene_intro->CreatePrimitive(PrimitiveTypes::Primitive_Pyramid);
+			}
+			if (ImGui::MenuItem("Cylinder"))
+			{
+				App->scene_intro->CreatePrimitive(PrimitiveTypes::Primitive_Cylinder);
+			}
+
+			ImGui::EndMenu();
+		}
 		
 		if (ImGui::BeginMenu("Help"))
 		{
