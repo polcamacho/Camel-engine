@@ -215,6 +215,7 @@
     <ClInclude Include="PanelConsole.h" />
     <ClInclude Include="PanelHierarchy.h" />
     <ClInclude Include="parson\parson.h" />
+    <ClInclude Include="PathNode.h" />
     <ClInclude Include="Primitive.h" />
     <ClInclude Include="PugiXml\src\pugiconfig.hpp" />
     <ClInclude Include="PugiXml\src\pugixml.hpp" />

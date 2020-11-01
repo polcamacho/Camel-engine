@@ -1,9 +1,5 @@
 #include "Application.h"
 #include "JSONDataController.h"
-
-
-
-
 #include "MathGeoLib/include/MathBuildConfig.h"
 #include "MathGeoLib/include/MathGeoLib.h"
 
@@ -16,6 +12,7 @@ Application::Application()
 	camera = new ModuleCamera3D(true);
 	engine_ui = new EngineUI(true);
 	load_object = new ModuleLoadObject(true);
+	file_system = new FileSystem(true);
 
 	// The order of calls is very important!
 	// Modules will Init() Start() and Update in this order
@@ -28,6 +25,7 @@ Application::Application()
 
 	// Load Object
 	AddModule(load_object);
+	AddModule(file_system);
 
 	//Scene
 	AddModule(scene_intro);

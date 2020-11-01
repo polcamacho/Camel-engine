@@ -58,7 +58,21 @@ update_status ModuleLoadObject::Update(float dt)
 std::vector<MeshPart*>* ModuleLoadObject::LoadObjectData(const char* path)
 {
 	// Load FBX
-	const aiScene* scene = aiImportFile(path, aiProcessPreset_TargetRealtime_MaxQuality);
+	const aiScene* scene = nullptr;
+	char* buffer = nullptr;
+	std::string file_path(path);
+	// Shows directory of dropped file
+	file_path.erase(0, file_path.find_last_of("\\") + 1);
+	file_path = "Assets/Models/" + file_path;
+	uint buffer_size = App->file_system->Load(file_path.c_str(), &buffer);
+	
+	if (buffer) {
+		scene = aiImportFileFromMemory(buffer, buffer_size, aiProcessPreset_TargetRealtime_MaxQuality, NULL);
+	}
+	else {
+		scene = aiImportFile(path, aiProcessPreset_TargetRealtime_MaxQuality);
+	}
+		
 	FullMesh* ret = new FullMesh;
 	ret->id = path;
 	if (scene != nullptr && scene->HasMeshes())
@@ -177,15 +191,28 @@ void ModuleLoadObject::CreateCheckerBuffer(uint& id)
 void ModuleLoadObject::LoadTexture(const char* path_texture)
 {
 	ILuint imageID = 0;
+	ILenum type;
+	uint buffer_size;
 
 	ilGenImages(1, &imageID);
 	ilBindImage(imageID);
 	ilEnable(IL_ORIGIN_SET);
 	ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
 
-	//imageID =ilutGLBindTexImage();
-	ilLoadImage(path_texture);
-
+	char* buffer = nullptr;
+	std::string file_path(path_texture);
+	file_path.erase(0, file_path.find_last_of("\\") + 1);
+	file_path = "Assets/Textures/" + file_path;
+	buffer_size = App->file_system->Load(file_path.c_str(), &buffer);
+	
+	if (file_path.substr(file_path.find_last_of(".")) == ".jpg") {
+		type = IL_JPG;
+	}
+	else if (file_path.substr(file_path.find_last_of(".")) == ".png"){
+		type = IL_PNG;
+	}
+	ilLoadL(type, buffer, buffer_size);
+	
 	if (imageID != NULL) {
 		LOG("path: %s", path_texture);
 	}
