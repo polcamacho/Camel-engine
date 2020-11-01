@@ -4,6 +4,7 @@
 #include "Component.h"
 #include "ComponentTransform.h"
 #include "ComponentMesh.h"
+#include "PanelInspector.h"
 #include "Primitive.h"
 #include <gl/GL.h>
 #include "glew/include/glew.h"
@@ -74,6 +75,8 @@ update_status ModuleSceneIntro::Update(float dt)
 {
 	PlaneP p(0, 1, 0, 0);
 	p.axis = true;
+
+
 	p.Render();
 	root->Update();
 

@@ -79,13 +79,19 @@ void PanelInspector::DisplayInspector()
 
 	if (ImGui::CollapsingHeader("Texture"))
 	{
+		
+		if (ImGui::Checkbox("Enable Texture", &GL_Texture_2D)) {}
+
+		
 		if (App->scene_intro->selected_game_obj != nullptr)
 		{
 			for (std::vector<FullMesh*>::iterator iter = App->scene_intro->meshes.begin(); iter != App->scene_intro->meshes.end(); ++iter)
 			{
 				if ((*iter)->id == App->scene_intro->selected_game_obj->name.c_str())
 				{
-					ImGui::Image((ImTextureID)(*(*iter)->parts.begin())->id_texture, ImGui::GetWindowSize());
+
+					ImGui::Image((ImTextureID)(*(*iter)->parts.begin())->texture_id, ImVec2(150,150), ImVec2(0, 1), ImVec2(1, 0));
+
 						
 				}
 			}

@@ -58,6 +58,7 @@ public:
 	bool about_window = false;
 	bool hierarchy_window = false;
 	bool inspector_window = false;
+	bool status_window = false;
 	
 
 	std::vector<Panel*> panel_list;
