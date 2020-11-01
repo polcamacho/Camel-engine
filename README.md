@@ -16,16 +16,25 @@ https://github.com/polcamacho/Camel-engine
 ## Engine controls
 * WSAD: Move camera forward/backward/left/right.
 * Mouse wheel: Zoom in/out.
+* Mouse Botton Center (drag mouse): Move left and right.
 * Alt + Left click: Move around an object.
 * F: Focus the camera in a selected object.
 * SHIFT (Holded): Duplicate WSAD movement.
 
 ## Functionality
-Camel Engine supports 3D model and texture loading. Also, it is possible to drag and drop, with left mouse click hovered, models and textures. 
+Camel Engine supports 3D model and texture loading. Also, it is possible to drag and drop, with left mouse click hovered, models and textures.
+This models will appear with the textures they were exported with and the user can change textures dragging them from the texture folder.
 
 This engine has 3 differenciated parts: The hierarchy, where are displayed all game objects that are present at sceen, with root object that corresponds to 
 scene, and all child objects that a game object can have. Second, the scene itself, that shows models and textures and 3D scene. And finally, the inspector, where
-are shown the game object components: Transform (object position, scale and rotation), mesh and material (texture).
+are shown the game object components: Transform (object position, scale and rotation), mesh and material (texture). Also the user is able to hide an object or only hide its texture.
+
+And last but not least there is the main menu bar where appear few other functionalities:
+
+ * The user can create 4 different primitives in determined positions (Cube, Sphere, Cylinder and Pyramid).
+ * Open status, console, hierarchy and inspector windows.
+ * About info of the project
+ * Close the application
 
 ## License
 
