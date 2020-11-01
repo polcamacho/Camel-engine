@@ -35,17 +35,28 @@ void PanelInspector::DisplayInspector()
 			LOG("hide");
 		}
 
-		/*ImGui::SameLine();
+		ImGui::SameLine();
+
+
 		if (ImGui::Button("delete", ImVec2(90, 20)))
 		{
-			if (App->scene_intro->selected_game_obj->parent->type == OBJECT_TYPE::SUBPARENT)
+			std::vector<GameObject*>	childs = App->scene_intro->selected_game_obj->childs;
+			if (!childs.empty())
 			{
-				App->scene_intro->root->RemoveSubChildGameObject(App->scene_intro->selected_game_obj);
+				for (std::vector<GameObject*>::iterator iter = childs.begin(); iter != childs.end(); ++iter)
+				{
+					App->scene_intro->root->DeleteChild(App->scene_intro->selected_game_obj);
+
+				}
 			}
 
-			else App->scene_intro->root->RemoveGameObject(App->scene_intro->selected_game_obj);
+			else
+			{ 
+				delete App->scene_intro->selected_game_obj;
+				App->scene_intro->selected_game_obj = nullptr;
+			}
 
-		}*/
+		}
 
 
 

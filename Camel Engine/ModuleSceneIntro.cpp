@@ -81,10 +81,14 @@ update_status ModuleSceneIntro::Update(float dt)
 //TODO: Review non copy method
 std::vector<MeshPart*>* ModuleSceneIntro::AddMesh(const char* path)
 {
+	
+		std::string newid = path;
+		newid.substr(newid.find_last_of("\\"));
+
 	std::vector<FullMesh*>::iterator it = meshes.begin();
 	for (; it < meshes.end() && meshes.size() > 0; ++it)
 	{
-		if (path == (*it)->id) return &(*it)->parts;
+		if (newid == (*it)->id) return &(*it)->parts;
 	}
 	return App->load_object->LoadObjectData(path);
 }
@@ -111,11 +115,13 @@ void ModuleSceneIntro::CreateCheckerBuffer(uint& id)
 
 void ModuleSceneIntro::CreateGameObjectByDragging(const char* path)
 {
-	root->AddGameObjectAsChild(new GameObject(std::string(path), root));
+	std::string name = path;
+	name.substr(name.find_last_of("\\\\"));
+	root->AddGameObjectAsChild(new GameObject(name, root));
 	std::vector<GameObject*>::iterator it = root->GetChilds()->begin();
 	for (; it != root->GetChilds()->end(); ++it)
 	{
-		if ((*it)->GetName() == std::string(path))
+		if ((*it)->GetName() == name)
 		{
 			(*it)->CreateComponent(Component::COMPONENT_TYPE::MESH);
 			(*it)->GetComponentMesh()->AssignMesh(path);

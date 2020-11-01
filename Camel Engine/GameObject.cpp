@@ -11,15 +11,21 @@ GameObject::~GameObject()
 {
 	//Empty components
 	std::vector<Component*>::iterator comp = components.begin();
-	for (; comp != components.end();++comp)delete* comp;
+	for (; comp != components.end() && components.size() > 0 ; ++comp)delete* comp;
 	components.clear();
 
-	//Empty childs
-	if (childs.size() != 0)
-		GetChildsNewParent();
+	std::vector<GameObject*>::iterator obj = childs.begin();
+	for (; obj != childs.end() && childs.size() > 0; ++obj)delete* obj;
+	childs.clear();
 
-	//Deletes gameobject pointer from its parent
-	parent->EraseChildPointer(this);
+	//Empty childs
+	/* if (childs.size() != 0)
+		GetChildsNewParent(); */
+
+		//Deletes gameobject pointer from its parent
+		parent->EraseChildPointer(this);
+
+	parent = nullptr;
 }
 
 void GameObject::Enable()
@@ -97,7 +103,7 @@ void GameObject::DeleteChild(GameObject* child)
 		for (it = childs.begin(); it != childs.end(); ++it) {
 			if (*it == child)
 			{
-				(*it)->GetChildsNewParent();
+				//(*it)->GetChildsNewParent();
 				childs.erase(it);
 				delete* it;
 				return;
