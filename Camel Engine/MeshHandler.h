@@ -17,6 +17,8 @@ struct MeshPart {   //all the data needed to print a mesh
 struct FullMesh {
     std::string id;
     std::vector<MeshPart*> parts;
+	uint num_index;
+	uint num_vertex;
 };
 
 struct MeshData {

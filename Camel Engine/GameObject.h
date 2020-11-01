@@ -11,6 +11,9 @@
 
 class ComponentMesh;
 
+
+
+
 /// ///////////////////////////////////////// ///
 /// The first game object in scene, aka root, ///
 /// must have root as name, and recieve		  ///
@@ -89,7 +92,10 @@ public:
 	std::string					name;
 	std::vector<Component*>		components;
 	std::vector<GameObject*>	childs;
-	
+
+
+	bool show = false;
+
 	//Components:
 	ComponentMesh*				comp_mesh;
 };

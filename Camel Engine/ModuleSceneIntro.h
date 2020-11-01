@@ -20,6 +20,7 @@ public:
 	std::vector<MeshPart*>* AddMesh(const char* path);
 
 	void CreateGameObjectByDragging(const char* path);
+	void UpdateGameObject(GameObject* parent);
 	void SetTextureDragging(uint &tex_id);
 
 public:

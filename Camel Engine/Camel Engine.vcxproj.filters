@@ -525,6 +525,9 @@
     <ClInclude Include="PanelHierarchy.h">
       <Filter>Source Code\Modules\Internal Engine\UI\Editor</Filter>
     </ClInclude>
+    <ClInclude Include="PanelInspector.h">
+      <Filter>Source Code\Modules\Internal Engine\UI\Editor</Filter>
+    </ClInclude>
     <ClInclude Include="PathNode.h">
       <Filter>Source Code\Modules\Internal Engine</Filter>
     </ClInclude>
@@ -720,6 +723,9 @@
       <Filter>Source Code\Utils</Filter>
     </ClCompile>
     <ClCompile Include="PanelHierarchy.cpp">
+      <Filter>Source Code\Modules\Internal Engine\UI\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Panelinspector.cpp">
       <Filter>Source Code\Modules\Internal Engine\UI\Editor</Filter>
     </ClCompile>
   </ItemGroup>

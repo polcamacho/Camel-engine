@@ -76,7 +76,10 @@ std::vector<MeshPart*>* ModuleLoadObject::LoadObjectData(const char* path)
 	}
 		
 	FullMesh* ret = new FullMesh;
-	ret->id = path;
+	ret->num_index = 0;
+	ret->num_vertex = 0;
+	std::string newid = path;
+	newid.erase(0, newid.find_last_of("\\") + 1);
 	if (scene != nullptr && scene->HasMeshes())
 	{
 		for (int num_meshes = 0; num_meshes < scene->mNumMeshes; ++num_meshes)
@@ -155,6 +158,8 @@ std::vector<MeshPart*>* ModuleLoadObject::LoadObjectData(const char* path)
 			p->id_tex_coords = m.id_tex_coords;
 			p->texture_id = texture_id;
 			ret->parts.push_back(p);
+			ret->num_index += m.num_index;
+			ret->num_vertex += m.num_vertex;
 		}
 
 		// Call after import data
@@ -164,7 +169,7 @@ std::vector<MeshPart*>* ModuleLoadObject::LoadObjectData(const char* path)
 	
 	else
 		LOG("Error loading scene % s", scene);
-
+	ret->id =  newid;
 	App->scene_intro->meshes.push_back(ret);
 
 	return &ret->parts;

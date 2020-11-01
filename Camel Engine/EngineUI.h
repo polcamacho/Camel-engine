@@ -15,6 +15,7 @@ class Panel;
 class PanelConsole;
 class PanelAbout;
 class PanelHierarchy;
+class PanelInspector;
 
 class EngineUI : public Module
 {
@@ -50,11 +51,14 @@ public:
 	PanelConsole* console_p;
 	PanelAbout* about_p;
 	PanelHierarchy* hierarchy_p;
+	PanelInspector* inspector_p;
 	
 
 	bool console_window = false;
 	bool about_window = false;
 	bool hierarchy_window = false;
+	bool inspector_window = false;
+	bool status_window = false;
 	
 
 	std::vector<Panel*> panel_list;

@@ -10,6 +10,7 @@ ComponentMesh::ComponentMesh(GameObject* owner, bool active) : Component(COMPONE
 
 ComponentMesh::~ComponentMesh()
 {
+	mesh->clear();
 }
 
 void ComponentMesh::Update()

@@ -7,6 +7,7 @@
 #include "PanelConsole.h"
 #include "PanelAbout.h"
 #include "PanelHierarchy.h"
+#include "PanelInspector.h"
 #include "imgui/imgui.h"
 
 #include "Assimp/Assimp/include/version.h"
@@ -23,9 +24,12 @@ EngineUI::EngineUI(bool start_enabled) : Module(start_enabled) {
 	console_p = nullptr;
 	about_p = nullptr;
 	hierarchy_p = nullptr;
+	inspector_p = nullptr;
+
 	console_window = true;
-	about_window = true;
+	about_window = false;
 	hierarchy_window = true;
+	inspector_window = true;
 }
 
 EngineUI::~EngineUI() {}
@@ -45,6 +49,7 @@ bool EngineUI::Start()
 	io.DisplaySize.x = 1280.0f;
 	io.DisplaySize.y = 720.0f;
 	io.IniFilename = "imgui.ini";
+	io.WantSaveIniSettings = false;	
 
 	// Setup Dear ImGui style
 	ImGui::StyleColorsDark();
@@ -57,6 +62,7 @@ bool EngineUI::Start()
 	panel_list.push_back(console_p = new PanelConsole("Console"));
 	panel_list.push_back(about_p = new PanelAbout("About"));
 	panel_list.push_back(hierarchy_p = new PanelHierarchy("Hierarchy"));
+	panel_list.push_back(inspector_p = new PanelInspector("Inspector"));
 
 	std::vector<const char*>::iterator item = App->log_saves.begin();
 
@@ -91,6 +97,7 @@ bool EngineUI::CleanUp()
 	console_p = nullptr;
 	hierarchy_p = nullptr;
 	about_p = nullptr;
+	inspector_p = nullptr;
 
 	return true;
 }
@@ -108,8 +115,7 @@ update_status EngineUI::PreUpdate(float dt)
 // Update
 update_status EngineUI::Update(float dt)
 {
-	bool show_demo_wndow = true;
-	ImGui::ShowDemoWindow(&show_demo_wndow);
+	
 
 	MainMenu();
 
@@ -153,40 +159,46 @@ update_status EngineUI::PostUpdate(float dt)
 
 void EngineUI::MainMenu()
 {
-	ImGui::Begin("Test", (bool*)0);
-	if (ImGui::CollapsingHeader("System Status")) {
-		TextNames();
-		if (ImGui::TreeNode("Graphics view")) {
-			App->DrawEngineGraphics();
-			ImGui::TreePop();
-		}
-		if (ImGui::TreeNode("Screen options")) {
-			CheckBoxOptions();
-			ScrollBarOptions();
-			ImGui::TreePop();
-		}
-		
-		if (ImGui::TreeNode("Hardware status")) {
-			HardwareDisplay();
-			ImGui::TreePop();
-		}
-
-		if (ImGui::TreeNode("Object options")) {
-
-			if (ImGui::Checkbox("Wireframe", &wireframe)) {
-				if (wireframe) {
-					glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-				}
-				else {
-					glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-				}
-			}
-			ImGui::TreePop();
-		}
-		//
-	}
 	
-	ImGui::End();
+	if (status_window)
+	{
+		ImGui::Begin("System Status", (bool*)0);
+		if (ImGui::CollapsingHeader("System Status")) {
+			TextNames();
+			if (ImGui::TreeNode("Graphics view")) {
+				App->DrawEngineGraphics();
+				ImGui::TreePop();
+			}
+			if (ImGui::TreeNode("Screen options")) {
+				CheckBoxOptions();
+				ScrollBarOptions();
+				ImGui::TreePop();
+			}
+
+			if (ImGui::TreeNode("Hardware status")) {
+				HardwareDisplay();
+				ImGui::TreePop();
+			}
+
+
+			if (ImGui::TreeNode("Object options")) {
+
+				if (ImGui::Checkbox("Wireframe", &wireframe)) {
+					if (wireframe) {
+						glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+					}
+					else {
+						glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+					}
+				}
+				ImGui::TreePop();
+			}
+			//
+		}
+
+		ImGui::End();
+	}
+
 	if (ImGui::BeginMainMenuBar())
 	{
 		if (ImGui::BeginMenu("File"))
@@ -207,6 +219,16 @@ void EngineUI::MainMenu()
 			if (ImGui::MenuItem("Console"))
 			{
 				console_window = (console_window == false) ? true : false;
+			}
+
+			if (ImGui::MenuItem("Inspector"))
+			{
+				inspector_window = (inspector_window == false) ? true : false;
+			}
+
+			if (ImGui::MenuItem("Status"))
+			{
+				status_window = (status_window == false) ? true : false;
 			}
 
 			ImGui::EndMenu();
