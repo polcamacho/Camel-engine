@@ -23,7 +23,10 @@ EngineUI::EngineUI(bool start_enabled) : Module(start_enabled) {
 	is_fullscreen = false, is_resizable = true, is_borderless = false, wireframe = false;
 	console_p = nullptr;
 	about_p = nullptr;
+	hierarchy_p = nullptr;
 	console_window = true;
+	about_window = true;
+	hierarchy_window = true;
 }
 
 EngineUI::~EngineUI() {}
@@ -54,6 +57,7 @@ bool EngineUI::Start()
 
 	panel_list.push_back(console_p = new PanelConsole("Console"));
 	panel_list.push_back(about_p = new PanelAbout("About"));
+	panel_list.push_back(hierarchy_p = new PanelHierarchy("Hierarchy"));
 
 	std::vector<const char*>::iterator item = App->log_saves.begin();
 
@@ -86,6 +90,7 @@ bool EngineUI::CleanUp()
 	panel_list.clear();
 	console_p->Clear();
 	console_p = nullptr;
+	hierarchy_p = nullptr;
 	about_p = nullptr;
 
 	return true;
@@ -192,11 +197,7 @@ void EngineUI::MainMenu()
 
 			ImGui::EndMenu();
 		}
-		if (ImGui::BeginMenu("View"))
-		{
-			console_window = (console_window == false) ? true : false;
-
-		}
+		
 		if (ImGui::BeginMenu("Help"))
 		{
 			if (ImGui::MenuItem("About"))
