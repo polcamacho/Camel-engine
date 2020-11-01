@@ -1,5 +1,6 @@
 #include "GameObject.h"
 #include "ComponentMesh.h"
+#include "ComponentTransform.h"
 #include "Component.h"
 
 GameObject::GameObject(std::string& name, GameObject* parent, bool active) :name(name), parent(parent), active(active) 
@@ -104,13 +105,15 @@ void GameObject::DeleteChild(GameObject* child)
 
 void GameObject::CreateComponent(Component::COMPONENT_TYPE type)
 {
+	//ComponentTransform* cTrans = new ComponentTransform(this);
+	ComponentMesh* cMesh = new ComponentMesh(this);
 	switch (type)
 	{
 	/*case Component::COMPONENT_TYPE::TRANSFORM:
-		components.push_back(new ComponentTransform(type));
+		CheckAddComponent(cTrans);
+		components.push_back(cTrans);
 		break;*/
 	case Component::COMPONENT_TYPE::MESH:
-		ComponentMesh* cMesh = new ComponentMesh(this);
 		CheckAddComponent(cMesh);
 		comp_mesh = cMesh;
 		break;
@@ -136,6 +139,22 @@ void GameObject::CheckAddComponent(Component* new_comp)
 std::vector<Component*>* const GameObject::GetComponents()
 {
 	return &components;
+}
+
+Component* GameObject::GetComponent(Component::COMPONENT_TYPE type)
+{
+	Component* comp = nullptr;
+	std::vector<Component*>::iterator ci = components.begin();
+	for (; ci != components.end(); ++ci)
+	{
+		if ((*ci)->GetComponentType() == type)
+		{
+			comp = (*ci);
+			return comp;
+		}
+	}
+
+	return comp;
 }
 
 ComponentMesh* GameObject::GetComponentMesh()

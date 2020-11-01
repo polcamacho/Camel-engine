@@ -507,6 +507,9 @@
     <ClInclude Include="MeshHandler.h">
       <Filter>Source Code\Modules\Internal Engine</Filter>
     </ClInclude>
+    <ClInclude Include="ComponentTransform.h">
+      <Filter>Source Code\Components</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="glmath.cpp">
@@ -688,6 +691,9 @@
     </ClCompile>
     <ClCompile Include="FileSystem.cpp">
       <Filter>Source Code\Modules\Internal Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="ComponentTransform.cpp">
+      <Filter>Source Code\Components</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

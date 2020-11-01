@@ -23,10 +23,10 @@ public:
 	void SetTextureDragging(uint &tex_id);
 
 public:
-	Cube* c;
-	Sphere* s;
-	Pyramid* pyr;
-	Cylinder* cyl;
+	CubeP* c;
+	SphereP* s;
+	PyramidP* pyr;
+	CylinderP* cyl;
 	GameObject* root;
 
 	//Meshes--

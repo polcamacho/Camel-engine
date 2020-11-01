@@ -1,6 +1,8 @@
 #include "Globals.h"
 #include "Application.h"
 #include "ModuleSceneIntro.h"
+#include "Component.h"
+#include "ComponentTransform.h"
 #include "ComponentMesh.h"
 #include "Primitive.h"
 #include <gl/GL.h>
@@ -69,10 +71,9 @@ bool ModuleSceneIntro::CleanUp()
 // Update
 update_status ModuleSceneIntro::Update(float dt)
 {
-	Plane p(0, 1, 0, 0);
+	PlaneP p(0, 1, 0, 0);
 	p.axis = true;
 	p.Render();
-	//App->renderer3D->RenderMesh(a);
 	root->Update();
 
 	return UPDATE_CONTINUE;
@@ -96,12 +97,16 @@ void ModuleSceneIntro::CreateGameObjectByDragging(const char* path)
 {
 	root->AddGameObjectAsChild(new GameObject(std::string(path), root));
 	std::vector<GameObject*>::iterator it = root->GetChilds()->begin();
+	//ComponentTransform* trans = nullptr;
 	for (; it != root->GetChilds()->end(); ++it)
 	{
 		if ((*it)->GetName() == std::string(path))
 		{
 			(*it)->CreateComponent(Component::COMPONENT_TYPE::MESH);
+			//(*it)->CreateComponent(Component::COMPONENT_TYPE::TRANSFORM);
 			(*it)->GetComponentMesh()->AssignMesh(path);
+			//((ComponentTransform*)(*it)->GetComponent(Component::COMPONENT_TYPE::TRANSFORM))->SetPosition(math::float3(1.0f,1.0f,1.0f));
+			//trans
 		}
 	}
 }
