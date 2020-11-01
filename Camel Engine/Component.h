@@ -41,6 +41,8 @@ public:
 	//Get component type
 	COMPONENT_TYPE GetComponentType();
 
+	GameObject* GetOwner();
+
 public:
 
 	bool			active;

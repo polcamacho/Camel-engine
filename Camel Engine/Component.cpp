@@ -33,3 +33,8 @@ Component::COMPONENT_TYPE Component::GetComponentType()
 {
 	return COMPONENT_TYPE();
 }
+
+GameObject* Component::GetOwner()
+{
+	return owner;
+}

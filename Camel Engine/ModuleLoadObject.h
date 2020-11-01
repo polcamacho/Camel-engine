@@ -16,7 +16,12 @@ public:
     update_status Update(float dt);
     bool CleanUp();
     std::vector<MeshPart*>* LoadObjectData(const char* path);
+    void CreateCheckersImage();
+    void CreateCheckerBuffer(uint& id);
+    void CreateTextureBuffer(uint& id);
+    void LoadTexture(const char* path_texture);
 public:
-   
+
+    GLubyte checkerImage[64][64][4];
 };
 #endif // !__MODULELOADOBJECT_H__

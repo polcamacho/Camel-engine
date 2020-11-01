@@ -48,9 +48,11 @@ update_status ModuleCamera3D::Update(float dt)
 		newPos -= Z * speed;
 	if (App->input->GetMouseZ() < 0)
 		newPos += Z * speed;
-
+	if (App->input->GetKey(SDL_SCANCODE_F) == KEY_DOWN) {
+		Look({ 0,2,5 }, { 0,0,0 },true);
+	}
 	if(App->input->GetKey(SDL_SCANCODE_R) == KEY_REPEAT) newPos.y += speed;
-	if(App->input->GetKey(SDL_SCANCODE_F) == KEY_REPEAT) newPos.y -= speed;
+	if(App->input->GetKey(SDL_SCANCODE_T) == KEY_REPEAT) newPos.y -= speed;
 
 	if(App->input->GetKey(SDL_SCANCODE_W) == KEY_REPEAT) newPos -= Z * speed;
 	if(App->input->GetKey(SDL_SCANCODE_S) == KEY_REPEAT) newPos += Z * speed;
@@ -59,8 +61,7 @@ update_status ModuleCamera3D::Update(float dt)
 	if(App->input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT) newPos -= X * speed;
 	if(App->input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT) newPos += X * speed;
 
-	Position += newPos;
-	Reference += newPos;
+	
 
 	// Mouse motion ----------------
 
@@ -98,6 +99,57 @@ update_status ModuleCamera3D::Update(float dt)
 
 		Position = Reference + Z * length(Position);
 	}
+
+	if ((App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_REPEAT) && (App->input->GetKey(SDL_SCANCODE_LALT) == KEY_REPEAT))
+	{
+		int dx = -App->input->GetMouseXMotion();
+		int dy = -App->input->GetMouseYMotion();
+
+		float Sensitivity = 0.25f;
+
+		if (dx != 0)
+		{
+			float DeltaX = (float)dx * Sensitivity;
+
+			X = rotate(X, DeltaX, vec3(0.0f, 1.0f, 0.0f));
+			Y = rotate(Y, DeltaX, vec3(0.0f, 1.0f, 0.0f));
+			Z = rotate(Z, DeltaX, vec3(0.0f, 1.0f, 0.0f));
+		}
+
+		if (dy != 0)
+		{
+			float DeltaY = (float)dy * Sensitivity;
+
+			Y = rotate(Y, DeltaY, X);
+			Z = rotate(Z, DeltaY, X);
+
+			if (Y.y < 0.0f)
+			{
+				Z = vec3(0.0f, Z.y > 0.0f ? 1.0f : -1.0f, 0.0f);
+				Y = cross(Z, X);
+			}
+		}
+
+	}
+
+	if (App->input->GetMouseButton(SDL_BUTTON_MIDDLE) == KEY_REPEAT)
+	{
+		if (App->input->GetMouseXMotion() > 0)
+			newPos -= X * (App->input->GetMouseXMotion() * dt) * (speed * 2);
+		
+		if (App->input->GetMouseXMotion() < 0)
+			newPos -= X * (App->input->GetMouseXMotion() * dt) * (speed * 2);
+		
+		if (App->input->GetMouseYMotion() > 0)
+			newPos += Y * (App->input->GetMouseYMotion() * dt) * (speed * 2);
+		
+		if (App->input->GetMouseYMotion() < 0)
+			newPos += Y * (App->input->GetMouseYMotion() * dt) * (speed * 2);
+		
+	}
+
+	Position += newPos;
+	Reference += newPos;
 
 	// Recalculate matrix -------------
 	CalculateViewMatrix();

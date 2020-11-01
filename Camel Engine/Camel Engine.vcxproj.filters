@@ -516,11 +516,17 @@
     <ClInclude Include="MeshHandler.h">
       <Filter>Source Code\Modules\Internal Engine</Filter>
     </ClInclude>
+    <ClInclude Include="ComponentTransform.h">
+      <Filter>Source Code\Components</Filter>
+    </ClInclude>
     <ClInclude Include="PanelAbout.h">
       <Filter>Source Code\Modules\Internal Engine\UI\Editor</Filter>
     </ClInclude>
     <ClInclude Include="PanelHierarchy.h">
       <Filter>Source Code\Modules\Internal Engine\UI\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="PathNode.h">
+      <Filter>Source Code\Modules\Internal Engine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -703,6 +709,9 @@
     </ClCompile>
     <ClCompile Include="FileSystem.cpp">
       <Filter>Source Code\Modules\Internal Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="ComponentTransform.cpp">
+      <Filter>Source Code\Components</Filter>
     </ClCompile>
     <ClCompile Include="PanelAbout.cpp">
       <Filter>Source Code\Modules\Internal Engine\UI\Editor</Filter>

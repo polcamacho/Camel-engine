@@ -18,20 +18,18 @@ public:
 	bool CleanUp();
 
 	std::vector<MeshPart*>* AddMesh(const char* path);
-	void CreateCheckersImage();
-	void CreateCheckerBuffer(uint& id);
 
 	void CreateGameObjectByDragging(const char* path);
+	void SetTextureDragging(uint &tex_id);
 
 public:
-	Cube* c;
-	Sphere* s;
-	Pyramid* pyr;
-	Cylinder* cyl;
+	CubeP* c;
+	SphereP* s;
+	PyramidP* pyr;
+	CylinderP* cyl;
 	GameObject* root;
 	GameObject* selected_game_obj;
 
-	GLubyte checkerImage[64][64][4];
 	//Meshes--
 	std::vector<FullMesh*> meshes;
 	//--------
