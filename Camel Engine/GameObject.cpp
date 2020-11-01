@@ -105,14 +105,13 @@ void GameObject::DeleteChild(GameObject* child)
 
 void GameObject::CreateComponent(Component::COMPONENT_TYPE type)
 {
-	//ComponentTransform* cTrans = new ComponentTransform(this);
 	ComponentMesh* cMesh = new ComponentMesh(this);
+	ComponentTransform* cTrans = new ComponentTransform(this);
 	switch (type)
 	{
-	/*case Component::COMPONENT_TYPE::TRANSFORM:
+	case Component::COMPONENT_TYPE::TRANSFORM:
 		CheckAddComponent(cTrans);
-		components.push_back(cTrans);
-		break;*/
+		break;
 	case Component::COMPONENT_TYPE::MESH:
 		CheckAddComponent(cMesh);
 		comp_mesh = cMesh;
@@ -125,7 +124,6 @@ void GameObject::CreateComponent(Component::COMPONENT_TYPE type)
 	//	break;
 	}
 }
-
 
 void GameObject::CheckAddComponent(Component* new_comp)
 {

@@ -3,36 +3,30 @@
 #define __COMPONENTTRANSFORM_H__
 
 #include "Component.h"
-#include "MathGeoLib/include/MathGeoLib.h"
+#include "glmath.h"
 
 class ComponentTransform : public Component 
 {
 public:
 
 	// Parameter Constructor
-	ComponentTransform(GameObject* owner, math::float3 position = math::float3::zero, math::float3 rotation = math::float3::zero, math::float3 scale = math::float3::one);
-
-	// Copy Constructor
-	ComponentTransform(ComponentTransform& transform);
+	ComponentTransform(GameObject* owner);
 
 	// Destructor
 	~ComponentTransform();
 
 
 	// Get this transform position
-	math::float3 GetPosition() const;
+	vec3 GetPosition() const;
 
 	// Get this transform rotation
-	math::float3 GetRotation() const;
+	vec3 GetRotation() const;
 
 	// Get this transform scale
-	math::float3 GetScale() const;
-
-	// Get this transform quaternion
-	math::Quat GetQuaternion() const;
+	vec3 GetScale() const;
 
 	// Get transform matrix
-	math::float4x4 GetTransformMatrix() const;
+	mat4x4 GetTransformMatrix() const;
 
 	
 	// Update global matrix
@@ -40,27 +34,23 @@ public:
 
 
 	// Set this transform position
-	void SetPosition(math::float3& new_pos);
+	void SetPosition(vec3& new_pos);
 
 	// Set this transform rotation
-	void SetRotation(math::float3& new_rotation);
+	void SetRotation(vec3& new_rotation);
 
 	// Set this transform scale
-	void SetScale(math::float3& new_scale);
-
-	// Set this transform quaternion
-	void SetQuaternion(math::Quat& quaternion);
+	void SetScale(vec3& new_scale);
 
 	
 private:
 
-	math::float3 position;
-	math::float3 euler_angles;
-	math::float3 scale;
-	math::Quat quaternion_rotation;
+	vec3 position;
+	vec3 euler_angles;
+	vec3 scale;
 
-	math::float4x4 local_matrix;
-	math::float4x4 global_matrix;
+	mat4x4 local_matrix;
+	mat4x4 global_matrix;
 };
 
 #endif // !__COMPONENTTRANSFORM_H__

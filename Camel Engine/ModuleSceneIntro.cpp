@@ -104,10 +104,8 @@ void ModuleSceneIntro::CreateGameObjectByDragging(const char* path)
 		if ((*it)->GetName() == std::string(path))
 		{
 			(*it)->CreateComponent(Component::COMPONENT_TYPE::MESH);
-			//(*it)->CreateComponent(Component::COMPONENT_TYPE::TRANSFORM);
+			(*it)->CreateComponent(Component::COMPONENT_TYPE::TRANSFORM);
 			(*it)->GetComponentMesh()->AssignMesh(path);
-			//((ComponentTransform*)(*it)->GetComponent(Component::COMPONENT_TYPE::TRANSFORM))->SetPosition(math::float3(1.0f,1.0f,1.0f));
-			//trans
 		}
 	}
 }
