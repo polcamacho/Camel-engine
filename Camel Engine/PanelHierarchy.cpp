@@ -5,6 +5,7 @@
 
 
 
+
 update_status PanelHierarchy::Draw()
 {
 	if (App->engine_ui->hierarchy_window)

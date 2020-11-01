@@ -83,7 +83,7 @@ std::vector<MeshPart*>* ModuleSceneIntro::AddMesh(const char* path)
 {
 	
 		std::string newid = path;
-		newid.substr(newid.find_last_of("\\"));
+		newid.erase(0, newid.find_last_of("\\") +1);
 
 	std::vector<FullMesh*>::iterator it = meshes.begin();
 	for (; it < meshes.end() && meshes.size() > 0; ++it)
@@ -116,7 +116,8 @@ void ModuleSceneIntro::CreateCheckerBuffer(uint& id)
 void ModuleSceneIntro::CreateGameObjectByDragging(const char* path)
 {
 	std::string name = path;
-	name.substr(name.find_last_of("\\\\"));
+	name.erase(0, name.find_last_of("\\") +1);
+	
 	root->AddGameObjectAsChild(new GameObject(name, root));
 	std::vector<GameObject*>::iterator it = root->GetChilds()->begin();
 	for (; it != root->GetChilds()->end(); ++it)

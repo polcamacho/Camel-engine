@@ -55,13 +55,42 @@ void PanelInspector::DisplayInspector()
 				delete App->scene_intro->selected_game_obj;
 				App->scene_intro->selected_game_obj = nullptr;
 			}
-
 		}
-
-
-
 	}
 
+
+	if (ImGui::CollapsingHeader("Mesh"))
+	{
+		if (App->scene_intro->selected_game_obj != nullptr)
+		{
+			for (std::vector<FullMesh*>::iterator iter = App->scene_intro->meshes.begin(); iter != App->scene_intro->meshes.end(); ++iter)
+			{
+
+				if ((*iter)->id == App->scene_intro->selected_game_obj->name.c_str())
+				{
+					ImGui::Text("Mesh information");
+					ImGui::Separator();
+					ImGui::Text("%i num_vertex", (*iter)->num_vertex);
+					ImGui::Text("%i num_index", (*iter)->num_index);
+				}
+			}
+		}
+	}
+
+	if (ImGui::CollapsingHeader("Texture"))
+	{
+		if (App->scene_intro->selected_game_obj != nullptr)
+		{
+			for (std::vector<FullMesh*>::iterator iter = App->scene_intro->meshes.begin(); iter != App->scene_intro->meshes.end(); ++iter)
+			{
+				if ((*iter)->id == App->scene_intro->selected_game_obj->name.c_str())
+				{
+					ImGui::Image((ImTextureID)(*(*iter)->parts.begin())->id_texture, ImGui::GetWindowSize());
+						
+				}
+			}
+		}
+	}
 
 
 
