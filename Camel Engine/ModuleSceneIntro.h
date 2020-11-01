@@ -23,6 +23,8 @@ public:
 	void UpdateGameObject(GameObject* parent);
 	void SetTextureDragging(uint &tex_id);
 
+	void CreatePrimitive(PrimitiveTypes type);
+
 public:
 	CubeP* c;
 	SphereP* s;
@@ -33,6 +35,10 @@ public:
 
 	//Meshes--
 	std::vector<FullMesh*> meshes;
+	std::vector<CubeP*> cubes;
+	std::vector<SphereP*>spheres;
+	std::vector<PyramidP*> pyramids;
+	std::vector<CylinderP*> cylinders;
 	//--------
 	//std::vector<MeshPart*>* a;
 };
