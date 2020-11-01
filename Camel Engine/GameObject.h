@@ -74,6 +74,9 @@ public:
 	//Get a pointer to this game object components vector
 	std::vector<Component*>* const GetComponents();
 
+
+	Component* GetComponent(Component::COMPONENT_TYPE type);
+
 	ComponentMesh* GetComponentMesh();
 
 

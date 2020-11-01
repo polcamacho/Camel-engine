@@ -162,7 +162,7 @@ void ModuleRenderer3D::RenderMesh(std::vector<MeshPart*>* mesh)
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, (*it)->id_index);
 
-		glBindTexture(GL_TEXTURE_2D, (*it)->checkers_id);
+		glBindTexture(GL_TEXTURE_2D, (*it)->texture_id);
 		glDrawElements(GL_TRIANGLES, (*it)->num_index, GL_UNSIGNED_INT, NULL);
 
 		glBindBuffer(GL_ARRAY_BUFFER, 0);

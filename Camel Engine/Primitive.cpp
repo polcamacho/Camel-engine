@@ -82,12 +82,12 @@ void Primitive::InnerRender() const
 }
 
 // CUBE ============================================
-Cube::Cube() :Primitive()
+CubeP::CubeP() :Primitive()
 {
 	type = PrimitiveTypes::Primitive_Cube;
 }
 
-Cube::Cube(vec3 position, vec3 size) : Primitive()
+CubeP::CubeP(vec3 position, vec3 size) : Primitive()
 {
 	type = PrimitiveTypes::Primitive_Cube;
 	
@@ -148,7 +148,7 @@ Cube::Cube(vec3 position, vec3 size) : Primitive()
 }
 
 
-void Cube::InnerRender(vec4 rotation) const
+void CubeP::InnerRender(vec4 rotation) const
 {	
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glBindBuffer(GL_ARRAY_BUFFER, id_for_vertex);
@@ -161,12 +161,12 @@ void Cube::InnerRender(vec4 rotation) const
 }
 
 // SPHERE ============================================
-Sphere::Sphere() : Primitive()
+SphereP::SphereP() : Primitive()
 {
 	type = PrimitiveTypes::Primitive_Sphere;
 }
 
-Sphere::Sphere(vec3 position, float radius, int num_sectors, int num_stacks) : Primitive(), rad(radius), sectorCount (num_sectors), stackCount (num_stacks)
+SphereP::SphereP(vec3 position, float radius, int num_sectors, int num_stacks) : Primitive(), rad(radius), sectorCount (num_sectors), stackCount (num_stacks)
 {
 	pos.x = position.x;
 	pos.y = position.y;
@@ -281,7 +281,7 @@ Sphere::Sphere(vec3 position, float radius, int num_sectors, int num_stacks) : P
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * numindices, new_indices, GL_STATIC_DRAW);
 }
 
-void Sphere::InnerRender(vec4 rotation) const
+void SphereP::InnerRender(vec4 rotation) const
 {
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glBindBuffer(GL_ARRAY_BUFFER, id_for_vertex);
@@ -295,12 +295,12 @@ void Sphere::InnerRender(vec4 rotation) const
 
 // PYRAMID ==================================
 
-Pyramid::Pyramid(): Primitive()
+PyramidP::PyramidP(): Primitive()
 {
 	type = Primitive_Pyramid;
 }
 
-Pyramid::Pyramid(vec3 position, vec3 size) :Primitive()
+PyramidP::PyramidP(vec3 position, vec3 size) :Primitive()
 {
 	type = Primitive_Pyramid;
 	sizes.x = size.x;
@@ -350,7 +350,7 @@ Pyramid::Pyramid(vec3 position, vec3 size) :Primitive()
 	glBufferData(GL_ARRAY_BUFFER, sizeof(int) * 36, indices2, GL_STATIC_DRAW);
 }
 
-void Pyramid::InnerRender(vec4 rotation) const
+void PyramidP::InnerRender(vec4 rotation) const
 {
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glBindBuffer(GL_ARRAY_BUFFER, id_for_vertex);
@@ -365,12 +365,12 @@ void Pyramid::InnerRender(vec4 rotation) const
 }
 
 // CYLINDER ============================================
-Cylinder::Cylinder() : Primitive()
+CylinderP::CylinderP() : Primitive()
 {
 	type = PrimitiveTypes::Primitive_Cylinder;
 }
 
-Cylinder::Cylinder(vec3 position, float radius, float height, int num_sectors) : Primitive(), rad(radius), height(height), sectorCount(num_sectors)
+CylinderP::CylinderP(vec3 position, float radius, float height, int num_sectors) : Primitive(), rad(radius), height(height), sectorCount(num_sectors)
 {
 	type = PrimitiveTypes::Primitive_Cylinder;
 
@@ -523,7 +523,7 @@ Cylinder::Cylinder(vec3 position, float radius, float height, int num_sectors) :
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * numindices, new_indices, GL_STATIC_DRAW);
 }
 
-void Cylinder::InnerRender(vec4 rotation) const
+void CylinderP::InnerRender(vec4 rotation) const
 {
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glBindBuffer(GL_ARRAY_BUFFER, id_for_vertex);
@@ -537,17 +537,17 @@ void Cylinder::InnerRender(vec4 rotation) const
 }
 
 // LINE ==================================================
-Line::Line() : Primitive(), origin(0, 0, 0), destination(1, 1, 1)
+LineP::LineP() : Primitive(), origin(0, 0, 0), destination(1, 1, 1)
 {
 	type = PrimitiveTypes::Primitive_Line;
 }
 
-Line::Line(float x, float y, float z) : Primitive(), origin(0, 0, 0), destination(x, y, z)
+LineP::LineP(float x, float y, float z) : Primitive(), origin(0, 0, 0), destination(x, y, z)
 {
 	type = PrimitiveTypes::Primitive_Line;
 }
 
-void Line::InnerRender() const
+void LineP::InnerRender() const
 {
 	glLineWidth(2.0f);
 
@@ -562,17 +562,17 @@ void Line::InnerRender() const
 }
 
 // PLANE ==================================================
-Plane::Plane() : Primitive(), normal(0, 1, 0), constant(1)
+PlaneP::PlaneP() : Primitive(), normal(0, 1, 0), constant(1)
 {
 	type = PrimitiveTypes::Primitive_Plane;
 }
 
-Plane::Plane(float x, float y, float z, float d) : Primitive(), normal(x, y, z), constant(d)
+PlaneP::PlaneP(float x, float y, float z, float d) : Primitive(), normal(x, y, z), constant(d)
 {
 	type = PrimitiveTypes::Primitive_Plane;
 }
 
-void Plane::InnerRender() const
+void PlaneP::InnerRender() const
 {
 	glLineWidth(1.0f);
 

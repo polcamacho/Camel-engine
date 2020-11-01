@@ -1,6 +1,8 @@
 #include "Globals.h"
 #include "Application.h"
 #include "ModuleSceneIntro.h"
+#include "Component.h"
+#include "ComponentTransform.h"
 #include "ComponentMesh.h"
 #include "Primitive.h"
 #include <gl/GL.h>
@@ -41,12 +43,13 @@ bool ModuleSceneIntro::Start()
 		if ((*it)->GetName() == std::string("test"))
 		{
 			(*it)->CreateComponent(Component::COMPONENT_TYPE::MESH);
-			(*it)->GetComponentMesh()->AssignMesh("Assets/warrior.fbx");
+			(*it)->GetComponentMesh()->AssignMesh("Assets/Models/warrior.fbx");
 			CreateCheckersImage();
 			return ret;
 		}
 	}*/
-	CreateCheckersImage();
+	App->load_object->CreateCheckersImage();
+	//App->load_object->LoadTexture("Assets/Textures/Lenna.png");
 	return ret;
 }
 
@@ -69,16 +72,15 @@ bool ModuleSceneIntro::CleanUp()
 // Update
 update_status ModuleSceneIntro::Update(float dt)
 {
-	Plane p(0, 1, 0, 0);
+	PlaneP p(0, 1, 0, 0);
 	p.axis = true;
 	p.Render();
-	//App->renderer3D->RenderMesh(a);
 	root->Update();
 
 	return UPDATE_CONTINUE;
 }
 
-//TODO: Review non copy method
+// Add mesh to meshes vector. If it already exists, send pointer, not adding it
 std::vector<MeshPart*>* ModuleSceneIntro::AddMesh(const char* path)
 {
 	
@@ -88,30 +90,15 @@ std::vector<MeshPart*>* ModuleSceneIntro::AddMesh(const char* path)
 	std::vector<FullMesh*>::iterator it = meshes.begin();
 	for (; it < meshes.end() && meshes.size() > 0; ++it)
 	{
+
 		if (newid == (*it)->id) return &(*it)->parts;
+
+
 	}
 	return App->load_object->LoadObjectData(path);
 }
 
-void ModuleSceneIntro::CreateCheckersImage()
-{	
-	for (int i = 0; i < 64; i++) {
-		for (int j = 0; j < 64; j++) {
-			int c = ((((i & 0x2) == 0) ^ (((j & 0x2)) == 0))) * 255;
-			checkerImage[i][j][0] = (GLubyte)c;
-			checkerImage[i][j][1] = (GLubyte)c;
-			checkerImage[i][j][2] = (GLubyte)c;
-			checkerImage[i][j][3] = (GLubyte)255;
-		}
-	}
-}
 
-void ModuleSceneIntro::CreateCheckerBuffer(uint& id)
-{
-	glBindTexture(GL_TEXTURE_2D, id);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 64, 64, 0, GL_RGBA, GL_UNSIGNED_BYTE, checkerImage);
-	glBindTexture(GL_TEXTURE_2D, 0);
-}
 
 void ModuleSceneIntro::CreateGameObjectByDragging(const char* path)
 {
@@ -120,11 +107,13 @@ void ModuleSceneIntro::CreateGameObjectByDragging(const char* path)
 	
 	root->AddGameObjectAsChild(new GameObject(name, root));
 	std::vector<GameObject*>::iterator it = root->GetChilds()->begin();
+	//ComponentTransform* trans = nullptr;
 	for (; it != root->GetChilds()->end(); ++it)
 	{
 		if ((*it)->GetName() == name)
 		{
 			(*it)->CreateComponent(Component::COMPONENT_TYPE::MESH);
+			(*it)->CreateComponent(Component::COMPONENT_TYPE::TRANSFORM);
 			(*it)->GetComponentMesh()->AssignMesh(path);
 		}
 	}
@@ -140,6 +129,18 @@ void ModuleSceneIntro::UpdateGameObject(GameObject* parent)
 
 		if (!(*iter)->show)
 			UpdateGameObject((*iter));
+	}
+}
+
+void ModuleSceneIntro::SetTextureDragging(uint& tex_id)
+{
+	std::vector<FullMesh*>::iterator im = meshes.begin();
+	for (; im != meshes.end(); ++im) {
+		std::vector<MeshPart*>::iterator ip = (*im)->parts.begin();
+		for (; ip != (*im)->parts.end(); ++ip) {
+			(*ip)->texture_id = tex_id;
+		}
+
 
 	}
 }
