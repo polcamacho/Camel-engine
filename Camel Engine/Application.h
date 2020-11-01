@@ -25,12 +25,12 @@ public:
 	EngineUI* engine_ui;
 	ModuleCamera3D* camera;
 	ModuleLoadObject* load_object;
-
 	JSON_Value* main_root;
 
 	bool is_vsync;
 	int caps_fps_ideal;
 	int caps_fps_real;
+
 
 private:
 
@@ -47,6 +47,9 @@ private:
 
 	bool quit_engine;
 	Uint32 flags;
+	std::string license;
+	std::string version;
+
 
 public:
 
@@ -55,9 +58,16 @@ public:
 
 	bool Init();
 	update_status Update();
+	void OpenWebsite(const std::string& link);
+	const char* GetLicense();
+	const char* GetAppVersion();
+	void saveLog(const char* fmt, ...);
 	bool CleanUp();
 
+	std::vector
+<const char*> log_saves;
 	void DrawEngineGraphics();
+	void Log(const char* fmt, ...);
 	void QuitEngine();
 	void SetVsync();
 

@@ -16,6 +16,7 @@ ModuleSceneIntro::ModuleSceneIntro(bool start_enabled) : Module(start_enabled)
 	pyr = nullptr;
 	cyl = nullptr;
 	root = nullptr;
+	selected_game_obj = nullptr;
 }
 
 ModuleSceneIntro::~ModuleSceneIntro()

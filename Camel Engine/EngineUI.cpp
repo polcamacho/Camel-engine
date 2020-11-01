@@ -3,7 +3,12 @@
 #include "EngineUI.h"
 #include "ModuleWindow.h"
 
-#include "imgui/imgui_internal.h"
+#include "Panel.h"
+#include "PanelConsole.h"
+#include "PanelAbout.h"
+#include "PanelHierarchy.h"
+#include "imgui/imgui.h"
+
 #include "Assimp/Assimp/include/version.h"
 #include "Devil/include/il.h"
 
@@ -15,6 +20,12 @@ EngineUI::EngineUI(bool start_enabled) : Module(start_enabled) {
 	width = SCREEN_WIDTH;
 	height = SCREEN_HEIGHT;
 	is_fullscreen = false, is_resizable = true, is_borderless = false, wireframe = false;
+	console_p = nullptr;
+	about_p = nullptr;
+	hierarchy_p = nullptr;
+	console_window = true;
+	about_window = true;
+	hierarchy_window = true;
 }
 
 EngineUI::~EngineUI() {}
@@ -28,9 +39,9 @@ bool EngineUI::Start()
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
-	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls ImGuiWindowFlags_MenuBar
-
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls ImGuiWindowFlags_MenuBar
+	
 	io.DisplaySize.x = 1280.0f;
 	io.DisplaySize.y = 720.0f;
 	io.IniFilename = "imgui.ini";
@@ -40,9 +51,26 @@ bool EngineUI::Start()
 	//ImGui::StyleColorsClassic();
 
 	// Setup Platform/Renderer bindings
-	ImGui_ImplOpenGL3_Init();
 	ImGui_ImplSDL2_InitForOpenGL(App->window->window, App->renderer3D->context);
+	ImGui_ImplOpenGL3_Init();
 
+	panel_list.push_back(console_p = new PanelConsole("Console"));
+	panel_list.push_back(about_p = new PanelAbout("About"));
+	panel_list.push_back(hierarchy_p = new PanelHierarchy("Hierarchy"));
+
+	std::vector<const char*>::iterator item = App->log_saves.begin();
+
+	for (item; item != App->log_saves.end(); ++item)
+	{
+		const char* logs = (*item);
+
+		LOG("%s", logs);
+	}
+
+	LOG("Vendor: %s", glGetString(GL_VENDOR));
+	LOG("Renderer: %s", glGetString(GL_RENDERER));
+	LOG("OpenGL version supported %s", glGetString(GL_VERSION));
+	LOG("GLSL: %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
 	return ret;
 }
 
@@ -52,6 +80,17 @@ bool EngineUI::CleanUp()
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplSDL2_Shutdown();
 	ImGui::DestroyContext();
+	std::vector<Panel*>::iterator item = panel_list.begin();
+	
+	while (item != panel_list.end())
+	{
+		++item;
+	}
+	panel_list.clear();
+	console_p->Clear();
+	console_p = nullptr;
+	hierarchy_p = nullptr;
+	about_p = nullptr;
 
 	return true;
 }
@@ -79,13 +118,24 @@ update_status EngineUI::Update(float dt)
 
 update_status EngineUI::PostUpdate(float dt)
 {
+	update_status ret = UPDATE_CONTINUE;
 
-	ImGui::Render();
-
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
 	ImVec4 clear_color = ImVec4(0.0f, 0.0f, 0.0f, 0.64f);
+
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplSDL2_NewFrame(App->window->window);
+	//ImGui::NewFrame();
+
+	
 
 	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 	glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
+
+	for (std::vector<Panel*>::iterator item = panel_list.begin(); item != panel_list.end(); ++item)
+	{
+		ret = (*item)->Draw();
+	}
 	//glClear(GL_COLOR_BUFFER_BIT);
 
 	// If you are using this code with non-legacy OpenGL header/contexts (which you should not, prefer using imgui_impl_opengl3.cpp!!), 
@@ -93,10 +143,12 @@ update_status EngineUI::PostUpdate(float dt)
 	//GLint last_program; 
 	//glGetIntegerv(GL_CURRENT_PROGRAM, &last_program);
 	//glUseProgram(0);
-	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+	
 	//glUseProgram(last_program);
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-	return UPDATE_CONTINUE;
+	return ret;
 }
 
 void EngineUI::MainMenu()
@@ -133,6 +185,7 @@ void EngineUI::MainMenu()
 		}
 		//
 	}
+	
 	ImGui::End();
 	if (ImGui::BeginMainMenuBar())
 	{
@@ -143,12 +196,28 @@ void EngineUI::MainMenu()
 
 			ImGui::EndMenu();
 		}
+
+		if (ImGui::BeginMenu("View"))
+		{
+			if (ImGui::MenuItem("Hierarchy"))
+			{
+				hierarchy_window = (hierarchy_window == false) ? true : false;
+			}
+
+			if (ImGui::MenuItem("Console"))
+			{
+				console_window = (console_window == false) ? true : false;
+			}
+
+			ImGui::EndMenu();
+		}
+		
 		if (ImGui::BeginMenu("Help"))
 		{
 			if (ImGui::MenuItem("About"))
 			{
-				ImGui::Begin("About", (bool*)0);
-				ImGui::End();
+				about_window = (about_window == false) ? true : false;
+
 			}
 
 			ImGui::EndMenu();
@@ -157,11 +226,7 @@ void EngineUI::MainMenu()
 	}
 }
 
-void EngineUI::AboutWindow()
-{
-	ImGui::Begin("About");
-	ImGui::End();
-}
+
 
 void EngineUI::ConfigWindow() 
 {
@@ -172,6 +237,16 @@ void EngineUI::SystemWindow()
 {
 
 }
+
+
+void EngineUI::Log(const char* fmt, ...)
+{
+	if (console_p != nullptr && console_window)
+	{
+		console_p->AddLog(fmt);
+	}
+}
+
 
 void EngineUI::TextNames()
 {

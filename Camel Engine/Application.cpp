@@ -1,6 +1,9 @@
 #include "Application.h"
 #include "JSONDataController.h"
 
+
+
+
 #include "MathGeoLib/include/MathBuildConfig.h"
 #include "MathGeoLib/include/MathGeoLib.h"
 
@@ -32,8 +35,12 @@ Application::Application()
 	//Engine UI
 	AddModule(engine_ui);
 
+
+	//Hardware
+
 	// Renderer last!
 	AddModule(renderer3D);
+
 
 	is_vsync = true;
 	caps_fps_ideal = 30;
@@ -146,6 +153,26 @@ update_status Application::Update()
 	return ret;
 }
 
+void Application::OpenWebsite(const std::string& link)
+{
+	ShellExecuteA(NULL, "open", link.c_str(), NULL, NULL, SW_SHOWNORMAL);
+}
+
+const char* Application::GetLicense()
+{
+	return license.c_str();
+}
+
+const char* Application::GetAppVersion()
+{
+	return version.c_str();
+}
+
+void Application::saveLog(const char* fmt, ...)
+{
+	log_saves.push_back(fmt);
+}
+
 bool Application::CleanUp()
 {
 	json_value_free(main_root);
@@ -186,6 +213,11 @@ void Application::DrawEngineGraphics()
 	ImGui::PlotHistogram("##framerate", &fps_vec[0], fps_vec.size(), 0, graph_variable, 0.0f, 100.0f, ImVec2(310, 100));
 }
 
+void Application::Log(const char* fmt, ...)
+{
+	engine_ui->Log(fmt);
+}
+
 void Application::SetVsync()
 {
 	caps_fps_real = (1 / caps_fps_ideal) * 1000;
@@ -195,3 +227,5 @@ void Application::QuitEngine()
 {
 	quit_engine = true;
 }
+
+

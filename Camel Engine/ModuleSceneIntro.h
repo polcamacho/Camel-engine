@@ -28,6 +28,7 @@ public:
 	PyramidP* pyr;
 	CylinderP* cyl;
 	GameObject* root;
+	GameObject* selected_game_obj;
 
 	//Meshes--
 	std::vector<FullMesh*> meshes;

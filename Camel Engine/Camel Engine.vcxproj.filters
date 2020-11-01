@@ -91,6 +91,9 @@
     <Filter Include="External Libraries\Devil">
       <UniqueIdentifier>{bd152624-45cb-4a41-9088-baa8631da1a8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Code\Modules\Internal Engine\UI\Editor">
+      <UniqueIdentifier>{ed486cda-8dad-458b-85aa-105add3d5e64}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="glmath.h">
@@ -462,6 +465,12 @@
     <ClInclude Include="Assimp\Assimp\include\port\AndroidJNI\AndroidJNIIOSystem.h">
       <Filter>External Libraries\Assimp\Port</Filter>
     </ClInclude>
+    <ClInclude Include="Panel.h">
+      <Filter>Source Code\Modules\Internal Engine\UI\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="PanelConsole.h">
+      <Filter>Source Code\Modules\Internal Engine\UI\Editor</Filter>
+    </ClInclude>
     <ClInclude Include="ModuleLoadObject.h">
       <Filter>Source Code\Modules\Internal Engine</Filter>
     </ClInclude>
@@ -510,6 +519,12 @@
     <ClInclude Include="ComponentTransform.h">
       <Filter>Source Code\Components</Filter>
     </ClInclude>
+    <ClInclude Include="PanelAbout.h">
+      <Filter>Source Code\Modules\Internal Engine\UI\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="PanelHierarchy.h">
+      <Filter>Source Code\Modules\Internal Engine\UI\Editor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="glmath.cpp">
@@ -547,9 +562,6 @@
     </ClCompile>
     <ClCompile Include="Application.cpp">
       <Filter>Source Code\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="log.cpp">
-      <Filter>Source Code\Tools\log</Filter>
     </ClCompile>
     <ClCompile Include="PugiXml\src\pugixml.cpp">
       <Filter>Source Code\Tools\pugi</Filter>
@@ -677,6 +689,9 @@
     <ClCompile Include="MathGeoLib\include\Time\Clock.cpp">
       <Filter>External Libraries\MatGeoLib\Time</Filter>
     </ClCompile>
+    <ClCompile Include="PanelConsole.cpp">
+      <Filter>Source Code\Modules\Internal Engine\UI\Editor</Filter>
+    </ClCompile>
     <ClCompile Include="ModuleLoadObject.cpp">
       <Filter>Source Code\Modules\Internal Engine</Filter>
     </ClCompile>
@@ -694,6 +709,15 @@
     </ClCompile>
     <ClCompile Include="ComponentTransform.cpp">
       <Filter>Source Code\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="PanelAbout.cpp">
+      <Filter>Source Code\Modules\Internal Engine\UI\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="log.cpp">
+      <Filter>Source Code\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="PanelHierarchy.cpp">
+      <Filter>Source Code\Modules\Internal Engine\UI\Editor</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
