@@ -80,7 +80,7 @@ public:
 	//Change game object's name. Passed by reference
 	void ChangeName(std::string& new_name);
 
-private:
+public:
 	GameObject*					parent;
 	bool						active;
 	std::string					name;

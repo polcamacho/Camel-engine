@@ -29,6 +29,7 @@ public:
 	Pyramid* pyr;
 	Cylinder* cyl;
 	GameObject* root;
+	GameObject* selected_game_obj;
 
 	GLubyte checkerImage[64][64][4];
 	//Meshes--

@@ -22,7 +22,7 @@ public:
 
 
 	void DisplayHierarchy();
-
+	void RecurisveTreeNode(GameObject* parent);
 };
 
 #endif // !_PANEL_HIERARCHY_H__
