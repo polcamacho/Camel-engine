@@ -103,8 +103,6 @@ std::vector<MeshPart*>* ModuleLoadObject::LoadObjectData(const char* path)
 				{
 					m.tex_coords[coords * 2] = Object_mesh->mTextureCoords[0][coords].x;
 					m.tex_coords[(coords * 2)+1] = Object_mesh->mTextureCoords[0][coords].y;
-					//memcpy(&m.tex_coords[coords * 2], &Object_mesh->mTextureCoords[0][coords].x, sizeof(float));
-					//memcpy(&m.tex_coords[(coords * 2) + 1], &Object_mesh->mTextureCoords[0][coords].y, sizeof(float));
 				}
 			}
 			LOG("New mesh with %d texture coords:", m.num_tex_coords);

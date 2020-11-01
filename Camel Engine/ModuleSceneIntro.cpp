@@ -78,13 +78,14 @@ update_status ModuleSceneIntro::Update(float dt)
 	return UPDATE_CONTINUE;
 }
 
-//TODO: Review non copy method
+// Add mesh to meshes vector. If it already exists, send pointer, not adding it
 std::vector<MeshPart*>* ModuleSceneIntro::AddMesh(const char* path)
 {
 	std::vector<FullMesh*>::iterator it = meshes.begin();
 	for (; it < meshes.end() && meshes.size() > 0; ++it)
 	{
-		if (path == (*it)->id) return &(*it)->parts;
+		if (path == (*it)->id) 
+			return &(*it)->parts;
 	}
 	return App->load_object->LoadObjectData(path);
 }
