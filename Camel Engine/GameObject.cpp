@@ -1,5 +1,6 @@
 #include "GameObject.h"
 #include "ComponentMesh.h"
+#include "ComponentTransform.h"
 #include "Component.h"
 
 GameObject::GameObject(std::string& name, GameObject* parent, bool active) :name(name), parent(parent), active(active) 
@@ -11,15 +12,21 @@ GameObject::~GameObject()
 {
 	//Empty components
 	std::vector<Component*>::iterator comp = components.begin();
-	for (; comp != components.end();++comp)delete* comp;
+	for (; comp != components.end() && components.size() > 0 ; ++comp)delete* comp;
 	components.clear();
 
-	//Empty childs
-	if (childs.size() != 0)
-		GetChildsNewParent();
+	std::vector<GameObject*>::iterator obj = childs.begin();
+	for (; obj != childs.end() && childs.size() > 0; ++obj)delete* obj;
+	childs.clear();
 
-	//Deletes gameobject pointer from its parent
-	parent->EraseChildPointer(this);
+	//Empty childs
+	/* if (childs.size() != 0)
+		GetChildsNewParent(); */
+
+		//Deletes gameobject pointer from its parent
+		parent->EraseChildPointer(this);
+
+	parent = nullptr;
 }
 
 void GameObject::Enable()
@@ -42,7 +49,11 @@ void GameObject::Update()
 	//Update childs
 	std::vector<GameObject*>::iterator g_o = childs.begin();
 
-	for (; g_o != childs.end() && childs.size()>0;++g_o)(*g_o)->Update();
+	for (; g_o != childs.end() && childs.size() > 0; ++g_o)
+	{
+		if((*g_o)->IsEnabled()) 
+			(*g_o)->Update();
+	}
 }
 
 bool GameObject::IsEnabled()
@@ -93,7 +104,7 @@ void GameObject::DeleteChild(GameObject* child)
 		for (it = childs.begin(); it != childs.end(); ++it) {
 			if (*it == child)
 			{
-				(*it)->GetChildsNewParent();
+				//(*it)->GetChildsNewParent();
 				childs.erase(it);
 				delete* it;
 				return;
@@ -104,13 +115,14 @@ void GameObject::DeleteChild(GameObject* child)
 
 void GameObject::CreateComponent(Component::COMPONENT_TYPE type)
 {
+	ComponentMesh* cMesh = new ComponentMesh(this);
+	ComponentTransform* cTrans = new ComponentTransform(this);
 	switch (type)
 	{
-	/*case Component::COMPONENT_TYPE::TRANSFORM:
-		components.push_back(new ComponentTransform(type));
-		break;*/
+	case Component::COMPONENT_TYPE::TRANSFORM:
+		CheckAddComponent(cTrans);
+		break;
 	case Component::COMPONENT_TYPE::MESH:
-		ComponentMesh* cMesh = new ComponentMesh(this);
 		CheckAddComponent(cMesh);
 		comp_mesh = cMesh;
 		break;
@@ -122,7 +134,6 @@ void GameObject::CreateComponent(Component::COMPONENT_TYPE type)
 	//	break;
 	}
 }
-
 
 void GameObject::CheckAddComponent(Component* new_comp)
 {
@@ -136,6 +147,22 @@ void GameObject::CheckAddComponent(Component* new_comp)
 std::vector<Component*>* const GameObject::GetComponents()
 {
 	return &components;
+}
+
+Component* GameObject::GetComponent(Component::COMPONENT_TYPE type)
+{
+	Component* comp = nullptr;
+	std::vector<Component*>::iterator ci = components.begin();
+	for (; ci != components.end(); ++ci)
+	{
+		if ((*ci)->GetComponentType() == type)
+		{
+			comp = (*ci);
+			return comp;
+		}
+	}
+
+	return comp;
 }
 
 ComponentMesh* GameObject::GetComponentMesh()

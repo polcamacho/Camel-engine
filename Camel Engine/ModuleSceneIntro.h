@@ -18,21 +18,27 @@ public:
 	bool CleanUp();
 
 	std::vector<MeshPart*>* AddMesh(const char* path);
-	void CreateCheckersImage();
-	void CreateCheckerBuffer(uint& id);
 
 	void CreateGameObjectByDragging(const char* path);
+	void UpdateGameObject(GameObject* parent);
+	void SetTextureDragging(uint &tex_id);
+
+	void CreatePrimitive(PrimitiveTypes type);
 
 public:
-	Cube* c;
-	Sphere* s;
-	Pyramid* pyr;
-	Cylinder* cyl;
+	CubeP* c;
+	SphereP* s;
+	PyramidP* pyr;
+	CylinderP* cyl;
 	GameObject* root;
+	GameObject* selected_game_obj;
 
-	GLubyte checkerImage[64][64][4];
 	//Meshes--
 	std::vector<FullMesh*> meshes;
+	std::vector<CubeP*> cubes;
+	std::vector<SphereP*>spheres;
+	std::vector<PyramidP*> pyramids;
+	std::vector<CylinderP*> cylinders;
 	//--------
 	//std::vector<MeshPart*>* a;
 };

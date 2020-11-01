@@ -4,19 +4,21 @@
 
 #include "Globals.h"
 #include <vector>
+#include <string>
 
 struct MeshPart {   //all the data needed to print a mesh
     uint id_index;
     uint id_vertex;
     uint id_tex_coords;
-    uint id_texture;
     uint num_index;
-    uint checkers_id;
+    uint texture_id;
 };
 
 struct FullMesh {
-    const char* id;
+    std::string id;
     std::vector<MeshPart*> parts;
+	uint num_index;
+	uint num_vertex;
 };
 
 struct MeshData {

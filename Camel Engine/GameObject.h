@@ -11,6 +11,9 @@
 
 class ComponentMesh;
 
+
+
+
 /// ///////////////////////////////////////// ///
 /// The first game object in scene, aka root, ///
 /// must have root as name, and recieve		  ///
@@ -71,6 +74,9 @@ public:
 	//Get a pointer to this game object components vector
 	std::vector<Component*>* const GetComponents();
 
+
+	Component* GetComponent(Component::COMPONENT_TYPE type);
+
 	ComponentMesh* GetComponentMesh();
 
 
@@ -80,13 +86,16 @@ public:
 	//Change game object's name. Passed by reference
 	void ChangeName(std::string& new_name);
 
-private:
+public:
 	GameObject*					parent;
 	bool						active;
 	std::string					name;
 	std::vector<Component*>		components;
 	std::vector<GameObject*>	childs;
-	
+
+
+	bool show = false;
+
 	//Components:
 	ComponentMesh*				comp_mesh;
 };

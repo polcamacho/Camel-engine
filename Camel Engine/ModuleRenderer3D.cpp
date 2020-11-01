@@ -1,6 +1,8 @@
 #include "Globals.h"
 #include "Application.h"
 #include "ModuleRenderer3D.h"
+#include "EngineUI.h"
+#include "PanelInspector.h"
 #include "SDL\include\SDL_opengl.h"
 
 #include "ModuleLoadObject.h"
@@ -148,7 +150,10 @@ bool ModuleRenderer3D::CleanUp()
 void ModuleRenderer3D::RenderMesh(std::vector<MeshPart*>* mesh)
 {
 	std::vector<MeshPart*>::iterator it = (*mesh).begin();
-
+	if (App->engine_ui->inspector_p->GL_Texture_2D)
+		glEnable(GL_TEXTURE_2D);
+	else
+		glDisable(GL_TEXTURE_2D);
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 	for (; it != (*mesh).end(); ++it) {
@@ -162,7 +167,7 @@ void ModuleRenderer3D::RenderMesh(std::vector<MeshPart*>* mesh)
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, (*it)->id_index);
 
-		glBindTexture(GL_TEXTURE_2D, (*it)->checkers_id);
+		glBindTexture(GL_TEXTURE_2D, (*it)->texture_id);
 		glDrawElements(GL_TRIANGLES, (*it)->num_index, GL_UNSIGNED_INT, NULL);
 
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -171,6 +176,8 @@ void ModuleRenderer3D::RenderMesh(std::vector<MeshPart*>* mesh)
 	}
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 	glDisableClientState(GL_VERTEX_ARRAY);
+	glEnable(GL_TEXTURE_2D);
+
 }
 
 

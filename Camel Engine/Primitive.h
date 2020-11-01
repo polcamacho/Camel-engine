@@ -40,20 +40,20 @@ protected:
 };
 
 // ============================================
-class Cube : public Primitive
+class CubeP : public Primitive
 {
 public :
-	Cube();
-	Cube(vec3 position, vec3 size);
+	CubeP();
+	CubeP(vec3 position, vec3 size);
 	void InnerRender(vec4 rotation) const;
 };
 
 // ============================================
-class Sphere : public Primitive
+class SphereP : public Primitive
 {
 public:
-	Sphere();
-	Sphere(vec3 position, float radius, int num_sectors, int num_stacks);
+	SphereP();
+	SphereP(vec3 position, float radius, int num_sectors, int num_stacks);
 	void InnerRender(vec4 rotation) const;
 public:
 	float rad;
@@ -68,20 +68,20 @@ public:
 };
 
 // ============================================
-class Pyramid : public Primitive
+class PyramidP : public Primitive
 {
 public:
-	Pyramid();
-	Pyramid(vec3 position, vec3 size);
+	PyramidP();
+	PyramidP(vec3 position, vec3 size);
 	void InnerRender(vec4 rotation) const;
 };
 
 // ============================================
-class Cylinder : public Primitive
+class CylinderP : public Primitive
 {
 public:
-	Cylinder();
-	Cylinder(vec3 position, float radius, float height, int num_sectors);
+	CylinderP();
+	CylinderP(vec3 position, float radius, float height, int num_sectors);
 	void InnerRender(vec4 rotation) const;
 public:
 	float rad;
@@ -96,11 +96,11 @@ public:
 };
 
 // ============================================
-class Line : public Primitive
+class LineP : public Primitive
 {
 public:
-	Line();
-	Line(float x, float y, float z);
+	LineP();
+	LineP(float x, float y, float z);
 	void InnerRender() const;
 public:
 	vec3 origin;
@@ -108,11 +108,11 @@ public:
 };
 
 // ============================================
-class Plane : public Primitive
+class PlaneP : public Primitive
 {
 public:
-	Plane();
-	Plane(float x, float y, float z, float d);
+	PlaneP();
+	PlaneP(float x, float y, float z, float d);
 	void InnerRender() const;
 public:
 	vec3 normal;

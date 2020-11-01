@@ -1,11 +1,21 @@
 #pragma once
 #include "Module.h"
 #include "Globals.h"
+#include <vector>
 
 
-#include "imgui/imgui.h"
+
+
+
 #include "imgui/examples/imgui_impl_sdl.h"
 #include "imgui/examples/imgui_impl_opengl3.h"
+
+
+class Panel;
+class PanelConsole;
+class PanelAbout;
+class PanelHierarchy;
+class PanelInspector;
 
 class EngineUI : public Module
 {
@@ -27,13 +37,31 @@ public:
 
 	void MainMenu();
 
-	void AboutWindow();
 	void SystemWindow();
 	void ConfigWindow();
+	void Log(const char* fmt, ...);
 
 	void CheckBoxOptions();
 	void TextNames();
 	void ScrollBarOptions();
 	void HardwareDisplay();
+	
+public:
+
+	PanelConsole* console_p;
+	PanelAbout* about_p;
+	PanelHierarchy* hierarchy_p;
+	PanelInspector* inspector_p;
+	
+
+	bool console_window = false;
+	bool about_window = false;
+	bool hierarchy_window = false;
+	bool inspector_window = false;
+	bool status_window = false;
+	
+
+	std::vector<Panel*> panel_list;
+
 
 };

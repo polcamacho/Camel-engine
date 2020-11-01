@@ -10,6 +10,7 @@ ComponentMesh::ComponentMesh(GameObject* owner, bool active) : Component(COMPONE
 
 ComponentMesh::~ComponentMesh()
 {
+	mesh->clear();
 }
 
 void ComponentMesh::Update()
@@ -34,5 +35,5 @@ bool ComponentMesh::IsEnabled()
 
 void ComponentMesh::AssignMesh(const char* path)
 {
-	mesh = App->scene_intro->AddMesh(path);
+	mesh = App->scene_intro->AddMesh(GetOwner()->GetName().c_str());
 }
