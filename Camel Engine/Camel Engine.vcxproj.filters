@@ -519,6 +519,7 @@
     <ClInclude Include="PanelAbout.h">
       <Filter>Source Code\Modules\Internal Engine\UI\Editor</Filter>
     </ClInclude>
+    <ClInclude Include="PanelHierarchy.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="glmath.cpp">
@@ -556,9 +557,6 @@
     </ClCompile>
     <ClCompile Include="Application.cpp">
       <Filter>Source Code\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="log.cpp">
-      <Filter>Source Code\Tools\log</Filter>
     </ClCompile>
     <ClCompile Include="PugiXml\src\pugixml.cpp">
       <Filter>Source Code\Tools\pugi</Filter>
@@ -705,6 +703,12 @@
       <Filter>Source Code\Modules\Internal Engine</Filter>
     </ClCompile>
     <ClCompile Include="PanelAbout.cpp">
+      <Filter>Source Code\Modules\Internal Engine\UI\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="log.cpp">
+      <Filter>Source Code\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="PanelHierarchy.cpp">
       <Filter>Source Code\Modules\Internal Engine\UI\Editor</Filter>
     </ClCompile>
   </ItemGroup>

@@ -6,6 +6,7 @@
 #include "Panel.h"
 #include "PanelConsole.h"
 #include "PanelAbout.h"
+#include "PanelHierarchy.h"
 #include "imgui/imgui.h"
 
 #include "Assimp/Assimp/include/version.h"
@@ -21,7 +22,7 @@ EngineUI::EngineUI(bool start_enabled) : Module(start_enabled) {
 	height = SCREEN_HEIGHT;
 	is_fullscreen = false, is_resizable = true, is_borderless = false, wireframe = false;
 	console_p = nullptr;
-	about_panel = nullptr;
+	about_p = nullptr;
 	console_window = true;
 }
 
@@ -52,7 +53,7 @@ bool EngineUI::Start()
 	ImGui_ImplOpenGL3_Init();
 
 	panel_list.push_back(console_p = new PanelConsole("Console"));
-	panel_list.push_back(about_panel = new PanelAbout("About"));
+	panel_list.push_back(about_p = new PanelAbout("About"));
 
 	std::vector<const char*>::iterator item = App->log_saves.begin();
 
@@ -85,7 +86,7 @@ bool EngineUI::CleanUp()
 	panel_list.clear();
 	console_p->Clear();
 	console_p = nullptr;
-	about_panel = nullptr;
+	about_p = nullptr;
 
 	return true;
 }
@@ -180,10 +181,7 @@ void EngineUI::MainMenu()
 		}
 		//
 	}
-	if (ImGui::CollapsingHeader("Console"))
-	{
-		
-	}
+	
 	ImGui::End();
 	if (ImGui::BeginMainMenuBar())
 	{
@@ -193,6 +191,11 @@ void EngineUI::MainMenu()
 				App->QuitEngine();
 
 			ImGui::EndMenu();
+		}
+		if (ImGui::BeginMenu("View"))
+		{
+			console_window = (console_window == false) ? true : false;
+
 		}
 		if (ImGui::BeginMenu("Help"))
 		{
@@ -208,11 +211,7 @@ void EngineUI::MainMenu()
 	}
 }
 
-void EngineUI::AboutWindow()
-{
-	ImGui::Begin("About");
-	ImGui::End();
-}
+
 
 void EngineUI::ConfigWindow() 
 {
@@ -233,13 +232,6 @@ void EngineUI::Log(const char* fmt, ...)
 	}
 }
 
-void EngineUI::ConsoleWindow()
-
-{
-	ImGui::Begin("Console");
-	ImGui::End();
-
-}
 
 void EngineUI::TextNames()
 {

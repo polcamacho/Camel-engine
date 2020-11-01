@@ -14,6 +14,7 @@
 class Panel;
 class PanelConsole;
 class PanelAbout;
+class PanelHierarchy;
 
 class EngineUI : public Module
 {
@@ -35,11 +36,9 @@ public:
 
 	void MainMenu();
 
-	void AboutWindow();
 	void SystemWindow();
 	void ConfigWindow();
 	void Log(const char* fmt, ...);
-	void ConsoleWindow();
 
 	void CheckBoxOptions();
 	void TextNames();
@@ -49,10 +48,14 @@ public:
 public:
 
 	PanelConsole* console_p;
-	PanelAbout* about_panel;
+	PanelAbout* about_p;
+	PanelHierarchy* hierarchy_p;
+	
 
 	bool console_window = false;
 	bool about_window = false;
+	bool hierarchy_window = false;
+	
 
 	std::vector<Panel*> panel_list;
 
