@@ -22,6 +22,7 @@ public:
 	void CreateCheckerBuffer(uint& id);
 
 	void CreateGameObjectByDragging(const char* path);
+	void UpdateGameObject(GameObject* parent);
 
 public:
 	Cube* c;

@@ -42,7 +42,11 @@ void GameObject::Update()
 	//Update childs
 	std::vector<GameObject*>::iterator g_o = childs.begin();
 
-	for (; g_o != childs.end() && childs.size()>0;++g_o)(*g_o)->Update();
+	for (; g_o != childs.end() && childs.size() > 0; ++g_o)
+	{
+		if((*g_o)->IsEnabled()) 
+			(*g_o)->Update();
+	}
 }
 
 bool GameObject::IsEnabled()

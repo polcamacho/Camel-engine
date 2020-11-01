@@ -86,7 +86,10 @@ public:
 	std::string					name;
 	std::vector<Component*>		components;
 	std::vector<GameObject*>	childs;
-	
+
+
+	bool show = false;
+
 	//Components:
 	ComponentMesh*				comp_mesh;
 };

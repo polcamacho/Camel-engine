@@ -28,7 +28,7 @@ EngineUI::EngineUI(bool start_enabled) : Module(start_enabled) {
 	inspector_p = nullptr;
 
 	console_window = true;
-	about_window = true;
+	about_window = false;
 	hierarchy_window = true;
 	inspector_window = true;
 }
@@ -49,7 +49,7 @@ bool EngineUI::Start()
 	
 	io.DisplaySize.x = 1280.0f;
 	io.DisplaySize.y = 720.0f;
-	io.IniFilename = "imgui.ini";
+	io.WantSaveIniSettings = false;
 
 	// Setup Dear ImGui style
 	ImGui::StyleColorsDark();
