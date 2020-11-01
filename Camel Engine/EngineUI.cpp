@@ -216,6 +216,11 @@ void EngineUI::MainMenu()
 				console_window = (console_window == false) ? true : false;
 			}
 
+			if (ImGui::MenuItem("Inspector"))
+			{
+				inspector_window = (inspector_window == false) ? true : false;
+			}
+
 			ImGui::EndMenu();
 		}
 		

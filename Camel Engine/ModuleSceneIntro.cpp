@@ -122,3 +122,17 @@ void ModuleSceneIntro::CreateGameObjectByDragging(const char* path)
 		}
 	}
 }
+
+
+void ModuleSceneIntro::UpdateGameObject(GameObject* parent)
+{
+	parent->Update();
+	std::vector<GameObject*>::iterator iter = parent->childs.begin();
+	for (iter; iter != parent->childs.end(); ++iter)
+	{
+
+		if (!(*iter)->show)
+			UpdateGameObject((*iter));
+
+	}
+}
