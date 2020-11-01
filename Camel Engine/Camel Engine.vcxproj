@@ -213,6 +213,7 @@
     <ClInclude Include="PanelAbout.h" />
     <ClInclude Include="PanelConsole.h" />
     <ClInclude Include="PanelHierarchy.h" />
+    <ClInclude Include="PanelInspector.h" />
     <ClInclude Include="parson\parson.h" />
     <ClInclude Include="Primitive.h" />
     <ClInclude Include="PugiXml\src\pugiconfig.hpp" />
@@ -279,6 +280,7 @@
     <ClCompile Include="PanelAbout.cpp" />
     <ClCompile Include="PanelConsole.cpp" />
     <ClCompile Include="PanelHierarchy.cpp" />
+    <ClCompile Include="Panelinspector.cpp" />
     <ClCompile Include="parson\parson.c" />
     <ClCompile Include="Primitive.cpp" />
     <ClCompile Include="PugiXml\src\pugixml.cpp" />

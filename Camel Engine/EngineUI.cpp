@@ -7,6 +7,7 @@
 #include "PanelConsole.h"
 #include "PanelAbout.h"
 #include "PanelHierarchy.h"
+#include "PanelInspector.h"
 #include "imgui/imgui.h"
 
 #include "Assimp/Assimp/include/version.h"
@@ -24,9 +25,12 @@ EngineUI::EngineUI(bool start_enabled) : Module(start_enabled) {
 	console_p = nullptr;
 	about_p = nullptr;
 	hierarchy_p = nullptr;
+	inspector_p = nullptr;
+
 	console_window = true;
 	about_window = true;
 	hierarchy_window = true;
+	inspector_window = true;
 }
 
 EngineUI::~EngineUI() {}
@@ -58,6 +62,7 @@ bool EngineUI::Start()
 	panel_list.push_back(console_p = new PanelConsole("Console"));
 	panel_list.push_back(about_p = new PanelAbout("About"));
 	panel_list.push_back(hierarchy_p = new PanelHierarchy("Hierarchy"));
+	panel_list.push_back(inspector_p = new PanelInspector("Inspector"));
 
 	std::vector<const char*>::iterator item = App->log_saves.begin();
 
@@ -92,6 +97,7 @@ bool EngineUI::CleanUp()
 	console_p = nullptr;
 	hierarchy_p = nullptr;
 	about_p = nullptr;
+	inspector_p = nullptr;
 
 	return true;
 }
