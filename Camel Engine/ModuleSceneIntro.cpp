@@ -49,7 +49,7 @@ bool ModuleSceneIntro::Start()
 			return ret;
 		}
 	}*/
-	App->load_object->CreateCheckersImage();
+	//App->load_object->CreateCheckersImage();
 	//App->load_object->LoadTexture("Assets/Textures/Lenna.png");
 	return ret;
 }

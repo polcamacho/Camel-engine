@@ -61,6 +61,8 @@ std::vector<MeshPart*>* ModuleLoadObject::LoadObjectData(const char* path)
 	const aiScene* scene = nullptr;
 	char* buffer = nullptr;
 	std::string file_path(path);
+	aiString texture_path_to_read;
+
 	// Shows directory of dropped file
 	file_path.erase(0, file_path.find_last_of("\\") + 1);
 	file_path = "Assets/Models/" + file_path;
@@ -92,6 +94,13 @@ std::vector<MeshPart*>* ModuleLoadObject::LoadObjectData(const char* path)
 			memcpy(m.vertex, Object_mesh->mVertices, sizeof(float) * m.num_vertex * 3);
 			LOG("New mesh with %d vertices", m.num_vertex);
 
+			aiMaterial* Object_material = scene->mMaterials[Object_mesh->mMaterialIndex];
+			aiGetMaterialTexture(Object_material, aiTextureType_DIFFUSE, Object_mesh->mMaterialIndex, &texture_path_to_read);
+			std::string file_path(texture_path_to_read.C_Str());
+			file_path = "//" + file_path;
+			if (texture_path_to_read.length > 0) {
+				LoadTexture(file_path.c_str());
+			}
 			// Load / copy faces
 			if (Object_mesh->HasFaces())
 			{
@@ -140,8 +149,8 @@ std::vector<MeshPart*>* ModuleLoadObject::LoadObjectData(const char* path)
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 			uint texture_id = 0;
-			CreateCheckerBuffer(texture_id);
-			//CreateTextureBuffer(texture_id);
+			//CreateCheckerBuffer(texture_id);
+			CreateTextureBuffer(texture_id);
 			MeshPart* p = new MeshPart;
 			p->id_index = m.id_index;
 			p->id_vertex = m.id_vertex;
@@ -219,7 +228,7 @@ void ModuleLoadObject::LoadTexture(const char* path_texture)
 	ilLoadL(type, buffer, buffer_size);
 	
 	if (imageID != NULL) {
-		LOG("path: %s", path_texture);
+		LOG("path: %s", file_path);
 	}
 	else {
 		LOG("Error loading image");
