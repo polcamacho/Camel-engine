@@ -1,7 +1,9 @@
 #pragma once
-
+#ifndef _GAMEOBJECT_H_
+#define _GAMEOBJECT_H_
 #include <vector>
 #include <string>
+#include "MathGeoLib/include/MathGeoLib.h"
 
 class Component;
 class Transform;
@@ -37,8 +39,12 @@ public:
 	void DeleteChildren();
 	void UpdateChildrenTransforms();
 
-public: 
+	void GenerateAABB(GnMesh* mesh);
+
+public:
 	bool to_delete;
+	AABB bbox;
+	OBB obb;
 private:
 	bool enabled;
 	std::string name;
@@ -47,3 +53,5 @@ private:
 	std::vector<Component*> components;
 	std::vector<GameObject*> children;
 };
+
+#endif // !_GAMEOBJECT_H

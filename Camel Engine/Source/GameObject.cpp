@@ -212,3 +212,11 @@ void GameObject::UpdateChildrenTransforms()
 		children[i]->GetTransform()->UpdateGlobalTransform(transform->GetGlobalTransform());
 	}
 }
+
+void GameObject::GenerateAABB(GnMesh* mesh)
+{
+	bbox.SetNegativeInfinity();
+	bbox.Enclose((float3*)mesh->vertices, mesh->vertices_amount);
+	obb.SetFrom(bbox);
+	obb.Transform(transform->GetGlobalTransform());
+}

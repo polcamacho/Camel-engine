@@ -29,10 +29,7 @@ bool ModuleScene::Start()
 	GameObject* house = MeshImporter::LoadFBX("Assets/Models/baker_house/BakerHouse.FBX");
 	AddGameObject(house);
 
-	//GameObject* rayman = MeshImporter::LoadFBX("Assets/Models/rayman/rayman.fbx");
-	//AddGameObject(rayman);
-
-	//MeshImporter::LoadFBX("Assets/Models/monkey.fbx");
+	//GameObject* house = MeshImporter::LoadFBX("Assets/Models/Street/street2.FBX");
 
 	return ret;
 }

@@ -428,17 +428,14 @@ bool Editor::CreateMainMenuBar() {
 
 		if (ImGui::BeginMenu("Help"))
 		{
-			if (ImGui::MenuItem("Documentation"))
-				ShellExecuteA(NULL, "open", "https://github.com/marcpages2020/GenesisEngine/wiki", NULL, NULL, SW_SHOWNORMAL);
-
 			if (ImGui::MenuItem("Download latest"))
-				ShellExecuteA(NULL, "open", "https://github.com/marcpages2020/GenesisEngine/releases", NULL, NULL, SW_SHOWNORMAL);
+				ShellExecuteA(NULL, "open", "https://github.com/polcamacho/Camel-engine/releases", NULL, NULL, SW_SHOWNORMAL);
 
 			if (ImGui::MenuItem("Report a bug"))
-				ShellExecuteA(NULL, "open", "https://github.com/marcpages2020/GenesisEngine/issues", NULL, NULL, SW_SHOWNORMAL);
+				ShellExecuteA(NULL, "open", "https://github.com/polcamacho/Camel-engine/issues", NULL, NULL, SW_SHOWNORMAL);
 
 			if (ImGui::MenuItem("View on GitHub"))
-				ShellExecuteA(NULL, "open", "https://github.com/marcpages2020/GenesisEngine", NULL, NULL, SW_SHOWNORMAL);
+				ShellExecuteA(NULL, "open", "https://github.com/polcamacho/Camel-engine", NULL, NULL, SW_SHOWNORMAL);
 
 			if (ImGui::MenuItem("About"))
 				show_about_window = true;
@@ -772,9 +769,13 @@ void Editor::ShowAboutWindow()
 
 		ImGui::Text("Made by: ");
 		ImGui::SameLine();
-		if (ImGui::SmallButton("Marc Pages Francesch"))
-			ShellExecuteA(NULL, "open", "https://github.com/marcpages2020", NULL, NULL, SW_SHOWNORMAL);
-
+		if (ImGui::SmallButton("Pol Camacho Banal"))
+			ShellExecuteA(NULL, "open", "https://github.com/polcamacho", NULL, NULL, SW_SHOWNORMAL);
+		if (ImGui::SmallButton("Marc Rosell"))
+			ShellExecuteA(NULL, "open", "https://github.com/MarcRosellH", NULL, NULL, SW_SHOWNORMAL);
+		ImGui::SameLine();
+		if (ImGui::SmallButton("Alexandru Cercel"))
+			ShellExecuteA(NULL, "open", "https://github.com/AlexandruC5", NULL, NULL, SW_SHOWNORMAL);
 
 		ImGui::Spacing();
 		ImGui::Separator();
@@ -826,7 +827,7 @@ void Editor::ShowAboutWindow()
 		ImGui::Text("MIT License");
 		ImGui::Spacing();
 
-		ImGui::TextWrapped("Copyright (c) 2020 Marc Pages Francesch");
+		ImGui::TextWrapped("Copyright (c) 2020 Marc Rosell, Alexandru Cercel, Pol Camacho");
 		ImGui::Spacing();
 		ImGui::TextWrapped(
 			"Permission is hereby granted, free of charge, to any person obtaining a copy"
