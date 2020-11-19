@@ -4,6 +4,7 @@
 #include "Mesh.h"
 #include "Material.h"
 #include "ImGui/imgui.h"
+#include "glew/include/glew.h"
 
 #include <vector>
 
@@ -16,6 +17,7 @@ GameObject::GameObject(GnMesh* mesh) : GameObject()
 {
 	SetName(mesh->name);
 	AddComponent((Component*)mesh);
+
 }
 
 GameObject::~GameObject(){
@@ -47,6 +49,9 @@ void GameObject::Update()
 		{
 			children[i]->Update();
 		}
+
+		GenerateOBB();
+		DrawBoundingBox();
 	}
 }
 
@@ -213,10 +218,29 @@ void GameObject::UpdateChildrenTransforms()
 	}
 }
 
-void GameObject::GenerateAABB(GnMesh* mesh)
+void GameObject::GenerateOBB()
 {
-	bbox.SetNegativeInfinity();
-	bbox.Enclose((float3*)mesh->vertices, mesh->vertices_amount);
-	obb.SetFrom(bbox);
-	obb.Transform(transform->GetGlobalTransform());
+	GnMesh* mesh = (GnMesh*)GetComponent(ComponentType::MESH);
+	Transform* tr = (Transform*)GetComponent(ComponentType::TRANSFORM);
+	if (mesh != nullptr) {
+		obb.SetFrom(mesh->GetAABB());
+		obb.Transform(tr->GetGlobalTransform());
+		new_aabb.SetNegativeInfinity();
+		new_aabb.Enclose(obb);
+	}
+}
+
+void GameObject::DrawBoundingBox()
+{
+	glBegin(GL_LINES);
+	glLineWidth(5.0f);
+	glColor4f(0.25f, 1.0f, 0.0f, 1.0f);
+
+	for (uint i = 0; i < 12; i++)
+	{
+		glVertex3f(new_aabb.Edge(i).a.x, new_aabb.Edge(i).a.y, new_aabb.Edge(i).a.z);
+		glVertex3f(new_aabb.Edge(i).b.x, new_aabb.Edge(i).b.y, new_aabb.Edge(i).b.z);
+	}
+	glEnd();
+	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 }

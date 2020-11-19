@@ -28,6 +28,9 @@ public:
 	void DrawVertexNormals();
 	void DrawFaceNormals();
 
+	math::AABB GetAABB();
+	void GenerateAABB();
+
 public:
 	uint vertices_buffer = -1;
 	int vertices_amount = -1;
@@ -47,6 +50,7 @@ public:
 	float* colors;
 
 	const char* name;
+	AABB bbox;
 
 private:
 	bool draw_vertex_normals;

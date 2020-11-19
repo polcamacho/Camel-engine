@@ -217,6 +217,7 @@ update_status ModuleRenderer3D::Update(float dt)
 	update_status ret = UPDATE_CONTINUE;
 
 	DrawMeshes();
+	
 	//DrawDirectModeCube();
 
 	return ret;

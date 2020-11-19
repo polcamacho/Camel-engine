@@ -39,12 +39,15 @@ public:
 	void DeleteChildren();
 	void UpdateChildrenTransforms();
 
-	void GenerateAABB(GnMesh* mesh);
+	void GenerateOBB();
+
+	void DrawBoundingBox();
 
 public:
 	bool to_delete;
-	AABB bbox;
+	AABB new_aabb;
 	OBB obb;
+	
 private:
 	bool enabled;
 	std::string name;
