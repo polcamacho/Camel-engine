@@ -8,7 +8,7 @@
 
 #include <vector>
 
-GameObject::GameObject() : enabled(true), name("Empty Game Object"), parent(nullptr), to_delete(false)
+GameObject::GameObject() : enabled(true), bbox_enabled(true), name("Empty Game Object"), parent(nullptr), to_delete(false)
 {
 	transform = (Transform*)AddComponent(ComponentType::TRANSFORM);
 }
@@ -51,8 +51,10 @@ void GameObject::Update()
 		}
 
 		GenerateOBB();
-		DrawBoundingBox();
+		//DrawBoundingBox();
 	}
+	if (bbox_enabled)
+		DrawBoundingBox();
 }
 
 void GameObject::OnEditor()
@@ -71,10 +73,14 @@ void GameObject::OnEditor()
 
 	if(ImGui::CollapsingHeader("Debugging Information")) 
 	{
-		if(parent != nullptr)
+		if (parent != nullptr) {
 			ImGui::Text("Parent: %s", parent->GetName());
-		else 
+		}
+		else {
 			ImGui::Text("No parent");
+		}
+
+		ImGui::Checkbox("Activate Bounding Box", &bbox_enabled);
 	}
 }
 

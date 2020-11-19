@@ -50,6 +50,7 @@ public:
 	
 private:
 	bool enabled;
+	bool bbox_enabled;
 	std::string name;
 	GameObject* parent;
 	Transform* transform;
