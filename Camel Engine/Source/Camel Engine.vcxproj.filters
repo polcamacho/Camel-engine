@@ -167,6 +167,9 @@
     <ClCompile Include="Libs\MathGeoLib\include\Algorithm\Random\LCG.cpp">
       <Filter>Libs\MathGeoLib\Algorithm</Filter>
     </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>GameObjects &amp; Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
@@ -439,6 +442,9 @@
     </ClInclude>
     <ClInclude Include="Libs\MathGeoLib\include\Algorithm\Random\LCG.h">
       <Filter>Libs\MathGeoLib\Algorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>GameObjects &amp; Components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

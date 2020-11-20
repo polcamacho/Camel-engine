@@ -1,6 +1,9 @@
 #include "Component.h"
 
-Component::Component() : enabled(true), gameObject(nullptr) {}
+Component::Component() : enabled(true), gameObject(nullptr) {
+   
+    type = ComponentType::NO_TYPE;
+}
 
 Component::~Component()
 {

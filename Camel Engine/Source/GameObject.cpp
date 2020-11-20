@@ -3,6 +3,7 @@
 #include "Transform.h"
 #include "Mesh.h"
 #include "Material.h"
+#include "Camera.h"
 #include "ImGui/imgui.h"
 #include "glew/include/glew.h"
 
@@ -113,6 +114,12 @@ Component* GameObject::AddComponent(ComponentType type)
 		return mesh;
 	}
 	else if (type == ComponentType::MATERIAL)
+	{
+		Material* material = new Material();
+		components.push_back(material);
+		return material;
+	}
+	else if (type == ComponentType::CAMERA)
 	{
 		Material* material = new Material();
 		components.push_back(material);
