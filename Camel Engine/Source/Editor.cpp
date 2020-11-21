@@ -2,6 +2,7 @@
 #include "Editor.h"
 #include "parson/parson.h"
 #include "Mesh.h"
+#include "Camera.h"
 #include "ModuleScene.h"
 #include "GameObject.h"
 #include "FileSystem.h"
@@ -398,9 +399,9 @@ bool Editor::CreateMainMenuBar() {
 			{
 				App->scene->AddGameObject(MeshImporter::LoadFBX("Assets/Models/Primitives/cone.fbx"));
 			}
-			else if (ImGui::MenuItem("Suzanne"))
+			else if (ImGui::MenuItem("Camera"))
 			{
-				App->scene->AddGameObject(MeshImporter::LoadFBX("Assets/Models/Primitives/monkey.fbx"));
+				App->scene->AddGameObject(new GameObject(new Camera()));
 			}
 			ImGui::EndMenu();
 		}

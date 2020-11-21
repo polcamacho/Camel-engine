@@ -11,11 +11,19 @@ public:
 	Camera();
 	~Camera();
 	void Update(float dt);
+	void OnEditor() override;
+
+	float GetNearPlane();
+	float GetFarPlane();
+	float GetAspectRatio();
+
+	float GetFov();
+
+	void DrawCameraLines();
 
 public:
-	int v_fov, h_fov;
-	float aspect_ratio;
-	Frustum frustrum;
+	Frustum frustum;
+	const char* name;
 };
 
 #endif // !_CAMERA_

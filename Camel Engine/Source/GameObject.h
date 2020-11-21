@@ -8,12 +8,14 @@
 class Component;
 class Transform;
 class GnMesh;
+class Camera;
 enum class ComponentType;
 
 class GameObject {
 public:
 	GameObject();
 	GameObject(GnMesh* mesh);
+	GameObject(Camera* cam);
 	~GameObject();
 
 	void Update();

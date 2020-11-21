@@ -21,6 +21,12 @@ GameObject::GameObject(GnMesh* mesh) : GameObject()
 
 }
 
+GameObject::GameObject(Camera* cam) : GameObject()
+{
+	SetName(cam->name);
+	AddComponent((Component*)cam);
+}
+
 GameObject::~GameObject(){
 	parent = nullptr;
 
@@ -52,7 +58,6 @@ void GameObject::Update()
 		}
 
 		GenerateOBB();
-		//DrawBoundingBox();
 	}
 	if (bbox_enabled)
 		DrawBoundingBox();
@@ -121,9 +126,9 @@ Component* GameObject::AddComponent(ComponentType type)
 	}
 	else if (type == ComponentType::CAMERA)
 	{
-		Material* material = new Material();
-		components.push_back(material);
-		return material;
+		Camera* camera = new Camera();
+		components.push_back(camera);
+		return camera;
 	}
 
 	return nullptr;
