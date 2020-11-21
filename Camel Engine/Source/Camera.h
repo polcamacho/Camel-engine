@@ -10,8 +10,8 @@ class Camera: public Component{
 public:
 	Camera();
 	~Camera();
-	void Update(float dt);
-	void OnEditor() override;
+	virtual void Update() override;
+	virtual void OnEditor() override;
 
 	float GetNearPlane();
 	float GetFarPlane();

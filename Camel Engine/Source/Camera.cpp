@@ -30,11 +30,10 @@ Camera::~Camera()
 
 }
 
-void Camera::Update(float dt)
+void Camera::Update()
 {
 	//frustrum.ProjectionMatrix();
 	DrawCameraLines();
-	LOG("%.2f", frustum.verticalFov);
 }
 
 void Camera::OnEditor()
@@ -65,6 +64,8 @@ float Camera::GetFov()
 {
 	return RadToDeg(frustum.verticalFov);
 }
+
+
 
 void Camera::DrawCameraLines()
 {
