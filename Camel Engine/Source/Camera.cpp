@@ -19,8 +19,8 @@ Camera::Camera() : Component() {
 
 	frustum.farPlaneDistance = 50.0f;
 	frustum.nearPlaneDistance = 1.0f;
-	frustum.verticalFov = DegToRad(70.0f);
-	aspect_ratio = 16 / 9;
+	frustum.verticalFov = 60.f*DEGTORAD;
+	aspect_ratio = (float)16/9;
 	frustum.horizontalFov = 2 * atanf(tanf(frustum.verticalFov / 2) * aspect_ratio);
 }
 
@@ -31,7 +31,7 @@ Camera::~Camera()
 
 void Camera::Update()
 {
-	frustum.ProjectionMatrix();
+	GetViewMatrix();
 	DrawCameraLines();
 }
 
@@ -41,19 +41,18 @@ void Camera::OnEditor()
 	{
 		float new_near_plane = GetNearPlane();
 		float new_far_plane = GetFarPlane();
-		if(ImGui::SliderFloat("Near Plane", &new_near_plane, 0, 100) && new_near_plane < new_far_plane)
-			SetNearPlane(new_near_plane);
-
-		if(ImGui::SliderFloat("Far Plane", &new_far_plane, 0, 100) && new_near_plane < new_far_plane)
-			SetFarPlane(new_far_plane);
-
 		float new_FOV = GetFOV();
-		if (ImGui::SliderFloat("Vertical FOV", &new_FOV, 0, 50))
-			SetFOV(new_FOV);
 
-		float new_aspect_ratio = GetAspectRatio();
-		if (ImGui::SliderFloat("Aspect Ratio", &new_aspect_ratio, 0, 50))
-			SetAspectRatio(new_aspect_ratio);
+		if (ImGui::SliderFloat("Near Plane", &new_near_plane, 0, 20) && new_near_plane < new_far_plane) {
+			SetNearPlane(new_near_plane);
+		}
+		if (ImGui::SliderFloat("Far Plane", &new_far_plane, 0, 20) && new_near_plane < new_far_plane) {
+			SetFarPlane(new_far_plane);
+		}
+		if (ImGui::SliderFloat("Vertical FOV", &new_FOV, 0, 90)) {
+			SetFOV(new_FOV);
+		}
+		ImGui::Text("Aspect ratio: %.2f", aspect_ratio);
 	}
 }
 
@@ -74,7 +73,7 @@ float Camera::GetAspectRatio()
 
 float Camera::GetFOV()
 {
-	return RadToDeg(frustum.verticalFov);
+	return frustum.verticalFov * RADTODEG;
 }
 
 void Camera::SetNearPlane(float nearP) {
@@ -86,13 +85,29 @@ void Camera::SetFarPlane(float farP) {
 }
 
 void Camera::SetFOV(float vFOV) {
-	frustum.verticalFov = DegToRad(vFOV);
+	frustum.verticalFov = DEGTORAD * vFOV;
 	frustum.horizontalFov = 2 * atanf(tanf(frustum.verticalFov / 2) * aspect_ratio);
 }
 
 void Camera::SetAspectRatio(float a_ratio) {
 	aspect_ratio = a_ratio;
 	frustum.horizontalFov = 2 * atanf(tanf(frustum.verticalFov / 2) * a_ratio);
+}
+
+float* Camera::GetProjectionMatrix() {
+	float4x4 new_matrix;
+	new_matrix = frustum.ProjectionMatrix();
+	new_matrix.Transpose();
+
+	return (float*)new_matrix.v;
+}
+
+float* Camera::GetViewMatrix() {
+	float4x4 new_matrix;
+	new_matrix = frustum.ViewMatrix();
+	new_matrix.Transpose();
+
+	return (float*)new_matrix.v;
 }
 
 void Camera::DrawCameraLines()

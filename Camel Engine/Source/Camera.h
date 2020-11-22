@@ -23,6 +23,9 @@ public:
 	void SetFOV(float vFOV);
 	void SetAspectRatio(float a_ratio);
 
+	float* GetProjectionMatrix();
+	float* GetViewMatrix();
+
 	void DrawCameraLines();
 
 public:
