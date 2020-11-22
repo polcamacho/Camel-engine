@@ -20,9 +20,8 @@ Camera::Camera() : Component() {
 	frustum.farPlaneDistance = 50.0f;
 	frustum.nearPlaneDistance = 1.0f;
 	frustum.verticalFov = DegToRad(70.0f);
-	
-	/*frustum.horizontalFov = 9;
-	frustum.AspectRatio();*/
+	aspect_ratio = 16 / 9;
+	frustum.horizontalFov = 2 * atanf(tanf(frustum.verticalFov / 2) * aspect_ratio);
 }
 
 Camera::~Camera()
@@ -32,7 +31,7 @@ Camera::~Camera()
 
 void Camera::Update()
 {
-	//frustrum.ProjectionMatrix();
+	frustum.ProjectionMatrix();
 	DrawCameraLines();
 }
 
@@ -40,8 +39,21 @@ void Camera::OnEditor()
 {
 	if (ImGui::CollapsingHeader("Camera", ImGuiTreeNodeFlags_DefaultOpen))
 	{
-		ImGui::SliderFloat("Near Plane", &frustum.nearPlaneDistance, 0, 50);
-		ImGui::SliderFloat("Far Plane", &frustum.farPlaneDistance, 50, 400);
+		float new_near_plane = GetNearPlane();
+		float new_far_plane = GetFarPlane();
+		if(ImGui::SliderFloat("Near Plane", &new_near_plane, 0, 100) && new_near_plane < new_far_plane)
+			SetNearPlane(new_near_plane);
+
+		if(ImGui::SliderFloat("Far Plane", &new_far_plane, 0, 100) && new_near_plane < new_far_plane)
+			SetFarPlane(new_far_plane);
+
+		float new_FOV = GetFOV();
+		if (ImGui::SliderFloat("Vertical FOV", &new_FOV, 0, 50))
+			SetFOV(new_FOV);
+
+		float new_aspect_ratio = GetAspectRatio();
+		if (ImGui::SliderFloat("Aspect Ratio", &new_aspect_ratio, 0, 50))
+			SetAspectRatio(new_aspect_ratio);
 	}
 }
 
@@ -60,12 +72,28 @@ float Camera::GetAspectRatio()
 	return frustum.AspectRatio();
 }
 
-float Camera::GetFov()
+float Camera::GetFOV()
 {
 	return RadToDeg(frustum.verticalFov);
 }
 
+void Camera::SetNearPlane(float nearP) {
+	frustum.nearPlaneDistance = nearP;
+}
 
+void Camera::SetFarPlane(float farP) {
+	frustum.farPlaneDistance = farP;
+}
+
+void Camera::SetFOV(float vFOV) {
+	frustum.verticalFov = DegToRad(vFOV);
+	frustum.horizontalFov = 2 * atanf(tanf(frustum.verticalFov / 2) * aspect_ratio);
+}
+
+void Camera::SetAspectRatio(float a_ratio) {
+	aspect_ratio = a_ratio;
+	frustum.horizontalFov = 2 * atanf(tanf(frustum.verticalFov / 2) * a_ratio);
+}
 
 void Camera::DrawCameraLines()
 {

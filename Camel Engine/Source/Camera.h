@@ -16,13 +16,18 @@ public:
 	float GetNearPlane();
 	float GetFarPlane();
 	float GetAspectRatio();
+	float GetFOV();
 
-	float GetFov();
+	void SetNearPlane(float nearP);
+	void SetFarPlane(float farP);
+	void SetFOV(float vFOV);
+	void SetAspectRatio(float a_ratio);
 
 	void DrawCameraLines();
 
 public:
 	Frustum frustum;
+	float aspect_ratio;
 	const char* name;
 };
 
