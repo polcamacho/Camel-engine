@@ -666,7 +666,6 @@ void Editor::ShowConfigurationWindow()
 				App->renderer3D->SetVSYNC(vsync);
 
 
-			//TODO:	Add two more enables
 		}
 
 		if (ImGui::CollapsingHeader("Camera")) {

@@ -1,6 +1,6 @@
 #pragma once
-#ifndef _CAMERA_
-#define _CAMERA_
+#ifndef _CAMERA_H_
+#define _CAMERA_H_
 
 #include "Component.h"
 #include "MathGeoLib/include/Geometry/Frustum.h"

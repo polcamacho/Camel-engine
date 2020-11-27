@@ -1,8 +1,10 @@
 #include "Camera.h"
 #include "Globals.h"
+#include "Transform.h"
+#include "GameObject.h"
 #include "MathGeoLib/include/MathGeoLib.h"
 #include "ImGui/imgui.h"
-
+#include "ModuleCamera3D.h"
 
 #include "glew/include/glew.h"
 
@@ -15,11 +17,11 @@ Camera::Camera() : Component() {
 
 	frustum.front = float3::unitZ;
 	frustum.up = float3::unitY;
-	frustum.pos = float3(0.0f, 0.0f, 0.0f);
+	frustum.pos = float3(0,0,0);
 
-	frustum.farPlaneDistance = 50.0f;
+	frustum.farPlaneDistance = 20.0f;
 	frustum.nearPlaneDistance = 1.0f;
-	frustum.verticalFov = 60.f*DEGTORAD;
+	frustum.verticalFov = 60.0f*DEGTORAD;
 	aspect_ratio = (float)16/9;
 	frustum.horizontalFov = 2 * atanf(tanf(frustum.verticalFov / 2) * aspect_ratio);
 }
@@ -31,7 +33,11 @@ Camera::~Camera()
 
 void Camera::Update()
 {
-	GetViewMatrix();
+	frustum.pos = gameObject->GetTransform()->GetPosition();
+	frustum.up = gameObject->GetTransform()->GetGlobalTransform().WorldY();
+	frustum.front = gameObject->GetTransform()->GetGlobalTransform().WorldZ();
+
+	GetProjectionMatrix();
 	DrawCameraLines();
 }
 
