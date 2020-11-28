@@ -36,6 +36,7 @@ public:
 	float drag_speed;
 	float zoom_speed;
 	float sensitivity;
+	float constant_mov;
 
 };
 

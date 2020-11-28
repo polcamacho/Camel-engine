@@ -19,7 +19,7 @@ Camera::Camera() : Component() {
 	frustum.up = float3::unitY;
 	frustum.pos = float3(0,0,0);
 
-	frustum.farPlaneDistance = 20.0f;
+	frustum.farPlaneDistance = 50.0f;
 	frustum.nearPlaneDistance = 1.0f;
 	frustum.verticalFov = 60.0f*DEGTORAD;
 	aspect_ratio = (float)16/9;
@@ -49,10 +49,10 @@ void Camera::OnEditor()
 		float new_far_plane = GetFarPlane();
 		float new_FOV = GetFOV();
 
-		if (ImGui::SliderFloat("Near Plane", &new_near_plane, 0, 20) && new_near_plane < new_far_plane) {
+		if (ImGui::SliderFloat("Near Plane", &new_near_plane, 0, 50) && new_near_plane < new_far_plane) {
 			SetNearPlane(new_near_plane);
 		}
-		if (ImGui::SliderFloat("Far Plane", &new_far_plane, 0, 20) && new_near_plane < new_far_plane) {
+		if (ImGui::SliderFloat("Far Plane", &new_far_plane, 0, 50) && new_near_plane < new_far_plane) {
 			SetFarPlane(new_far_plane);
 		}
 		if (ImGui::SliderFloat("Vertical FOV", &new_FOV, 0, 90)) {

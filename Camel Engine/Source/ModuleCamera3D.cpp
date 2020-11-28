@@ -16,6 +16,7 @@ ModuleCamera3D::ModuleCamera3D(bool start_enabled) : Module(start_enabled)
 	Reference = float3(0.0f, 0.0f, 0.0f);
 
 	background = { 0.12f, 0.12f, 0.12f, 1.0f };
+	constant_mov = 0.9f;
 }
 
 ModuleCamera3D::~ModuleCamera3D()
@@ -63,7 +64,7 @@ update_status ModuleCamera3D::Update(float dt)
 		return UPDATE_CONTINUE;
 
 
-	float3 newPos(0, 0, 0);
+	float3 newPos(0.0f, 0.0f, 0.0f);
 	int speed_multiplier = 1;
 
 	if (App->input->GetKey(SDL_SCANCODE_LSHIFT) == KEY_REPEAT)
@@ -92,30 +93,30 @@ update_status ModuleCamera3D::Update(float dt)
 
 	//Forwards/Backwards
 	if ((App->input->GetKey(SDL_SCANCODE_W) == KEY_REPEAT) || (App->input->GetKey(SDL_SCANCODE_UP) == KEY_REPEAT)) 
-		newPos += cam->frustum.front * move_speed * speed_multiplier * dt;
-	LOG("%d %d %d", newPos);
+		newPos += cam->frustum.front * move_speed * speed_multiplier * dt * constant_mov;
+	//LOG("%.2f %.2f %.2f", cam->frustum.front);
 	if ((App->input->GetKey(SDL_SCANCODE_S) == KEY_REPEAT) || (App->input->GetKey(SDL_SCANCODE_DOWN) == KEY_REPEAT)) 
-		newPos -= cam->frustum.front * move_speed * speed_multiplier * dt;
-
+		newPos -= cam->frustum.front * move_speed * speed_multiplier * dt * constant_mov;
+	//LOG("%.2f %.2f %.2f", cam->frustum.front);
 	//Left/Right
 	if ((App->input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT) || (App->input->GetKey(SDL_SCANCODE_RIGHT) == KEY_REPEAT)) 
-		newPos += cam->frustum.WorldRight() * move_speed * speed_multiplier * dt;
+		newPos += cam->frustum.WorldRight() * move_speed * speed_multiplier * dt * constant_mov;
 	if ((App->input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT) || (App->input->GetKey(SDL_SCANCODE_LEFT) == KEY_REPEAT))
-		newPos -= cam->frustum.WorldRight() * move_speed * speed_multiplier * dt;
+		newPos -= cam->frustum.WorldRight() * move_speed * speed_multiplier * dt * constant_mov;
 
 	//Drag
 	if ((App->input->GetMouseButton(SDL_BUTTON_MIDDLE) == KEY_REPEAT))
 	{
-		newPos -= cam->frustum.WorldRight() * App->input->GetMouseXMotion() * speed_multiplier * drag_speed * dt;
-		newPos += cam->frustum.up * App->input->GetMouseYMotion() * speed_multiplier * drag_speed * dt;
+		newPos -= cam->frustum.WorldRight() * App->input->GetMouseXMotion() * speed_multiplier * drag_speed * dt * constant_mov;
+		newPos += cam->frustum.up * App->input->GetMouseYMotion() * speed_multiplier * drag_speed * dt * constant_mov;
 	}
 
 	// Zoom 
 
 	if (App->input->GetMouseZ() > 0)
-		newPos += cam->frustum.front * zoom_speed * dt;
+		newPos += cam->frustum.front * zoom_speed * dt * constant_mov;
 	else if(App->input->GetMouseZ() < 0 )
-		newPos -= cam->frustum.front * zoom_speed * dt;
+		newPos -= cam->frustum.front * zoom_speed * dt * constant_mov;
 
 	// Mouse motion ----------------
 
@@ -126,21 +127,16 @@ update_status ModuleCamera3D::Update(float dt)
 			int dx = -App->input->GetMouseXMotion();
 			int dy = -App->input->GetMouseYMotion();
 
-			if (dx != 0)
-			{
-				Quat quat = Quat::RotateY(dt * dx);
-				cam->frustum.WorldRight() = quat.Mul(cam->frustum.WorldRight()).Normalized();
-				cam->frustum.front = quat.Mul(cam->frustum.front).Normalized();
-				cam->frustum.up = quat.Mul(cam->frustum.up).Normalized();
-			}
+			Quat rotx(cam->frustum.up, dx * dt * (constant_mov / 3));
+			Quat roty(cam->frustum.WorldRight(), dy * dt * (constant_mov / 3));
 
-			if (dy != 0)
-			{
-				Quat quat = Quat::RotateAxisAngle(cam->frustum.WorldRight(), dt * dy);
-				cam->frustum.up = quat.Mul(cam->frustum.up).Normalized();
-				cam->frustum.front = quat.Mul(cam->frustum.front).Normalized();
+			float3 distance = Position - Reference;
+			distance = rotx.Transform(distance);
+			distance = roty.Transform(distance);
 
-			}
+			Position = distance + Reference;
+			cam->frustum.pos = Position;
+			LookAt(Reference);
 
 		}
 	}
@@ -152,7 +148,7 @@ update_status ModuleCamera3D::Update(float dt)
 
 		if (dx != 0)
 		{
-			Quat quat = Quat::RotateY(dt * dx);
+			Quat quat = Quat::RotateY(dt * dx * (constant_mov / 3));
 			cam->frustum.WorldRight() = quat.Mul(cam->frustum.WorldRight()).Normalized();
 			cam->frustum.front = quat.Mul(cam->frustum.front).Normalized();
 			cam->frustum.up = quat.Mul(cam->frustum.up).Normalized();
@@ -160,7 +156,7 @@ update_status ModuleCamera3D::Update(float dt)
 
 		if (dy != 0)
 		{
-			Quat quat = Quat::RotateAxisAngle(cam->frustum.WorldRight(), dt * dy);
+			Quat quat = Quat::RotateAxisAngle(cam->frustum.WorldRight(), dt * dy * (constant_mov / 3));
 			cam->frustum.up = quat.Mul(cam->frustum.up).Normalized();
 			cam->frustum.front = quat.Mul(cam->frustum.front).Normalized();
 
