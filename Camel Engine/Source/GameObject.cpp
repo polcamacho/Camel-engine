@@ -1,3 +1,4 @@
+#include "Application.h"
 #include "GameObject.h"
 #include "Component.h"
 #include "Transform.h"
@@ -54,13 +55,16 @@ void GameObject::Update()
 
 		for (size_t i = 0; i < children.size(); i++)
 		{
+			App->camera->editor_cam->CullingObjects(children[i]);
 			children[i]->Update();
 		}
+		if (bbox_enabled) {
+			GetAABB();
+			GenerateOBB();
+			DrawBoundingBox();
 
-		GenerateOBB();
+		}
 	}
-	if (bbox_enabled)
-		DrawBoundingBox();
 }
 
 void GameObject::OnEditor()
@@ -236,12 +240,20 @@ void GameObject::UpdateChildrenTransforms()
 	}
 }
 
+math::AABB GameObject::GetAABB()
+{
+	return new_aabb;
+}
+
 void GameObject::GenerateOBB()
 {
 	GnMesh* mesh = (GnMesh*)GetComponent(ComponentType::MESH);
 	Transform* tr = (Transform*)GetComponent(ComponentType::TRANSFORM);
 	if (mesh != nullptr) {
-		obb.SetFrom(mesh->GetAABB());
+
+		new_aabb.SetNegativeInfinity();
+		new_aabb.Enclose((float3*)mesh->vertices, mesh->vertices_amount);
+		obb.SetFrom(new_aabb);
 		obb.Transform(tr->GetGlobalTransform());
 		new_aabb.SetNegativeInfinity();
 		new_aabb.Enclose(obb);

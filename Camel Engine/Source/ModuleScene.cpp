@@ -3,12 +3,15 @@
 #include "ModuleScene.h"
 #include "parson/parson.h"
 #include "Mesh.h"
+#include "Transform.h"
+#include "Camera.h"
 #include "FileSystem.h"
 #include "GameObject.h"
 
 ModuleScene::ModuleScene(bool start_enabled) : Module(start_enabled), show_grid(true), selectedGameObject(nullptr), root(nullptr) 
 {
 	name = "scene";
+	main_camera = nullptr;
 }
 
 ModuleScene::~ModuleScene() {}
@@ -29,6 +32,7 @@ bool ModuleScene::Start()
 	GameObject* house = MeshImporter::LoadFBX("Assets/Models/baker_house/BakerHouse.FBX");
 	AddGameObject(house);
 
+	CreateMainCamera();
 	//GameObject* street = MeshImporter::LoadFBX("Assets/Models/Street/street2.FBX");
 	//AddGameObject(street);
 	return ret;
@@ -124,4 +128,11 @@ update_status ModuleScene::Update(float dt)
 	return UPDATE_CONTINUE;
 }
 
+void ModuleScene::CreateMainCamera()
+{
+	GameObject* main_cam = new GameObject(new Camera());
+	AddGameObject(main_cam);
+	main_cam->SetName("Main Camera");
 
+	LOG("Cam created");
+}

@@ -28,9 +28,6 @@ public:
 	void DrawVertexNormals();
 	void DrawFaceNormals();
 
-	math::AABB GetAABB();
-	void GenerateAABB();
-
 public:
 	uint vertices_buffer = -1;
 	int vertices_amount = -1;

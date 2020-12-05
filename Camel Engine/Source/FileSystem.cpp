@@ -632,8 +632,6 @@ GnMesh* MeshImporter::LoadMesh(const aiScene* scene, aiNode* node, const char* p
 	}
 	//LOG("Texcoords loaded: %d", t);
 	currentMesh->GenerateBuffers();
-
-	currentMesh->GenerateAABB();
 	return currentMesh;
 }
 

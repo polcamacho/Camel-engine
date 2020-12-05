@@ -20,7 +20,7 @@ public:
 	update_status Update(float dt);
 	bool CleanUp();
 
-	void LookAt(const float3& Spot);
+	void LookAt(float3& Spot);
 	void Move(const float3& Movement);
 
 	void Reset();
@@ -30,7 +30,7 @@ public:
 
 	float3 Position, Reference;
 	Color background;
-	Camera* cam;
+	Camera* editor_cam;
 
 	float move_speed;
 	float drag_speed;

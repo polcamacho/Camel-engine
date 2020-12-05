@@ -261,16 +261,6 @@ void GnMesh::DrawFaceNormals()
 	glEnd();
 }
 
-math::AABB GnMesh::GetAABB()
-{
-	return bbox;
-}
-
-void GnMesh::GenerateAABB()
-{
-	bbox.SetNegativeInfinity();
-	bbox.Enclose((float3*)vertices, vertices_amount);
-}
 
 // --------------------------------------------------------------------------------------------------------------------------------
 

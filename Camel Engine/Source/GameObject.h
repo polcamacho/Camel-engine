@@ -41,17 +41,17 @@ public:
 	void DeleteChildren();
 	void UpdateChildrenTransforms();
 
+	math::AABB GetAABB();
 	void GenerateOBB();
-
 	void DrawBoundingBox();
 
 public:
 	bool to_delete;
 	AABB new_aabb;
 	OBB obb;
+	bool enabled;
 	
 private:
-	bool enabled;
 	bool bbox_enabled;
 	std::string name;
 	GameObject* parent;

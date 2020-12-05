@@ -5,6 +5,7 @@
 #include "Component.h"
 #include "MathGeoLib/include/Geometry/Frustum.h"
 
+class GnMesh;
 class Camera: public Component{
 
 public:
@@ -27,11 +28,16 @@ public:
 	float* GetViewMatrix();
 
 	void DrawCameraLines();
+	void LookAt(float3& Spot);
+	void CullingObjects(GameObject* go);
+	bool ContainsAaBox(AABB refBox);
 
 public:
 	Frustum frustum;
 	float aspect_ratio;
 	const char* name;
+
+private:
 };
 
 #endif // !_CAMERA_
