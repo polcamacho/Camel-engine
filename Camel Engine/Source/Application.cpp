@@ -88,6 +88,11 @@ void Application::PrepareUpdate()
 	ms_timer.Start();
 }
 
+float Application::GetMsTimer()
+{
+	return ms_timer.ReadTime() / 1000.0f;
+}
+
 // ---------------------------------------------
 void Application::FinishUpdate()
 {

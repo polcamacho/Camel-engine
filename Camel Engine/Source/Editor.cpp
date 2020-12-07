@@ -2,6 +2,7 @@
 #include "Editor.h"
 #include "parson/parson.h"
 #include "Mesh.h"
+#include "Time.h"
 #include "ModuleScene.h"
 #include "GameObject.h"
 #include "FileSystem.h"
@@ -135,6 +136,16 @@ update_status Editor::Draw()
 					ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), console_log[i].log_text.c_str());
 			}
 		}
+		ImGui::End();
+	}
+
+	//Time Panel
+
+	if (show_time_panel)
+	{
+		ImGui::Begin("Time", &show_time_panel);
+		ImGui::Text("Real Time: %.3f", App->GetMsTimer());
+		ImGui::Text("Game Time: %.3f", Time::time);
 		ImGui::End();
 	}
 
@@ -531,6 +542,15 @@ void Editor::ShowHierarchyWindow()
 		PreorderHierarchy(root);
 	}
 	ImGui::End();
+}
+
+void Editor::ShowTimePanel()
+{
+	if (ImGui::Begin("Time", &show_time_panel))
+	{
+
+	}
+
 }
 
 void Editor::PreorderHierarchy(GameObject* gameObject)

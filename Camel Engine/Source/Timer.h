@@ -17,6 +17,10 @@ public:
 	Uint32 Read();
 	float  ReadSec() const;
 
+	void Resume();
+
+	Uint32 ReadTime();
+
 private:
 
 	bool	running;

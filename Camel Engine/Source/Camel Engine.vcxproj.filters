@@ -167,6 +167,7 @@
     <ClCompile Include="Libs\MathGeoLib\include\Algorithm\Random\LCG.cpp">
       <Filter>Libs\MathGeoLib\Algorithm</Filter>
     </ClCompile>
+    <ClCompile Include="Time.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
@@ -439,6 +440,9 @@
     </ClInclude>
     <ClInclude Include="Libs\MathGeoLib\include\Algorithm\Random\LCG.h">
       <Filter>Libs\MathGeoLib\Algorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="Time.h">
+      <Filter>Tools</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
