@@ -5,6 +5,7 @@
 #include "Mesh.h"
 #include "FileSystem.h"
 #include "GameObject.h"
+#include "Time.h"
 
 ModuleScene::ModuleScene(bool start_enabled) : Module(start_enabled), show_grid(true), selectedGameObject(nullptr), root(nullptr) 
 {
@@ -128,3 +129,12 @@ update_status ModuleScene::Update(float dt)
 }
 
 
+
+void ModuleScene::Play()
+{
+	Time::Start();
+}
+void ModuleScene::Stop()
+{
+	Time::Stop();
+}

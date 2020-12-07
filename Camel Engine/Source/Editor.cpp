@@ -146,6 +146,8 @@ update_status Editor::Draw()
 		ImGui::Begin("Time", &show_time_panel);
 		ImGui::Text("Real Time: %.3f", App->GetMsTimer());
 		ImGui::Text("Game Time: %.3f", Time::time);
+		ShowTimePanel();
+		
 		ImGui::End();
 	}
 
@@ -546,11 +548,48 @@ void Editor::ShowHierarchyWindow()
 
 void Editor::ShowTimePanel()
 {
-	if (ImGui::Begin("Time", &show_time_panel))
+	ImGui::Spacing();
+	std::string stop_or_play = Time::running ? "STOP" : "PLAY";
+	if (ImGui::Button(stop_or_play.c_str(), ImVec2(70, 20)))
 	{
-
+		//Call play or stop depending of the running value
+		Time::running ? App->scene->Stop() : App->scene->Play();
 	}
 
+	ImGui::SameLine();
+
+	std::string pause_or_resume = Time::paused ? "RESUME" : "PAUSE";
+	if (ImGui::Button(pause_or_resume.c_str(), ImVec2(70, 20)))
+	{
+		Time::paused ? Time::Resume() : Time::Pause();
+	}
+
+	ImGui::SameLine();
+
+	if (Time::play_one)
+	{
+		Time::Pause();
+		Time::play_one = false;
+	}
+
+	if (ImGui::Button("I> ||", ImVec2(70, 20)))
+	{
+		Time::play_one = (Time::play_one == false) ? true : false;
+		if (Time::play_one)
+		{
+			if (Time::paused)
+			{
+				Time::Resume();
+				Time::paused = true;
+
+			}
+			else
+			{
+				Time::paused = true;
+				Time::Resume();
+			}
+		}
+	}
 }
 
 void Editor::PreorderHierarchy(GameObject* gameObject)

@@ -22,6 +22,10 @@ public:
 	GameObject* GetRoot() { return root; }
 	void SetDroppedTexture(GnTexture* texture);
 
+
+	void Stop();
+	void Play();
+
 public:
 	bool show_grid;
 	GameObject* selectedGameObject;
