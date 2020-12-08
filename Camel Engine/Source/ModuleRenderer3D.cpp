@@ -1,9 +1,9 @@
 #include "Globals.h"
 #include "Application.h"
-
 #include "GameObject.h"
 #include "Mesh.h"
 #include "Material.h"
+#include "Camera.h"
 
 #include <vector>
 #include "FileSystem.h"
@@ -12,6 +12,7 @@
 
 #include "ModuleWindow.h"
 #include "ModuleRenderer3D.h"
+#include "ModuleCamera3D.h"
 
 #include "glew/include/glew.h"
 #include "SDL\include\SDL_opengl.h"
@@ -201,10 +202,9 @@ update_status ModuleRenderer3D::PreUpdate(float dt)
 	glLoadIdentity();
 
 	glMatrixMode(GL_MODELVIEW);
-	glLoadMatrixf(App->camera->GetViewMatrix());
-
+	glLoadMatrixf(App->camera->editor_cam->GetViewMatrix());
 	// light 0 on cam pos
-	lights[0].SetPos(App->camera->Position.x, App->camera->Position.y, App->camera->Position.z);
+	//lights[0].SetPos(App->camera->editor_cam->frustum.pos.x, App->camera->editor_cam->frustum.pos.y, App->camera->editor_cam->frustum.pos.z);
 
 	for (uint i = 0; i < MAX_LIGHTS; ++i)
 		lights[i].Render();
@@ -217,6 +217,7 @@ update_status ModuleRenderer3D::Update(float dt)
 	update_status ret = UPDATE_CONTINUE;
 
 	DrawMeshes();
+	
 	//DrawDirectModeCube();
 
 	return ret;
@@ -288,7 +289,7 @@ void ModuleRenderer3D::OnResize(int width, int height)
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	ProjectionMatrix = perspective(60.0f, (float)width / (float)height, 0.125f, 512.0f);
-	glLoadMatrixf(&ProjectionMatrix);
+	glLoadMatrixf(App->camera->editor_cam->GetProjectionMatrix());
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();

@@ -632,7 +632,6 @@ GnMesh* MeshImporter::LoadMesh(const aiScene* scene, aiNode* node, const char* p
 	}
 	//LOG("Texcoords loaded: %d", t);
 	currentMesh->GenerateBuffers();
-
 	return currentMesh;
 }
 
@@ -730,7 +729,7 @@ GnTexture* TextureImporter::LoadTexture(const char* path)
 {
 	Timer timer;
 	timer.Start();
-	uint imageID = 0;
+	ILuint imageID = 0;
 
 	std::string normalized_path = FileSystem::NormalizePath(path);
 	std::string relative_path = FileSystem::GetPathRelativeToAssets(normalized_path.c_str());
@@ -765,6 +764,8 @@ GnTexture* TextureImporter::LoadTexture(const char* path)
 	{
 		LOG_WARNING("Error trying to load the texture %s into buffer, %d: %s", path, ilGetError(), iluErrorString(ilGetError()));
 		buffer = nullptr;
+		ilGenImages(1, &imageID);
+		ilBindImage(imageID);
 
 		if (ilLoadImage(normalized_path.c_str()) == IL_FALSE)
 		{
@@ -785,13 +786,15 @@ GnTexture* TextureImporter::LoadTexture(const char* path)
 	{
 		LOG("Texture loaded successfully from: %s in %.3f s", path, timer.ReadSec());
 
-		texture->id = imageID;
+		texture->id = (ILuint)imageID;
 		texture->name = FileSystem::GetFile(path) + format;
 		texture->data = ilGetData();
 		texture->width = ilGetInteger(IL_IMAGE_WIDTH);
 		texture->height = ilGetInteger(IL_IMAGE_HEIGHT);
 		texture->path = normalized_path.c_str();
 	}
+
+	ilBindImage(0);
 
 	if(buffer != NULL)
 		RELEASE_ARRAY(buffer);
@@ -835,7 +838,7 @@ std::string TextureImporter::FindTexture(const char* texture_name, const char* m
 
 void TextureImporter::UnloadTexture(uint imageID)
 {
-	ilBindImage(0);
+	//ilBindImage(0);
 	ilDeleteImages(1, &imageID);
 }
 
