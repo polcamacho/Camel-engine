@@ -29,20 +29,23 @@ public:
 
 public:
 	uint vertices_buffer = -1;
-	int vertices_amount = -1;
+	uint vertices_amount = -1;
 	float* vertices = nullptr;
 
 	uint indices_buffer = -1;
-	int indices_amount = -1;
+	uint indices_amount = -1;
 	uint* indices = nullptr;
 
 	uint normals_buffer;
 	float* normals;
+	uint normals_amount = -1;
 
 	uint texture_buffer = -1;
 	uint textureID;
 	GnTexture* texture;
 	float* texcoords = nullptr;
+	uint texcoords_amout = -1;
+
 	float* colors;
 
 	const char* name;

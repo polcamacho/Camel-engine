@@ -7,11 +7,14 @@
 #pragma region ForwardDeclarations
 
 class GameObject;
-struct GnTexture;
 class GnMesh;
 class Transform;
+class Material;
+struct GnTexture;
 
 class aiScene;
+class aiMesh;
+class aiMaterial;
 struct aiNode;
 
 struct json_array_t;
@@ -76,17 +79,34 @@ namespace FileSystem
 
 namespace MeshImporter 
 {
-	GameObject* LoadFBX(const char* path);
-	GnMesh* LoadMesh(const aiScene* scene, aiNode* node, const char* path);
+	// Model import method:
+	// ImportModel will use the other functions in order to create the new game object
+	GameObject* ImportModel(const char* path);
+	// --------------------
+
+	// Mesh Data Import and Managemenet
+	void Import(const aiMesh* imp_mesh, GnMesh* own_mesh);
+	uint64 Save(const GnMesh* own_mesh, char** file_buffer);
+	void Load(const char* file_buffer, GnMesh* own_mesh);
+	// --------------------------------
+
+	// GameObject Creation Block
 	GameObject* PreorderChildren(const aiScene* scene, aiNode* node, aiNode* parentNode, GameObject* parentGameObject, const char* path);
 	void LoadTransform(aiNode* node, Transform* transform);
+	// -------------------------
+}
+
+namespace MaterialImporter
+{
+	void Import(const aiMaterial* imp_material, Material* our_material, const char* path);
+	uint64 Save(const Material* our_material, char** file_buffer);
 }
 
 namespace TextureImporter
 {
-	GnTexture* GetAiMeshTexture(const aiScene* scene, aiNode* node, const char* path);
-	GnTexture* LoadTexture(const char* path);
 	std::string FindTexture(const char* texture_name, const char* model_directory);
+	GnTexture* LoadTexture(const char* path);
+
 	void UnloadTexture(uint imageID);
 }
 

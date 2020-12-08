@@ -356,7 +356,7 @@ bool Editor::CreateMainMenuBar() {
 			}
 			else if (ImGui::MenuItem("FBX: Cube"))
 			{
-				App->scene->AddGameObject(MeshImporter::LoadFBX("Assets/Models/Primitives/cube.fbx"));
+				App->scene->AddGameObject(MeshImporter::ImportModel("Assets/Models/Primitives/cube.fbx"));
 			}
 			else if (ImGui::MenuItem("Cylinder"))
 			{
@@ -364,7 +364,7 @@ bool Editor::CreateMainMenuBar() {
 			}
 			else if (ImGui::MenuItem("FBX: Cylinder"))
 			{
-				App->scene->AddGameObject(MeshImporter::LoadFBX("Assets/Models/Primitives/cylinder.fbx"));
+				App->scene->AddGameObject(MeshImporter::ImportModel("Assets/Models/Primitives/cylinder.fbx"));
 			}
 			else if (ImGui::MenuItem("Sphere"))
 			{
@@ -372,7 +372,7 @@ bool Editor::CreateMainMenuBar() {
 			}
 			else if (ImGui::MenuItem("FBX: Sphere"))
 			{
-				App->scene->AddGameObject(MeshImporter::LoadFBX("Assets/Models/Primitives/sphere.fbx"));
+				App->scene->AddGameObject(MeshImporter::ImportModel("Assets/Models/Primitives/sphere.fbx"));
 			}
 			else if (ImGui::MenuItem("Pyramid"))
 			{
@@ -380,7 +380,7 @@ bool Editor::CreateMainMenuBar() {
 			}
 			else if (ImGui::MenuItem("FBX: Pyramid"))
 			{
-				App->scene->AddGameObject(MeshImporter::LoadFBX("Assets/Models/Primitives/pyramid.fbx"));
+				App->scene->AddGameObject(MeshImporter::ImportModel("Assets/Models/Primitives/pyramid.fbx"));
 			}
 			else if (ImGui::MenuItem("Plane"))
 			{
@@ -388,7 +388,7 @@ bool Editor::CreateMainMenuBar() {
 			}
 			else if (ImGui::MenuItem("FBX: Plane"))
 			{
-				App->scene->AddGameObject(MeshImporter::LoadFBX("Assets/Models/Primitives/plane.fbx"));
+				App->scene->AddGameObject(MeshImporter::ImportModel("Assets/Models/Primitives/plane.fbx"));
 			}
 			else if (ImGui::MenuItem("Cone"))
 			{
@@ -396,11 +396,11 @@ bool Editor::CreateMainMenuBar() {
 			}
 			else if (ImGui::MenuItem("FBX: Cone"))
 			{
-				App->scene->AddGameObject(MeshImporter::LoadFBX("Assets/Models/Primitives/cone.fbx"));
+				App->scene->AddGameObject(MeshImporter::ImportModel("Assets/Models/Primitives/cone.fbx"));
 			}
 			else if (ImGui::MenuItem("Suzanne"))
 			{
-				App->scene->AddGameObject(MeshImporter::LoadFBX("Assets/Models/Primitives/monkey.fbx"));
+				App->scene->AddGameObject(MeshImporter::ImportModel("Assets/Models/Primitives/monkey.fbx"));
 			}
 			ImGui::EndMenu();
 		}

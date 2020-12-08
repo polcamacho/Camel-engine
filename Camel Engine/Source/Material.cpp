@@ -76,6 +76,8 @@ void Material::OnEditor()
 
 void Material::SetTexture(GnTexture* texture)
 {
+	if (diffuse_texture) DeleteTexture();
+
 	diffuse_texture = texture;
 
 	if (mesh != nullptr)

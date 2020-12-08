@@ -463,7 +463,7 @@ void FileSystem::LoadFile(const char* file_path, bool drag_and_drop)
 
 	if (extension == ".fbx")
 	{
-		GameObject* imported_fbx = MeshImporter::LoadFBX(processed_path.c_str());
+		GameObject* imported_fbx = MeshImporter::ImportModel(processed_path.c_str());
 
 		if (imported_fbx != nullptr)
 			App->scene->AddGameObject(imported_fbx);
@@ -496,144 +496,219 @@ std::string FileSystem::GetFile(const char* path)
 
 #pragma region MeshImporter
 
-GameObject* MeshImporter::LoadFBX(const char* path)
+GameObject* MeshImporter::ImportModel(const char* path)
 {
 	Timer timer;
 	timer.Start();
 
 	GameObject* root = nullptr;
-
-	std::string normalized_path = FileSystem::NormalizePath(path);
-	std::string relative_path = FileSystem::GetPathRelativeToAssets(normalized_path.c_str());
-
-	char* buffer = nullptr;
-	uint size = FileSystem::Load(relative_path.c_str(), &buffer);
-
-	if (buffer == nullptr)
-	{
-		if(relative_path.size() <= 0) {
-			size = FileSystem::Load(normalized_path.c_str(), &buffer);
-		}
-		else {
-			size = FileSystem::Load(relative_path.c_str(), &buffer);
-		}
-	}
-
 	const aiScene* scene = nullptr;
+	char* file_buffer = nullptr;
+	std::string folder, file, relative_path;
 
-	if (buffer != nullptr) 
+	FileSystem::SplitFilePath(path, &folder, &file);
+	relative_path = FileSystem::GetPathRelativeToAssets(path);
+
+	if (FileSystem::Exists(relative_path.c_str()))
 	{
-		scene = aiImportFileFromMemory(buffer, size, aiProcessPreset_TargetRealtime_MaxQuality, NULL);
-		
-		if(scene == NULL)
-		{
-			LOG_ERROR("Error trying to load %s directly from memory", path);
-			scene = aiImportFile(normalized_path.c_str(), aiProcessPreset_TargetRealtime_MaxQuality);
-		}
+		uint size = FileSystem::Load(relative_path.c_str(), &file_buffer);
+		scene = aiImportFileFromMemory(file_buffer, size, aiProcessPreset_TargetRealtime_MaxQuality, NULL);
+
+		RELEASE(file_buffer);
 	}
-	else 
-	{
-		scene = aiImportFile(normalized_path.c_str(), aiProcessPreset_TargetRealtime_MaxQuality);
-	}
+	else scene = aiImportFile(relative_path.c_str(), aiProcessPreset_TargetRealtime_MaxQuality);
 
 	if (scene != nullptr && scene->HasMeshes())
 	{
 		aiNode* rootNode = scene->mRootNode;
-		root = PreorderChildren(scene, rootNode, nullptr, nullptr, path);
+		root = PreorderChildren(scene, rootNode, nullptr, nullptr, folder.c_str());
+		root->SetName(file.c_str());
 		aiReleaseImport(scene);
 		LOG("%s loaded in %.3f s", path, timer.ReadSec());
 	}
 	else
 		LOG_ERROR("Error loading scene %s", path);
 
-	RELEASE_ARRAY(buffer);
+	RELEASE_ARRAY(file_buffer);
 
 	//root->UpdateChildrenTransforms();
 
 	return root;
 }
 
-GnMesh* MeshImporter::LoadMesh(const aiScene* scene, aiNode* node, const char* path) {
-	GnMesh* currentMesh = new GnMesh();
-	aiMesh* currentAiMesh = scene->mMeshes[*node->mMeshes];
+void MeshImporter::Import(const aiMesh* imp_mesh, GnMesh* own_mesh) {
 
 	//vertex copying
-	currentMesh->vertices_amount = currentAiMesh->mNumVertices;
-	currentMesh->vertices = new float[currentMesh->vertices_amount * 3]();
-	memcpy(currentMesh->vertices, currentAiMesh->mVertices, sizeof(float) * currentMesh->vertices_amount * 3);
-	LOG("%s loaded with %d vertices", currentAiMesh->mName.C_Str(), currentMesh->vertices_amount);
+	own_mesh->vertices_amount = imp_mesh->mNumVertices;
+	own_mesh->vertices = new float[own_mesh->vertices_amount * 3]();
+	memcpy(own_mesh->vertices, imp_mesh->mVertices, sizeof(float) * own_mesh->vertices_amount * 3);
+	LOG("%s loaded with %d vertices", imp_mesh->mName.C_Str(), own_mesh->vertices_amount);
 
 	//indices copying
-	if (currentAiMesh->HasFaces())
+	if (imp_mesh->HasFaces())
 	{
-		currentMesh->indices_amount = currentAiMesh->mNumFaces * 3;
-		currentMesh->indices = new uint[currentMesh->indices_amount]();
-		LOG("%s loaded with %d indices", currentAiMesh->mName.C_Str(), currentMesh->indices_amount);
+		own_mesh->indices_amount = imp_mesh->mNumFaces * 3;
+		own_mesh->indices = new uint[own_mesh->indices_amount]();
+		LOG("%s loaded with %d indices", imp_mesh->mName.C_Str(), own_mesh->indices_amount);
 
-		for (size_t f = 0; f < currentAiMesh->mNumFaces; f++)
+		for (size_t f = 0; f < imp_mesh->mNumFaces; f++)
 		{
-			if (currentAiMesh->mFaces[f].mNumIndices != 3)
+			if (imp_mesh->mFaces[f].mNumIndices != 3)
 			{
 				LOG_WARNING("WARNING, geometry face with != 3 indices!");
 			}
 			else
 			{
-				memcpy(&currentMesh->indices[f * 3], currentAiMesh->mFaces[f].mIndices, 3 * sizeof(uint));
+				memcpy(&own_mesh->indices[f * 3], imp_mesh->mFaces[f].mIndices, 3 * sizeof(uint));
 			}
 		}
 	}
 
-	currentMesh->texcoords = new float[currentMesh->vertices_amount * 2]();
-	currentMesh->colors = new float[currentMesh->indices_amount * 4]();
-	currentMesh->normals = new float[currentAiMesh->mNumVertices * 3]();
-
-	int t = 0;
+	own_mesh->texcoords_amout = imp_mesh->mNumVertices;
+	own_mesh->texcoords = new float[own_mesh->vertices_amount * 2]();
+	own_mesh->colors = new float[own_mesh->indices_amount * 4]();
+	if (imp_mesh->HasNormals())
+	{
+		own_mesh->normals_amount = own_mesh->vertices_amount;
+		own_mesh->normals = new float[own_mesh->vertices_amount * 3]();
+	}
 
 	//normals, color and texture coordinates
-	for (size_t v = 0, n = 0, tx = 0, c = 0; v < currentAiMesh->mNumVertices; v++, n += 3, c += 4, tx += 2)
+	for (size_t v = 0, n = 0, tx = 0, c = 0; v < imp_mesh->mNumVertices; v++, n += 3, c += 4, tx += 2)
 	{
 		//normal copying
-		if (currentAiMesh->HasNormals())
+		if (imp_mesh->HasNormals())
 		{
 			//normal copying
-			currentMesh->normals[n] = currentAiMesh->mNormals[v].x;
-			currentMesh->normals[n + 1] = currentAiMesh->mNormals[v].y;
-			currentMesh->normals[n + 2] = currentAiMesh->mNormals[v].z;
+			own_mesh->normals[n] = imp_mesh->mNormals[v].x;
+			own_mesh->normals[n + 1] = imp_mesh->mNormals[v].y;
+			own_mesh->normals[n + 2] = imp_mesh->mNormals[v].z;
 		}
 		//color copying
-		if (currentAiMesh->HasVertexColors(v))
+		if (imp_mesh->HasVertexColors(v))
 		{
-			currentMesh->colors[c] = currentAiMesh->mColors[v]->r;
-			currentMesh->colors[c + 1] = currentAiMesh->mColors[v]->g;
-			currentMesh->colors[c + 2] = currentAiMesh->mColors[v]->b;
-			currentMesh->colors[c + 3] = currentAiMesh->mColors[v]->a;
+			own_mesh->colors[c] = imp_mesh->mColors[v]->r;
+			own_mesh->colors[c + 1] = imp_mesh->mColors[v]->g;
+			own_mesh->colors[c + 2] = imp_mesh->mColors[v]->b;
+			own_mesh->colors[c + 3] = imp_mesh->mColors[v]->a;
 		}
 		else
 		{
-			currentMesh->colors[c] = 0.0f;
-			currentMesh->colors[c + 1] = 0.0f;
-			currentMesh->colors[c + 2] = 0.0f;
-			currentMesh->colors[c + 3] = 0.0f;
+			own_mesh->colors[c] = 0.0f;
+			own_mesh->colors[c + 1] = 0.0f;
+			own_mesh->colors[c + 2] = 0.0f;
+			own_mesh->colors[c + 3] = 0.0f;
 		}
 
 		//texcoords copying
-		if (currentAiMesh->mTextureCoords[0])
+		if (imp_mesh->mTextureCoords[0])
 		{
-			currentMesh->texcoords[tx] = currentAiMesh->mTextureCoords[0][v].x;
-			currentMesh->texcoords[tx + 1] = currentAiMesh->mTextureCoords[0][v].y;
+			own_mesh->texcoords[tx] = imp_mesh->mTextureCoords[0][v].x;
+			own_mesh->texcoords[tx + 1] = imp_mesh->mTextureCoords[0][v].y;
 			//LOG("TexCoords: %.2f , %.2f", currentMesh->texcoords[tx], currentMesh->texcoords[tx + 1]);
 		}
 		else
 		{
-			currentMesh->texcoords[tx] = 0.0f;
-			currentMesh->texcoords[tx + 1] = 0.0f;
+			own_mesh->texcoords[tx] = 0.0f;
+			own_mesh->texcoords[tx + 1] = 0.0f;
 		}
-		t = tx;
 	}
-	//LOG("Texcoords loaded: %d", t);
-	currentMesh->GenerateBuffers();
+	own_mesh->GenerateBuffers();
+}
 
-	return currentMesh;
+uint64 MeshImporter::Save(const GnMesh* own_mesh, char** file_buffer)
+{
+	//start with ranges
+	uint ranges[4] = { own_mesh->indices_amount,
+						own_mesh->vertices_amount,
+						own_mesh->normals_amount,
+						own_mesh->texcoords_amout };
+
+	//calculate buffer size
+	uint size = sizeof(ranges) +
+		sizeof(uint) * own_mesh->indices_amount +
+		sizeof(float) * own_mesh->vertices_amount * 3 +
+		sizeof(float) * own_mesh->texcoords_amout * 2 +
+		sizeof(float) * own_mesh->normals_amount * 3;
+
+	//create buffer and cursor
+	char* buffer = new char[size];
+	char* cursor = buffer;
+
+	uint bytes = 0u;
+	//save ranges
+	bytes = sizeof(ranges);
+	memcpy(cursor, ranges, bytes);
+	cursor += bytes;
+
+	//save indices
+	bytes = sizeof(uint) * own_mesh->indices_amount;
+	memcpy(cursor, own_mesh->indices, bytes);
+	cursor += bytes;
+
+	// save vertices
+	bytes = sizeof(float) * own_mesh->vertices_amount * 3;
+	memcpy(cursor, own_mesh->vertices, bytes);
+	cursor += bytes;
+
+	// save normals
+	bytes = sizeof(float) * own_mesh->normals_amount * 3;
+	memcpy(cursor, own_mesh->normals, bytes);
+	cursor += bytes;
+
+	// save texcoords
+	bytes = sizeof(float) * own_mesh->texcoords_amout * 2;
+	memcpy(cursor, own_mesh->texcoords, bytes);
+	cursor += bytes;
+
+	*file_buffer = buffer;
+
+	// return size of buffer;
+	return size;
+}
+
+void MeshImporter::Load(const char* file_buffer, GnMesh* own_mesh)
+{
+	//initialize cursor and bytes
+	char* cursor = (char*)file_buffer;
+	uint bytes = 0u;
+
+	//load ranges
+	uint ranges[4];
+	bytes = sizeof(ranges);
+	memcpy(ranges, cursor, bytes);
+	cursor += bytes;
+
+	own_mesh->indices_amount = ranges[0];
+	own_mesh->vertices_amount = ranges[1];
+	own_mesh->normals_amount = ranges[2];
+	own_mesh->texcoords_amout = ranges[3];
+
+	//load indices
+	bytes = sizeof(uint) * own_mesh->indices_amount;
+	own_mesh->indices = new uint[own_mesh->indices_amount];
+	memcpy(own_mesh->indices, cursor, bytes);
+	cursor += bytes;
+
+	//load vertices
+	bytes = sizeof(float) * own_mesh->vertices_amount * 3;
+	own_mesh->vertices = new float[own_mesh->vertices_amount * 3];
+	memcpy(own_mesh->vertices, cursor, bytes);
+	cursor += bytes;
+
+	//load normals
+	bytes = sizeof(float) * own_mesh->normals_amount * 3;
+	own_mesh->normals = new float[own_mesh->normals_amount * 3];
+	memcpy(own_mesh->normals, cursor, bytes);
+	cursor += bytes;
+
+	//load texcoords
+	bytes = sizeof(float) * own_mesh->texcoords_amout * 2;
+	own_mesh->texcoords = new float[own_mesh->texcoords_amout * 2];
+	memcpy(own_mesh->normals, cursor, bytes);
+	cursor += bytes;
+
+	own_mesh->GenerateBuffers();
 }
 
 GameObject* MeshImporter::PreorderChildren(const aiScene* scene, aiNode* node, aiNode* parentNode, GameObject* parentGameObject, const char* path)
@@ -650,21 +725,23 @@ GameObject* MeshImporter::PreorderChildren(const aiScene* scene, aiNode* node, a
 	{
 		gameObject->SetName(node->mName.C_Str());
 
-		GnMesh* mesh = LoadMesh(scene, node, path);
+		char* buffer;
+		GnMesh* mesh = new GnMesh();
+		aiMesh* imp_mesh = scene->mMeshes[*node->mMeshes];
+		Import(imp_mesh, mesh);
+		uint size = Save(mesh, &buffer);
+		std::string path_name = "Library/Meshes/";
+		path_name += mesh->name;
+		FileSystem::Save(path_name.c_str(), buffer, size);
 		gameObject->AddComponent(mesh);
 
-		GnTexture* texture = TextureImporter::GetAiMeshTexture(scene, node, path);
-		Material* material = new Material(mesh, texture);
-		gameObject->AddComponent(material);
+		Material* our_material = new Material();
+		aiMaterial* imp_material = scene->mMaterials[imp_mesh->mMaterialIndex];
+		MaterialImporter::Import(imp_material, our_material, path);
+
+		gameObject->AddComponent(our_material);
 
 		LoadTransform(node, gameObject->GetTransform());
-	}
-	else
-	{
-		std::string folder;
-		std::string file;
-		FileSystem::SplitFilePath(path, &folder, &file);
-		gameObject->SetName(file.c_str());
 	}
 
 	for (size_t i = 0; i < node->mNumChildren; i++)
@@ -699,32 +776,45 @@ void MeshImporter::LoadTransform(aiNode* node, Transform* transform)
 
 #pragma endregion 
 
-#pragma region TextureImporter
+#pragma region MaterialImporter
 
-GnTexture* TextureImporter::GetAiMeshTexture(const aiScene* scene, aiNode* node, const char* path)
+void MaterialImporter::Import(const aiMaterial* imp_material, Material* our_material, const char* path)
 {
-	aiMesh* currentAiMesh = scene->mMeshes[*node->mMeshes];
+	aiString imp_path;
+	imp_material->GetTexture(aiTextureType_DIFFUSE, 0, &imp_path);
 
-	aiMaterial* material = scene->mMaterials[currentAiMesh->mMaterialIndex];
-	aiString aiTexture_path;
-	aiGetMaterialTexture(material, aiTextureType_DIFFUSE, currentAiMesh->mMaterialIndex, &aiTexture_path);
-
-	GnTexture* texture = new GnTexture();
-
-	if (aiTexture_path.length != 0)
+	if (imp_path.length > 0)
 	{
-		std::string tmp_path = FindTexture(aiTexture_path.C_Str(), path);
+		std::string file_path = path;
+		file_path += imp_path.C_Str();
 
-		if (tmp_path.size() <= 0)
-			tmp_path = aiTexture_path.C_Str();
+		GnTexture* tex = TextureImporter::LoadTexture(file_path.c_str());
 
-		texture = LoadTexture(tmp_path.c_str());
-		texture->name = aiTexture_path.C_Str();
-		texture->path = tmp_path;
+		our_material->SetTexture(tex);
+	}
+}
+
+uint64 MaterialImporter::Save(const Material* our_material, char** file_buffer)
+{
+	uint size;
+	UCHAR* data;
+
+	ilSetInteger(IL_DXTC_DATA_FORMAT, IL_DXT5);
+	size = ilSaveL(IL_DDS, nullptr, 0);
+	if (size > 0)
+	{
+		data = new UCHAR[size];
+		if (ilSaveL(IL_DDS, data, size) > 0) *file_buffer = (char*)data;
+
+		RELEASE_ARRAY(data);
 	}
 
-	return texture;
+	return size;
 }
+
+#pragma endregion
+
+#pragma region TextureImporter
 
 GnTexture* TextureImporter::LoadTexture(const char* path)
 {
@@ -746,9 +836,6 @@ GnTexture* TextureImporter::LoadTexture(const char* path)
 	if (imageID == 0)
 		LOG_ERROR("Could not create a texture buffer to load: %s, %d", path, ilGetError());
 
-	char* buffer;
-	uint size = FileSystem::Load(relative_path.c_str(), &buffer);
-
 	ILenum file_format = IL_TYPE_UNKNOWN;
 
 	std::string format = FileSystem::GetFileFormat(path);
@@ -760,12 +847,23 @@ GnTexture* TextureImporter::LoadTexture(const char* path)
 	else if (format == ".bmp")
 		file_format = IL_BMP;
 
+	if (FileSystem::Exists(relative_path.c_str())) {
+		char* buffer;
+		uint size = FileSystem::Load(relative_path.c_str(), &buffer);
+		if (ilLoadL(file_format, buffer, size) == IL_FALSE)
+		{
+			LOG_WARNING("Error trying to load the texture %s into buffer, %d: %s", path, ilGetError(), iluErrorString(ilGetError()));
+				buffer = nullptr;
+				ilBindImage(0);
+				ilDeleteImages(1, &imageID);
+				ilGenImages(1, &imageID);
+				ilBindImage(imageID);
 
-	if (ilLoadL(file_format, buffer, size) == IL_FALSE)
+		}
+		if (buffer != NULL) RELEASE_ARRAY(buffer);
+	}
+	else 
 	{
-		LOG_WARNING("Error trying to load the texture %s into buffer, %d: %s", path, ilGetError(), iluErrorString(ilGetError()));
-		buffer = nullptr;
-
 		if (ilLoadImage(normalized_path.c_str()) == IL_FALSE)
 		{
 			LOG_ERROR("Error trying to load the texture directly from %s", path);
@@ -792,9 +890,7 @@ GnTexture* TextureImporter::LoadTexture(const char* path)
 		texture->height = ilGetInteger(IL_IMAGE_HEIGHT);
 		texture->path = normalized_path.c_str();
 	}
-
-	if(buffer != NULL)
-		RELEASE_ARRAY(buffer);
+	ilBindImage(0);
 
 	return texture;
 }
@@ -835,7 +931,6 @@ std::string TextureImporter::FindTexture(const char* texture_name, const char* m
 
 void TextureImporter::UnloadTexture(uint imageID)
 {
-	ilBindImage(0);
 	ilDeleteImages(1, &imageID);
 }
 
