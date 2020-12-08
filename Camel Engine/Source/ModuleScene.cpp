@@ -133,6 +133,6 @@ void ModuleScene::CreateMainCamera()
 	GameObject* main_cam = new GameObject(new Camera());
 	AddGameObject(main_cam);
 	main_cam->SetName("Main Camera");
-
+	main_camera = (Camera*)main_cam->GetComponent(ComponentType::CAMERA);
 	LOG("Cam created");
 }

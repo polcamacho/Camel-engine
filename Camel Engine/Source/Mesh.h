@@ -47,7 +47,6 @@ public:
 	float* colors;
 
 	const char* name;
-	AABB bbox;
 
 private:
 	bool draw_vertex_normals;

@@ -30,7 +30,7 @@ public:
 	void DrawCameraLines();
 	void LookAt(float3& Spot);
 	void CullingObjects(GameObject* go);
-	bool ContainsAaBox(AABB refBox);
+	bool ContainsAaBox(const AABB& refBox) const;
 
 public:
 	Frustum frustum;

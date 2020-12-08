@@ -41,7 +41,7 @@ public:
 	void DeleteChildren();
 	void UpdateChildrenTransforms();
 
-	math::AABB GetAABB();
+	math::AABB GetAABB() const;
 	void GenerateOBB();
 	void DrawBoundingBox();
 

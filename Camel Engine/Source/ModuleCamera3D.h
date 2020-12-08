@@ -7,6 +7,7 @@
 #include "MathGeoLib/include/MathGeoLib.h"
 
 class Camera;
+class GameObject;
 
 class ModuleCamera3D : public Module
 {
@@ -26,11 +27,15 @@ public:
 	void Reset();
 	void SetBackgroundColor(float r, float g, float b, float w);
 
+	void PickMouse();
+	void PickObject();
+
 public:
 
 	float3 Position, Reference;
 	Color background;
 	Camera* editor_cam;
+	std::vector<GameObject*> gameObject;
 
 	float move_speed;
 	float drag_speed;

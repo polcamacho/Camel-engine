@@ -165,6 +165,14 @@ update_status ModuleCamera3D::Update(float dt)
 	Position += newPos;
 	Reference += newPos;
 	editor_cam->frustum.pos = Position;
+
+	if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_DOWN) {
+
+		PickMouse();
+		PickObject();
+	}
+	
+
 	return UPDATE_CONTINUE;
 }
 
@@ -195,4 +203,25 @@ void ModuleCamera3D::Reset()
 void ModuleCamera3D::SetBackgroundColor(float r, float g, float b, float w)
 {
 	background = { r,g,b,w };
+}
+
+void ModuleCamera3D::PickMouse()
+{
+	int dx = App->input->GetMouseX();
+	int dy = App->input->GetMouseY();
+
+	float x_normalize = -(1.0f - ((float)dx * 2.0f) / (float)App->window->width);
+	float y_normalize = 1.0f - ((float)dy * 2.0f) / (float)App->window->height;
+
+	LineSegment ray = editor_cam->frustum.UnProjectLineSegment(x_normalize, y_normalize);
+	LOG("%.2f %.2f", x_normalize, y_normalize);
+}
+
+void ModuleCamera3D::PickObject()
+{
+	for (size_t i = 0; i < gameObject.size(); i++)
+	{
+		gameObject[i]->Update();
+	}
+
 }

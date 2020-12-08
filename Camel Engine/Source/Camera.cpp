@@ -149,32 +149,31 @@ void Camera::LookAt(float3& Spot)
 void Camera::CullingObjects(GameObject* go)
 {	
 	GnMesh* mesh = (GnMesh*)go->GetComponent(ComponentType::MESH);
+	if (mesh != nullptr) {
 
-	if (ContainsAaBox(go->GetAABB())==true) {
-		if(mesh!= nullptr)
-		mesh->Enable();
+		if (ContainsAaBox(go->GetAABB())) {
+			mesh->Enable();
+		}
+		else {
+			mesh->Disable();
+		}
 	}
-	else {
-		if (mesh != nullptr)
-		mesh->Disable();
-	}
+	
 }
 
-bool Camera::ContainsAaBox(AABB refBox)
+bool Camera::ContainsAaBox(const AABB& refBox) const
 {
-	bool ret = true;
 	float3 corner_vert[8];
 	int iTotalIn = 0;
 	Plane* m_plane = new Plane[6];
 	
 	refBox.GetCornerPoints(corner_vert); // get the corners of the box into the vCorner array
 	frustum.GetPlanes(m_plane);
-	// test all 8 corners against the 6 sides
-	// if all points are behind 1 specific plane, we are out
-	// if we are in with all points, then we are fully in
+	
 	for (int p = 0; p < 6; ++p) {
 		int iInCount = 8;
 		int iPtIn = 1;
+		
 		for (int i = 0; i < 8; ++i) {
 			if (m_plane[p].IsOnPositiveSide(corner_vert[i]))
 			{
@@ -187,10 +186,10 @@ bool Camera::ContainsAaBox(AABB refBox)
 		}
 		iTotalIn += iPtIn;
 	}
-	// so if iTotalIn is 6, then all are inside the view
-	if (iTotalIn == 6){
-		return true;
-	}
+	//// so if iTotalIn is 6, then all are inside the view
+	//if (iTotalIn == 6){
+	//	return true;
+	//}
 	// we must be partly in then otherwise
-	return ret;
+	return true;
 }
