@@ -7,6 +7,7 @@
 #include "Camera.h"
 #include "FileSystem.h"
 #include "GameObject.h"
+#include "Time.h"
 
 ModuleScene::ModuleScene(bool start_enabled) : Module(start_enabled), show_grid(true), selectedGameObject(nullptr), root(nullptr) 
 {
@@ -128,6 +129,7 @@ update_status ModuleScene::Update(float dt)
 	return UPDATE_CONTINUE;
 }
 
+
 void ModuleScene::CreateMainCamera()
 {
 	GameObject* main_cam = new GameObject(new Camera());
@@ -136,3 +138,15 @@ void ModuleScene::CreateMainCamera()
 	main_camera = (Camera*)main_cam->GetComponent(ComponentType::CAMERA);
 	LOG("Cam created");
 }
+
+
+
+void ModuleScene::Play()
+{
+	Time::Start();
+}
+void ModuleScene::Stop()
+{
+	Time::Stop();
+}
+

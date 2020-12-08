@@ -77,6 +77,8 @@ public:
 	float GetLastDt();
 	int GetFPSCap();
 	void SetFPSCap(int fps_cap);
+	float GetMsTimer();
+
 
 	HardwareSpecs GetHardware();
 	const char* GetEngineVersion();

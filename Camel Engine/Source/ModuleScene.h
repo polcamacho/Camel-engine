@@ -24,7 +24,12 @@ public:
 	GameObject* GetRoot() { return root; }
 	void SetDroppedTexture(GnTexture* texture);
 
+
 	void CreateMainCamera();
+
+	void Stop();
+	void Play();
+
 
 public:
 	bool show_grid;

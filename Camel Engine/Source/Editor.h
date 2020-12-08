@@ -46,6 +46,7 @@ private:
 	void ShowSceneWindow();
 	void ShowInspectorWindow();
 	void ShowHierarchyWindow();
+	void ShowTimePanel();
 	void ShowConfigurationWindow();
 	void ShowAboutWindow();
 
@@ -62,6 +63,7 @@ private:
 	bool show_console_window;
 	bool show_scene_window;
 	bool show_configuration_window;
+	bool show_time_panel;
 
 	//edit subwindows
 	bool show_preferences_window;

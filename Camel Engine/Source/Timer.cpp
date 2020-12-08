@@ -43,4 +43,25 @@ float Timer::ReadSec() const
 	return float(SDL_GetTicks() - started_at) / 1000.0f;
 }
 
+void Timer::Resume()
+{
+	if (running == false)
+	{
+		running = true;
+		started_at = SDL_GetTicks() - (stopped_at - started_at);
+	}
+}
 
+
+
+Uint32 Timer::ReadTime()
+{
+	if (running == true)
+	{
+		return SDL_GetTicks() - started_at;
+	}
+	else
+	{
+		return stopped_at - started_at;
+	}
+}
