@@ -28,20 +28,26 @@ public:
 	void SetBackgroundColor(float r, float g, float b, float w);
 
 	void PickMouse();
-	void PickObject();
+	//void ReturnObjectToPick(LineSegment ray);
+	void PickObject(LineSegment ray);
 
 public:
 
 	float3 Position, Reference;
 	Color background;
 	Camera* editor_cam;
-	std::vector<GameObject*> gameObject;
+	GameObject* gameObject;
+	GameObject* children;
+	std::vector<GameObject*> vec_objects;
+	LineSegment ray;
 
 	float move_speed;
 	float drag_speed;
 	float zoom_speed;
 	float sensitivity;
 	float constant_mov;
+
+	bool is_intersecting;
 
 };
 

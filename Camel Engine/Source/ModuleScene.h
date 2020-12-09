@@ -36,6 +36,5 @@ public:
 	GameObject* selectedGameObject;
 	Camera* main_camera;
 
-private:
 	GameObject* root;
 };

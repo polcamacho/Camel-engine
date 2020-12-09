@@ -17,6 +17,7 @@ ModuleCamera3D::ModuleCamera3D(bool start_enabled) : Module(start_enabled)
 
 	background = { 0.12f, 0.12f, 0.12f, 1.0f };
 	constant_mov = 0.9f;
+	is_intersecting = false;
 }
 
 ModuleCamera3D::~ModuleCamera3D()
@@ -169,7 +170,6 @@ update_status ModuleCamera3D::Update(float dt)
 	if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_DOWN) {
 
 		PickMouse();
-		PickObject();
 	}
 	
 
@@ -213,15 +213,40 @@ void ModuleCamera3D::PickMouse()
 	float x_normalize = -(1.0f - ((float)dx * 2.0f) / (float)App->window->width);
 	float y_normalize = 1.0f - ((float)dy * 2.0f) / (float)App->window->height;
 
-	LineSegment ray = editor_cam->frustum.UnProjectLineSegment(x_normalize, y_normalize);
-	LOG("%.2f %.2f", x_normalize, y_normalize);
+	ray = editor_cam->frustum.UnProjectLineSegment(x_normalize, y_normalize);
+	//LOG("%.2f %.2f", x_normalize, y_normalize);
+	PickObject(ray);
+
 }
 
-void ModuleCamera3D::PickObject()
+void ModuleCamera3D::PickObject(LineSegment ray)
 {
-	for (size_t i = 0; i < gameObject.size(); i++)
-	{
-		gameObject[i]->Update();
-	}
+	vec_objects.push_back(App->scene->root);
 
+	for (size_t i = 0; i < App->scene->root->GetChildAmount(); i++)
+	{
+		gameObject = App->scene->root->GetChildAt(i);
+
+		for (size_t j = 0; j < gameObject->GetChildAmount(); j++)
+		{
+			children = gameObject->GetChildAt(j);
+
+			if (ray.Intersects(children->new_aabb))
+			{
+				is_intersecting = true;
+
+				/*GnMesh* mesh = (GnMesh*)children->GetComponent(ComponentType::MESH);
+				if (mesh != nullptr) {
+
+				}*/
+			}
+			else {
+				is_intersecting = false;
+				LOG("NOT INTERSECTING");
+			}
+		}
+
+		//object pushback looking containsAABox condition -> upgrade
+		//obtain mesh (and transform??) and be sure that ray intersects in any of mesh vertices
+	}
 }
