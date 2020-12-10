@@ -19,6 +19,7 @@ public:
 	bool Start();
 	bool LoadConfig(JSON_Object* config) override;
 	update_status Update(float dt);
+	void DrawRay();
 	bool CleanUp();
 
 	void LookAt(float3& Spot);
@@ -47,7 +48,7 @@ public:
 	float sensitivity;
 	float constant_mov;
 
-	bool is_intersecting;
+	bool show_raycast;
 
 };
 

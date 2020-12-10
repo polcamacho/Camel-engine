@@ -20,7 +20,7 @@ ModuleCamera3D::ModuleCamera3D(bool start_enabled) : Module(start_enabled)
 
 	background = { 0.12f, 0.12f, 0.12f, 1.0f };
 	constant_mov = 0.9f;
-	is_intersecting = false;
+	show_raycast = false;
 }
 
 ModuleCamera3D::~ModuleCamera3D()
@@ -174,6 +174,16 @@ update_status ModuleCamera3D::Update(float dt)
 
 		PickMouse();
 	}
+	
+	if (show_raycast) {
+		DrawRay();
+	}
+
+	return UPDATE_CONTINUE;
+}
+
+void ModuleCamera3D::DrawRay()
+{
 	glBegin(GL_LINES);
 	glLineWidth(15.0f);
 	glColor4f(1.0f, 1.0f, 0.0f, 1.0f);
@@ -183,8 +193,6 @@ update_status ModuleCamera3D::Update(float dt)
 	glVertex3f(ray.b.x, ray.b.y, ray.b.z);
 	glEnd();
 	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-
-	return UPDATE_CONTINUE;
 }
 
 // -----------------------------------------------------------------
@@ -243,8 +251,6 @@ void ModuleCamera3D::PickObject(LineSegment ray)
 			GameObject* go_selected;
 			if (ray.Intersects(children->new_aabb))
 			{
-				is_intersecting = true;
-
 				float dis_hit = 0, dis_min = FLOAT_INF;
 				GnMesh* mesh = (GnMesh*)children->GetComponent(ComponentType::MESH);
 				Transform* trans = (Transform*)children->GetComponent(ComponentType::TRANSFORM);
@@ -281,7 +287,6 @@ void ModuleCamera3D::PickObject(LineSegment ray)
 				}
 			}
 			else {
-				is_intersecting = false;
 				App->scene->selectedGameObject = nullptr;
 			}
 		}

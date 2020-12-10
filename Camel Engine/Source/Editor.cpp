@@ -519,6 +519,10 @@ void Editor::ShowSceneWindow()
 			if (ImGui::Checkbox("Show Grid", &show_grid))
 				App->scene->show_grid = show_grid;
 
+			static bool show_raycast = App->camera->show_raycast;
+			if (ImGui::Checkbox("Show Ray", &show_raycast))
+				App->camera->show_raycast = show_raycast;
+
 			ImGui::EndMenuBar();
 		}
 
