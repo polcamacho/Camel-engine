@@ -47,11 +47,6 @@ void GameObject::Update()
 {
 	if (enabled)
 	{
-		if (bbox_enabled) {
-			GenerateOBB();
-			DrawBoundingBox();
-		}
-		//App->camera->editor_cam->CullingObjects(this);
 		App->scene->main_camera->CullingObjects(this);
 		for (size_t i = 0; i < components.size(); i++)
 		{
@@ -64,7 +59,10 @@ void GameObject::Update()
 			
 			children[i]->Update();
 		}
-		
+		if (bbox_enabled) {
+			GenerateOBB();
+			DrawBoundingBox();
+		}
 	}
 }
 

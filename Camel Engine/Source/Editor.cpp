@@ -243,6 +243,11 @@ void Editor::AddConsoleLog(const char* log, int warning_level)
 	console_log.push_back(message);
 }
 
+const ImVec2& Editor::GetImageSize()
+{
+	return image_size;
+}
+
 update_status Editor::ShowDockSpace(bool* p_open) 
 {
 	update_status ret = UPDATE_CONTINUE;
@@ -514,10 +519,16 @@ void Editor::ShowSceneWindow()
 			if (ImGui::Checkbox("Show Grid", &show_grid))
 				App->scene->show_grid = show_grid;
 
+			static bool show_raycast = App->camera->show_raycast;
+			if (ImGui::Checkbox("Show Ray", &show_raycast))
+				App->camera->show_raycast = show_raycast;
+
 			ImGui::EndMenuBar();
 		}
 
-		ImVec2 windowSize = ImGui::GetWindowSize();
+		windowSize = ImGui::GetWindowSize();
+		tab = ImGui::GetWindowContentRegionMin();
+		w_pos = ImGui::GetWindowPos();
 		if (image_size.x != windowSize.x || desired_aspect_ratio != aspect_ratio)
 			ResizeSceneImage(windowSize, desired_aspect_ratio);
 
@@ -592,7 +603,7 @@ void Editor::ShowTimePanel()
 
 void Editor::PreorderHierarchy(GameObject* gameObject)
 {
-	ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
+	flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
 
 	if (gameObject->GetChildAmount() > 0) 
 	{
