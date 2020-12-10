@@ -5,6 +5,7 @@
 #include "Camera.h"
 #include "Time.h"
 #include "ModuleScene.h"
+#include "Transform.h"
 #include "GameObject.h"
 #include "FileSystem.h"
 
@@ -242,6 +243,8 @@ void Editor::AddConsoleLog(const char* log, int warning_level)
 	log_message message = { log, warning_level };
 	console_log.push_back(message);
 }
+
+
 
 update_status Editor::ShowDockSpace(bool* p_open) 
 {
@@ -596,6 +599,13 @@ void Editor::PreorderHierarchy(GameObject* gameObject)
 
 	if (gameObject->GetChildAmount() > 0) 
 	{
+
+	
+
+		//BeginDragDropSource(obj);
+		//BeginDragDropTarget(obj);
+		//BeginDragDropTargetRoot(obj);
+
 		if (gameObject == App->scene->GetRoot())
 			flags |= ImGuiTreeNodeFlags_DefaultOpen;
 
@@ -937,3 +947,57 @@ void Editor::ResizeSceneImage(ImVec2 window_size, AspectRatio g_aspect_ratio)
 	aspect_ratio = g_aspect_ratio;
 }
 
+
+
+void Editor::BeginDragDropSource(GameObject* obj)
+{
+	if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None))
+	{
+		ImGui::SetDragDropPayload("HierarchyD&D", &obj, sizeof(GameObject));
+		ImGui::EndDragDropSource();
+	}
+}
+
+void Editor::BeginDragDropTarget(GameObject* obj)
+{
+	if (ImGui::BeginDragDropTarget())
+	{
+		if (const ImGuiPayload * payload = ImGui::AcceptDragDropPayload("GAMEOBJECT"))
+		{
+			GameObject* payload_n = *(GameObject * *)payload->Data;
+
+			if (!payload_n->IsChild(obj) && obj != payload_n)
+			{
+				payload_n->GetParent()->RemoveChild(payload_n);
+				obj->AddChild(payload_n);
+
+				payload_n->SetParent(obj);
+				payload_n->GetTransform()->UpdateLocalTransform();
+			}
+		}
+		ImGui::EndDragDropTarget();
+	}
+}
+
+void Editor::BeginDragDropTargetRoot(GameObject* obj)
+{
+	///*if (ImGui::BeginDragDropTargetCustom(ImGui::GetCurrentWindow()->Rect(), (ImGuiID)"Panel Hierarchy"))
+	//{
+	//	if (const ImGuiPayload * payload = ImGui::AcceptDragDropPayload("HierarchyD&D"))
+	//	{
+	//		GameObject* new_obj = *(GameObject * *)payload->Data;
+
+	//		if (!App->viewport->root_object->IsDirectChild(new_obj))
+	//		{
+	//			new_obj->GetParent()->RemoveChild(new_obj);
+	//			new_obj->SetParent(App->viewport->root_object);
+
+	//			ComponentTransform* trans = new_obj->GetComponentTransform();
+	//			if (trans)
+	//				trans->UpdateComponents();
+
+	//		}
+	//	}
+	//	ImGui::EndDragDropTarget();*/
+	//}
+}

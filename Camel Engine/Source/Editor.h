@@ -36,6 +36,11 @@ public:
 
 	bool IsSceneFocused();
 	void AddConsoleLog(const char* log, int warning_level);
+
+	//DragDrop
+	void SetDragAndDropTarget(GameObject* target);
+	
+
 	
 private:
 	//Dock Space
@@ -54,6 +59,9 @@ private:
 	void GetMemoryStatistics(const char* gpu_brand, GLint& vram_budget, GLint& vram_usage, GLint& vram_available, GLint& vram_reserved);
 
 	void ResizeSceneImage(ImVec2 window_size, AspectRatio ratio);
+	void BeginDragDropSource(GameObject* obj);
+	void BeginDragDropTarget(GameObject* obj);
+	void BeginDragDropTargetRoot(GameObject* obj);
 	void PreorderHierarchy(GameObject* gameObject);
 
 private:

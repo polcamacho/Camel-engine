@@ -2,6 +2,7 @@
 #include "ImGui/imgui.h"
 #include "Globals.h"
 #include "GameObject.h"
+#include "Application.h"
 
 Transform::Transform() : Component()
 {
@@ -104,6 +105,9 @@ void Transform::UpdateLocalTransform()
 	localTransform = float4x4::FromTRS(position, rotation, scale);
 	globalTransform = localTransform;
 
+	gameObject->UpdateChildrenTransforms();
+
+	
 	/*if (gameObject->GetParent() == nullptr)
 		globalTransform = localTransform;
 	else

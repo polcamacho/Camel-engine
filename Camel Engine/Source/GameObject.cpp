@@ -233,11 +233,14 @@ void GameObject::DeleteChildren()
 
 void GameObject::UpdateChildrenTransforms()
 {
-	transform->UpdateLocalTransform();
+	//transform->UpdateLocalTransform();
+
+
 
 	for (size_t i = 0; i < children.size(); i++)
 	{
 		children[i]->GetTransform()->UpdateGlobalTransform(transform->GetGlobalTransform());
+		children[i]->UpdateChildrenTransforms();
 	}
 }
 
