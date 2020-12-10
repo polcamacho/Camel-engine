@@ -86,6 +86,16 @@ void Material::SetTexture(GnTexture* texture)
 	}
 }
 
+void Material::SetMesh(GnMesh* in_mesh)
+{
+	mesh = in_mesh;
+}
+
+GnTexture* Material::GetTexture()
+{
+	return diffuse_texture;
+}
+
 bool Material::DeleteTexture()
 {
 	bool ret = true;

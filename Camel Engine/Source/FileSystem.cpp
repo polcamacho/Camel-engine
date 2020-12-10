@@ -50,7 +50,7 @@ void FileSystem::Init()
 	AddPath("."); //Adding ProjectFolder (working directory)
 	AddPath("Assets");
 
-	if (PHYSFS_setWriteDir("./Assets") == 0)
+	if (PHYSFS_setWriteDir(".") == 0)
 		LOG_ERROR("File System error while creating write dir: %s\n", PHYSFS_getLastError());
 
 	CreateLibraryDirectories();
@@ -84,14 +84,17 @@ void FileSystem::CreateLibraryDirectories()
 	//CreateDir(MESHES_PATH);
 	//CreateDir(TEXTURES_PATH);
 	//CreateDir(MATERIALS_PATH);
-	CreateDir("Config/");
-	CreateDir("Textures/");
-	CreateDir("Models/");
+	CreateDir("Assets/Config/");
+	CreateDir("Assets/Textures/");
+	CreateDir("Assets/Models/");
 	//CreateDir("Materials/");
 	//CreateDir(ANIMATIONS_PATH);
 	//CreateDir(PARTICLES_PATH);
 	//CreateDir(SHADERS_PATH);
 	//CreateDir(SCENES_PATH);
+	CreateDir("Library/Config/");
+	CreateDir("Library/Textures/");
+	CreateDir("Library/Models/");
 }
 
 // Add a new zip file or folder
@@ -529,14 +532,17 @@ GameObject* MeshImporter::ImportModel(const char* path)
 	else
 		LOG_ERROR("Error loading scene %s", path);
 
-	RELEASE_ARRAY(file_buffer);
-
 	//root->UpdateChildrenTransforms();
 
 	return root;
 }
 
 void MeshImporter::Import(const aiMesh* imp_mesh, GnMesh* own_mesh) {
+
+	Timer timer;
+	timer.Start();
+
+	own_mesh->name = imp_mesh->mName.C_Str();
 
 	//vertex copying
 	own_mesh->vertices_amount = imp_mesh->mNumVertices;
@@ -569,8 +575,8 @@ void MeshImporter::Import(const aiMesh* imp_mesh, GnMesh* own_mesh) {
 	own_mesh->colors = new float[own_mesh->indices_amount * 4]();
 	if (imp_mesh->HasNormals())
 	{
-		own_mesh->normals_amount = own_mesh->vertices_amount;
-		own_mesh->normals = new float[own_mesh->vertices_amount * 3]();
+		own_mesh->normals_amount = imp_mesh->mNumVertices;
+		own_mesh->normals = new float[imp_mesh->mNumVertices * 3]();
 	}
 
 	//normals, color and texture coordinates
@@ -613,7 +619,7 @@ void MeshImporter::Import(const aiMesh* imp_mesh, GnMesh* own_mesh) {
 			own_mesh->texcoords[tx + 1] = 0.0f;
 		}
 	}
-	own_mesh->GenerateBuffers();
+	LOG("Mesh imported in %.3f s", timer.ReadSec());
 }
 
 uint64 MeshImporter::Save(const GnMesh* own_mesh, char** file_buffer)
@@ -659,7 +665,6 @@ uint64 MeshImporter::Save(const GnMesh* own_mesh, char** file_buffer)
 	// save texcoords
 	bytes = sizeof(float) * own_mesh->texcoords_amout * 2;
 	memcpy(cursor, own_mesh->texcoords, bytes);
-	cursor += bytes;
 
 	*file_buffer = buffer;
 
@@ -669,8 +674,13 @@ uint64 MeshImporter::Save(const GnMesh* own_mesh, char** file_buffer)
 
 void MeshImporter::Load(const char* file_buffer, GnMesh* own_mesh)
 {
+	Timer timer;
+	timer.Start();
+
+	char* buffer = nullptr;
+	FileSystem::Load(file_buffer, &buffer);
 	//initialize cursor and bytes
-	char* cursor = (char*)file_buffer;
+	char* cursor = buffer;
 	uint bytes = 0u;
 
 	//load ranges
@@ -705,8 +715,10 @@ void MeshImporter::Load(const char* file_buffer, GnMesh* own_mesh)
 	//load texcoords
 	bytes = sizeof(float) * own_mesh->texcoords_amout * 2;
 	own_mesh->texcoords = new float[own_mesh->texcoords_amout * 2];
-	memcpy(own_mesh->normals, cursor, bytes);
+	memcpy(own_mesh->texcoords, cursor, bytes);
 	cursor += bytes;
+
+	LOG("%s loaded from custom file in %.3f s", file_buffer, timer.ReadSec());
 
 	own_mesh->GenerateBuffers();
 }
@@ -724,29 +736,56 @@ GameObject* MeshImporter::PreorderChildren(const aiScene* scene, aiNode* node, a
 	if (node->mMeshes != nullptr)
 	{
 		gameObject->SetName(node->mName.C_Str());
-
+		// Import save and load mesh, from FBX to custom file format
 		char* buffer;
 		GnMesh* mesh = new GnMesh();
 		aiMesh* imp_mesh = scene->mMeshes[*node->mMeshes];
 		Import(imp_mesh, mesh);
-		uint size = Save(mesh, &buffer);
-		std::string path_name = "Library/Meshes/";
-		path_name += mesh->name;
+		uint size = MeshImporter::Save(mesh, &buffer);
+		std::string path_name = "Library/Models/";
+		path_name += node->mName.C_Str();
+		path_name += ".ceMESH";
 		FileSystem::Save(path_name.c_str(), buffer, size);
-		gameObject->AddComponent(mesh);
 
+		delete mesh;
+		mesh = nullptr;
+		mesh = new GnMesh();
+		Load(path_name.c_str(), mesh);
+		gameObject->AddComponent(mesh);
+		RELEASE_ARRAY(buffer);
+		buffer = nullptr;
+
+		char* img_buffer;
+		//Import save and load material/texture 
 		Material* our_material = new Material();
 		aiMaterial* imp_material = scene->mMaterials[imp_mesh->mMaterialIndex];
 		MaterialImporter::Import(imp_material, our_material, path);
+		size = MaterialImporter::Save(our_material, &img_buffer);
+		path_name = "Library/Textures/";
+		path_name += FileSystem::GetFile(our_material->GetTexture()->name.c_str());
+		path_name += ".dds";
+		FileSystem::Save(path_name.c_str(), img_buffer, size);
+		
+		/// TODO: review material saving
 
+		delete our_material;
+		our_material = nullptr;
+		imp_material = nullptr;
+		our_material = new Material();
+
+		MaterialImporter::Load(path_name.c_str(), our_material);
+
+		our_material->SetMesh(mesh);
 		gameObject->AddComponent(our_material);
+		//RELEASE_ARRAY(img_buffer);
+		img_buffer = nullptr;
 
 		LoadTransform(node, gameObject->GetTransform());
 	}
 
 	for (size_t i = 0; i < node->mNumChildren; i++)
 	{
-		PreorderChildren(scene, node->mChildren[i], node, gameObject, path);
+		PreorderChildren(scene, node->mChildren[i], node, gameObject, path); /// TODO: review street and multiple children creation/load
 	}
 
 	return gameObject;
@@ -794,25 +833,81 @@ void MaterialImporter::Import(const aiMaterial* imp_material, Material* our_mate
 	}
 }
 
-uint64 MaterialImporter::Save(const Material* our_material, char** file_buffer)
+uint64 MaterialImporter::Save(Material* our_material, char** file_buffer)
 {
-	uint size;
-	UCHAR* data;
+	ILuint size;
+	ILubyte* data;
+
+	ilBindImage(our_material->GetTexture()->id);
 
 	ilSetInteger(IL_DXTC_DATA_FORMAT, IL_DXT5);
 	size = ilSaveL(IL_DDS, nullptr, 0);
 	if (size > 0)
 	{
-		data = new UCHAR[size];
+		data = new ILubyte[size];
 		if (ilSaveL(IL_DDS, data, size) > 0) *file_buffer = (char*)data;
 
 		RELEASE_ARRAY(data);
 	}
+	ilBindImage(0);
 
 	return size;
 }
 
-#pragma endregion
+void MaterialImporter::Load(const char* file_buffer, Material* own_material)
+{
+	ILuint imageID = 0;
+
+	ilGenImages(1, &imageID);
+	ilBindImage(imageID);
+
+	ilEnable(IL_ORIGIN_SET);
+	ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
+
+	char* buffer = nullptr;
+	uint size = FileSystem::Load(file_buffer, &buffer);
+
+	if (ilLoadL(IL_DDS, buffer, size) == IL_FALSE)
+	{
+		LOG_WARNING("Error when trying to load the texture %s into buffer, %d: %s", file_buffer, ilGetError(), iluErrorString(ilGetError()));
+		buffer = nullptr;
+
+		ilBindImage(0);
+		ilDeleteImages(1, &imageID);
+		ilGenImages(1, &imageID);
+		ilBindImage(imageID);
+	}
+
+	if (buffer != NULL)
+		RELEASE_ARRAY(buffer);
+
+	ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE);
+
+	ILenum error;
+	error = ilGetError();
+
+	if (error != IL_NO_ERROR)
+	{
+		ilBindImage(0);
+		ilDeleteImages(1, &imageID);
+		LOG_ERROR("Error when loading %s - %d: %s", file_buffer, error, iluErrorString(error));
+	}
+	else
+	{
+		GnTexture* texture = new GnTexture();
+
+		texture->id = (uint)(imageID);
+		//texture->name = FileSystem::GetFile(f) + format;
+		texture->data = ilGetData();
+		texture->width = ilGetInteger(IL_IMAGE_WIDTH);
+		texture->height = ilGetInteger(IL_IMAGE_HEIGHT);
+		texture->path = file_buffer;
+
+		own_material->SetTexture(texture);
+	}
+
+	ilBindImage(0);
+}
 
 #pragma region TextureImporter
 
@@ -878,6 +973,8 @@ GnTexture* TextureImporter::LoadTexture(const char* path)
 	if (error != IL_NO_ERROR)
 	{
 		LOG_ERROR("%d: %s", error, iluErrorString(error));
+		ilBindImage(0);
+		ilDeleteImages(1, &imageID);
 	}
 	else
 	{

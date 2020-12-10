@@ -99,7 +99,8 @@ namespace MeshImporter
 namespace MaterialImporter
 {
 	void Import(const aiMaterial* imp_material, Material* our_material, const char* path);
-	uint64 Save(const Material* our_material, char** file_buffer);
+	uint64 Save( Material* our_material, char** file_buffer);
+	void Load(const char* file_buffer, Material* our_material);
 }
 
 namespace TextureImporter

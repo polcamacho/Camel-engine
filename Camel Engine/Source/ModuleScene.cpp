@@ -26,7 +26,8 @@ bool ModuleScene::Start()
 	selectedGameObject = root;
 	root->SetName("Root");
 
-	GameObject* house = MeshImporter::ImportModel("Assets/Models/baker_house/BakerHouse.FBX");
+	GameObject* house = MeshImporter::ImportModel("Assets/Models/baker_house/BakerHouse.fbx");
+	//GameObject* house = MeshImporter::ImportModel("Assets/Models/street/street2.fbx");
 	AddGameObject(house);
 
 	return ret;
