@@ -48,7 +48,6 @@ void GameObject::Update()
 	if (enabled)
 	{
 		App->scene->main_camera->CullingObjects(this);
-		//App->camera->ReturnObjectToPick(this);
 		for (size_t i = 0; i < components.size(); i++)
 		{
 			if (components[i]->IsEnabled())

@@ -220,17 +220,12 @@ void ModuleCamera3D::PickMouse()
 {
 	float dx = App->input->GetMouseX() - (App->editor->w_pos.x + App->editor->tab.x);
 	float dy = App->input->GetMouseY() - (App->editor->w_pos.y + App->editor->tab.y);
-
-	/*float x_normalize = -(1.0f - ((float)dx * 2.0f) / (float)App->window->width);
-	float y_normalize = 1.0f - ((float)dy * 2.0f) / (float)App->window->height;*/
 	float x_normalize = ((dx / App->editor->image_size.x) - 0.5f) / 0.5f;
 	float y_normalize = -((dy / App->editor->image_size.y) - 0.5f) / 0.5f;
 
 	ray = editor_cam->frustum.UnProjectLineSegment(x_normalize, y_normalize);
 	PickObject(ray);
-	//LOG("%.2f %.2f", App->editor->GetImageSize().x, App->editor->GetImageSize().y);
 	LOG("%.2f %.2f", x_normalize, y_normalize);
-	//LOG("%.2f %.2f", dx, dy);	
 
 }
 
