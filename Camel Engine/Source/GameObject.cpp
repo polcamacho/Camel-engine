@@ -241,6 +241,29 @@ void GameObject::UpdateChildrenTransforms()
 	}
 }
 
+bool GameObject::IsChild(GameObject* obj) const
+{
+	bool ret = false;
+	for (auto it_child = children.begin(); it_child != children.end(); it_child++)
+	{
+		if ((*it_child) == obj)
+			return true;
+
+		ret = (*it_child)->IsChild(obj);
+	}
+	return ret;
+}
+
+bool GameObject::IsDirectChild(GameObject* obj) const
+{
+	for (auto it_child = children.begin(); it_child != children.end(); it_child++)
+	{
+		if ((*it_child) == obj)
+			return true;
+	}
+	return false;
+}
+
 math::AABB GameObject::GetAABB() const
 {
 	return new_aabb;

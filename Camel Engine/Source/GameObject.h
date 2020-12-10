@@ -41,6 +41,10 @@ public:
 	void DeleteChildren();
 	void UpdateChildrenTransforms();
 
+	bool IsChild(GameObject* obj) const;
+
+	bool IsDirectChild(GameObject* obj) const;
+
 	math::AABB GetAABB() const;
 	void GenerateOBB();
 	void DrawBoundingBox();
