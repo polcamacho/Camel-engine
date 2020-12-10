@@ -4,8 +4,11 @@
 #include "GameObject.h"
 #include "Transform.h"
 #include "Camera.h"
+#include "Mesh.h"
 
 #include "parson/parson.h"
+#include "glew/include/glew.h"
+
 
 ModuleCamera3D::ModuleCamera3D(bool start_enabled) : Module(start_enabled)
 {
@@ -171,7 +174,15 @@ update_status ModuleCamera3D::Update(float dt)
 
 		PickMouse();
 	}
-	
+	glBegin(GL_LINES);
+	glLineWidth(15.0f);
+	glColor4f(1.0f, 1.0f, 0.0f, 1.0f);
+
+
+	glVertex3f(ray.a.x, ray.a.y, ray.a.z);
+	glVertex3f(ray.b.x, ray.b.y, ray.b.z);
+	glEnd();
+	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
 	return UPDATE_CONTINUE;
 }
@@ -207,15 +218,19 @@ void ModuleCamera3D::SetBackgroundColor(float r, float g, float b, float w)
 
 void ModuleCamera3D::PickMouse()
 {
-	int dx = App->input->GetMouseX();
-	int dy = App->input->GetMouseY();
+	float dx = App->input->GetMouseX() - (App->editor->w_pos.x + App->editor->tab.x);
+	float dy = App->input->GetMouseY() - (App->editor->w_pos.y + App->editor->tab.y);
 
-	float x_normalize = -(1.0f - ((float)dx * 2.0f) / (float)App->window->width);
-	float y_normalize = 1.0f - ((float)dy * 2.0f) / (float)App->window->height;
+	/*float x_normalize = -(1.0f - ((float)dx * 2.0f) / (float)App->window->width);
+	float y_normalize = 1.0f - ((float)dy * 2.0f) / (float)App->window->height;*/
+	float x_normalize = ((dx / App->editor->image_size.x) - 0.5f) / 0.5f;
+	float y_normalize = -((dy / App->editor->image_size.y) - 0.5f) / 0.5f;
 
 	ray = editor_cam->frustum.UnProjectLineSegment(x_normalize, y_normalize);
-	//LOG("%.2f %.2f", x_normalize, y_normalize);
 	PickObject(ray);
+	//LOG("%.2f %.2f", App->editor->GetImageSize().x, App->editor->GetImageSize().y);
+	LOG("%.2f %.2f", x_normalize, y_normalize);
+	//LOG("%.2f %.2f", dx, dy);	
 
 }
 
@@ -230,19 +245,49 @@ void ModuleCamera3D::PickObject(LineSegment ray)
 		for (size_t j = 0; j < gameObject->GetChildAmount(); j++)
 		{
 			children = gameObject->GetChildAt(j);
-
+			GameObject* go_selected;
 			if (ray.Intersects(children->new_aabb))
 			{
 				is_intersecting = true;
 
-				/*GnMesh* mesh = (GnMesh*)children->GetComponent(ComponentType::MESH);
+				float dis_hit = 0, dis_min = FLOAT_INF;
+				GnMesh* mesh = (GnMesh*)children->GetComponent(ComponentType::MESH);
+				Transform* trans = (Transform*)children->GetComponent(ComponentType::TRANSFORM);
+
+				ray.Transform(trans->GetGlobalTransform().Inverted());
+
 				if (mesh != nullptr) {
 
-				}*/
+					for (size_t a = 0; a < mesh->indices_amount; a++) {
+						
+						float3 x = { mesh->vertices[mesh->indices[a] * 3],mesh->vertices[mesh->indices[a] * 3 + 1] ,mesh->vertices[mesh->indices[a] * 3 + 2] };
+						a++;
+						float3 y = { mesh->vertices[mesh->indices[a] * 3],mesh->vertices[mesh->indices[a] * 3 + 1] ,mesh->vertices[mesh->indices[a] * 3 + 2] };
+						a++;
+						float3 z = { mesh->vertices[mesh->indices[a] * 3],mesh->vertices[mesh->indices[a] * 3 + 1] ,mesh->vertices[mesh->indices[a] * 3 + 2] };
+						a++;
+
+						Triangle triangle = { x,y,z };
+						float3 hit_point;
+
+						if (ray.Intersects(triangle, &dis_hit, &hit_point))
+						{
+							if (dis_hit < dis_min)
+							{
+								go_selected = children;
+								dis_min = dis_hit;
+								App->scene->selectedGameObject = go_selected;
+							}
+						}
+
+					}
+
+					LOG("Intersecting %s", children->GetName());
+				}
 			}
 			else {
 				is_intersecting = false;
-				LOG("NOT INTERSECTING");
+				App->scene->selectedGameObject = nullptr;
 			}
 		}
 
