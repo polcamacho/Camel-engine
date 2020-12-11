@@ -754,7 +754,6 @@ GameObject* MeshImporter::PreorderChildren(const aiScene* scene, aiNode* node, a
 		Load(path_name.c_str(), mesh);
 		gameObject->AddComponent(mesh);
 		RELEASE_ARRAY(buffer);
-		buffer = nullptr;
 
 		char* img_buffer;
 		//Import save and load material/texture 
@@ -778,8 +777,7 @@ GameObject* MeshImporter::PreorderChildren(const aiScene* scene, aiNode* node, a
 
 		our_material->SetMesh(mesh);
 		gameObject->AddComponent(our_material);
-		//RELEASE_ARRAY(img_buffer);
-		img_buffer = nullptr;
+		RELEASE_ARRAY(img_buffer);
 
 		LoadTransform(node, gameObject->GetTransform());
 	}
@@ -846,9 +844,10 @@ uint64 MaterialImporter::Save(Material* our_material, char** file_buffer)
 	if (size > 0)
 	{
 		data = new ILubyte[size];
-		if (ilSaveL(IL_DDS, data, size) > 0) *file_buffer = (char*)data;
+		if (ilSaveL(IL_DDS, data, size) > 0) 
+			*file_buffer = (char*)data;
 
-		RELEASE_ARRAY(data);
+		//RELEASE_ARRAY(data);
 	}
 	ilBindImage(0);
 
