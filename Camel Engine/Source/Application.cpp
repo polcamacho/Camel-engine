@@ -83,9 +83,15 @@ bool Application::Init()
 // ---------------------------------------------
 void Application::PrepareUpdate()
 {
-	dt = (float)ms_timer.Read() / 1000;
-	fps = 1.0f / dt;
-	ms_timer.Start();
+	frame_count++;
+	last_sec_frame_count++;
+	if (pause)
+		dt = 0.0f;
+	else
+		dt = 1.0f / framerate_cap;
+	frame_time.Start();
+
+	Time::PreUpdate(dt);
 }
 
 float Application::GetMsTimer()
@@ -96,11 +102,35 @@ float Application::GetMsTimer()
 // ---------------------------------------------
 void Application::FinishUpdate()
 {
-	Uint32 last_frame_ms = ms_timer.Read();
-
-	if (last_frame_ms < capped_ms)
+	Time::Update();
+	if (last_sec_frame_time.ReadTime() > 1000)
 	{
-		SDL_Delay(capped_ms - last_frame_ms);
+		last_sec_frame_time.Start();
+		prev_last_sec_frame_count = last_sec_frame_count;
+		last_sec_frame_count = 0;
+	}
+	float avg_fps = (float)frame_count / ms_timer.ReadSec();
+	float seconds_since_startup = ms_timer.ReadSec();
+	double last_frame_ms = frame_time.ReadTime();
+
+
+	
+
+	if (framerate_cap == 0)
+		framerate_cap = 1;
+	float waiting_time = (1000 / framerate_cap) - last_frame_ms;
+	if (waiting_time > (1000 / framerate_cap))
+	{
+		waiting_time = (1000 / framerate_cap);
+	}
+	else if (waiting_time < 0)
+	{
+		waiting_time = 0;
+	}
+	if (vsync)
+	{
+		SDL_Delay(waiting_time);
+
 	}
 }
 

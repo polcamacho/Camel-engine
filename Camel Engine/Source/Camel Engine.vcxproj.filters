@@ -168,6 +168,7 @@
       <Filter>Libs\MathGeoLib\Algorithm</Filter>
     </ClCompile>
     <ClCompile Include="Time.cpp" />
+    <ClCompile Include="PerfTimer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
@@ -442,6 +443,9 @@
       <Filter>Libs\MathGeoLib\Algorithm</Filter>
     </ClInclude>
     <ClInclude Include="Time.h">
+      <Filter>Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="PerfTimer.h">
       <Filter>Tools</Filter>
     </ClInclude>
   </ItemGroup>

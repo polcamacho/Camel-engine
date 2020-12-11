@@ -80,6 +80,7 @@ public:
 	int GetFPSCap();
 	void SetFPSCap(int fps_cap);
 	float GetMsTimer();
+	bool vsync = true;
 
 
 	HardwareSpecs GetHardware();
@@ -106,8 +107,6 @@ private:
 	const char* config_path;
 
 	//timer variables
-	Timer		ms_timer;
-	float		dt;
 	uint64		frame_count = 0;
 	uint64		last_sec_frame_count;
 	uint64		prev_last_sec_frame_count;
