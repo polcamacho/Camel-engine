@@ -79,6 +79,7 @@ bool Application::Init()
 	RELEASE(buffer);
 
 	ms_timer.Start();
+	RELEASE_ARRAY(buffer);
 	return ret;
 }
 
@@ -88,6 +89,11 @@ void Application::PrepareUpdate()
 	dt = (float)ms_timer.Read() / 1000;
 	fps = 1.0f / dt;
 	ms_timer.Start();
+}
+
+float Application::GetMsTimer()
+{
+	return ms_timer.ReadTime() / 1000.0f;
 }
 
 // ---------------------------------------------

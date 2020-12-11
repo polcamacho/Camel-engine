@@ -5,7 +5,9 @@ class GameObject;
 enum class ComponentType {
 	TRANSFORM,
 	MESH,
-	MATERIAL
+	MATERIAL,
+	CAMERA,
+	NO_TYPE
 };
 
 class Component {

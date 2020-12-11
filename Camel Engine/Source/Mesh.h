@@ -3,6 +3,7 @@
 #include "Component.h"
 #include <vector>;
 #include "Material.h"
+#include "MathGeoLib/include/MathGeoLib.h"
 
 typedef float GLfloat;
 typedef unsigned short GLushort;

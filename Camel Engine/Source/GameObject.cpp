@@ -1,13 +1,16 @@
+#include "Application.h"
 #include "GameObject.h"
 #include "Component.h"
 #include "Transform.h"
 #include "Mesh.h"
 #include "Material.h"
+#include "Camera.h"
 #include "ImGui/imgui.h"
+#include "glew/include/glew.h"
 
 #include <vector>
 
-GameObject::GameObject() : enabled(true), name("Empty Game Object"), parent(nullptr), to_delete(false)
+GameObject::GameObject() : enabled(true), bbox_enabled(true), name("Empty Game Object"), parent(nullptr), to_delete(false)
 {
 	transform = (Transform*)AddComponent(ComponentType::TRANSFORM);
 }
@@ -16,6 +19,13 @@ GameObject::GameObject(GnMesh* mesh) : GameObject()
 {
 	SetName(mesh->name);
 	AddComponent((Component*)mesh);
+
+}
+
+GameObject::GameObject(Camera* cam) : GameObject()
+{
+	SetName(cam->name);
+	AddComponent((Component*)cam);
 }
 
 GameObject::~GameObject(){
@@ -37,15 +47,21 @@ void GameObject::Update()
 {
 	if (enabled)
 	{
+		App->scene->main_camera->CullingObjects(this);
 		for (size_t i = 0; i < components.size(); i++)
 		{
 			if (components[i]->IsEnabled())
 				components[i]->Update();
 		}
-
+		
 		for (size_t i = 0; i < children.size(); i++)
 		{
+			
 			children[i]->Update();
+		}
+		if (bbox_enabled) {
+			GenerateOBB();
+			DrawBoundingBox();
 		}
 	}
 }
@@ -66,10 +82,14 @@ void GameObject::OnEditor()
 
 	if(ImGui::CollapsingHeader("Debugging Information")) 
 	{
-		if(parent != nullptr)
+		if (parent != nullptr) {
 			ImGui::Text("Parent: %s", parent->GetName());
-		else 
+		}
+		else {
 			ImGui::Text("No parent");
+		}
+
+		ImGui::Checkbox("Activate Bounding Box", &bbox_enabled);
 	}
 }
 
@@ -106,6 +126,12 @@ Component* GameObject::AddComponent(ComponentType type)
 		Material* material = new Material();
 		components.push_back(material);
 		return material;
+	}
+	else if (type == ComponentType::CAMERA)
+	{
+		Camera* camera = new Camera();
+		components.push_back(camera);
+		return camera;
 	}
 
 	return nullptr;
@@ -211,4 +237,40 @@ void GameObject::UpdateChildrenTransforms()
 	{
 		children[i]->GetTransform()->UpdateGlobalTransform(transform->GetGlobalTransform());
 	}
+}
+
+math::AABB GameObject::GetAABB() const
+{
+	return new_aabb;
+}
+
+void GameObject::GenerateOBB()
+{
+	GnMesh* mesh = (GnMesh*)GetComponent(ComponentType::MESH);
+	Transform* tr = (Transform*)GetComponent(ComponentType::TRANSFORM);
+
+	if (mesh != nullptr) {
+
+		new_aabb.SetNegativeInfinity();
+		new_aabb.Enclose((float3*)mesh->vertices, mesh->vertices_amount);
+	}
+	obb.SetFrom(new_aabb);
+	obb.Transform(tr->GetGlobalTransform());
+	new_aabb.SetNegativeInfinity();
+	new_aabb.Enclose(obb);
+}
+
+void GameObject::DrawBoundingBox()
+{
+	glBegin(GL_LINES);
+	glLineWidth(5.0f);
+	glColor4f(0.25f, 1.0f, 0.0f, 1.0f);
+
+	for (uint i = 0; i < 12; i++)
+	{
+		glVertex3f(new_aabb.Edge(i).a.x, new_aabb.Edge(i).a.y, new_aabb.Edge(i).a.z);
+		glVertex3f(new_aabb.Edge(i).b.x, new_aabb.Edge(i).b.y, new_aabb.Edge(i).b.z);
+	}
+	glEnd();
+	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 }

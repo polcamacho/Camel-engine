@@ -721,6 +721,7 @@ void MeshImporter::Load(const char* file_buffer, GnMesh* own_mesh)
 	LOG("%s loaded from custom file in %.3f s", file_buffer, timer.ReadSec());
 
 	own_mesh->GenerateBuffers();
+	//LOG("Texcoords loaded: %d", t);
 }
 
 GameObject* MeshImporter::PreorderChildren(const aiScene* scene, aiNode* node, aiNode* parentNode, GameObject* parentGameObject, const char* path)
@@ -915,7 +916,7 @@ GnTexture* TextureImporter::LoadTexture(const char* path)
 {
 	Timer timer;
 	timer.Start();
-	uint imageID = 0;
+	ILuint imageID = 0;
 
 	std::string normalized_path = FileSystem::NormalizePath(path);
 	std::string relative_path = FileSystem::GetPathRelativeToAssets(normalized_path.c_str());
@@ -980,13 +981,14 @@ GnTexture* TextureImporter::LoadTexture(const char* path)
 	{
 		LOG("Texture loaded successfully from: %s in %.3f s", path, timer.ReadSec());
 
-		texture->id = imageID;
+		texture->id = (ILuint)imageID;
 		texture->name = FileSystem::GetFile(path) + format;
 		texture->data = ilGetData();
 		texture->width = ilGetInteger(IL_IMAGE_WIDTH);
 		texture->height = ilGetInteger(IL_IMAGE_HEIGHT);
 		texture->path = normalized_path.c_str();
 	}
+
 	ilBindImage(0);
 
 	return texture;

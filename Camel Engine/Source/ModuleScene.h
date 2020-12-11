@@ -4,6 +4,8 @@
 
 class GameObject;
 class GnTexture;
+class Camera;
+class Transform;
 
 class ModuleScene : public Module
 {
@@ -22,10 +24,17 @@ public:
 	GameObject* GetRoot() { return root; }
 	void SetDroppedTexture(GnTexture* texture);
 
+
+	void CreateMainCamera();
+
+	void Stop();
+	void Play();
+
+
 public:
 	bool show_grid;
 	GameObject* selectedGameObject;
+	Camera* main_camera;
 
-private:
 	GameObject* root;
 };

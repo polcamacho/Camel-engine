@@ -2,6 +2,8 @@
 #include "Editor.h"
 #include "parson/parson.h"
 #include "Mesh.h"
+#include "Camera.h"
+#include "Time.h"
 #include "ModuleScene.h"
 #include "GameObject.h"
 #include "FileSystem.h"
@@ -138,6 +140,18 @@ update_status Editor::Draw()
 		ImGui::End();
 	}
 
+	//Time Panel
+
+	if (show_time_panel)
+	{
+		ImGui::Begin("Time", &show_time_panel);
+		ImGui::Text("Real Time: %.3f", App->GetMsTimer());
+		ImGui::Text("Game Time: %.3f", Time::time);
+		ShowTimePanel();
+		
+		ImGui::End();
+	}
+
 	//Preferences
 	if (show_preferences_window)
 	{
@@ -227,6 +241,11 @@ void Editor::AddConsoleLog(const char* log, int warning_level)
 {
 	log_message message = { log, warning_level };
 	console_log.push_back(message);
+}
+
+const ImVec2& Editor::GetImageSize()
+{
+	return image_size;
 }
 
 update_status Editor::ShowDockSpace(bool* p_open) 
@@ -398,9 +417,9 @@ bool Editor::CreateMainMenuBar() {
 			{
 				App->scene->AddGameObject(MeshImporter::ImportModel("Assets/Models/Primitives/cone.fbx"));
 			}
-			else if (ImGui::MenuItem("Suzanne"))
+			else if (ImGui::MenuItem("Camera"))
 			{
-				App->scene->AddGameObject(MeshImporter::ImportModel("Assets/Models/Primitives/monkey.fbx"));
+				App->scene->AddGameObject(new GameObject(new Camera()));
 			}
 			ImGui::EndMenu();
 		}
@@ -428,17 +447,14 @@ bool Editor::CreateMainMenuBar() {
 
 		if (ImGui::BeginMenu("Help"))
 		{
-			if (ImGui::MenuItem("Documentation"))
-				ShellExecuteA(NULL, "open", "https://github.com/marcpages2020/GenesisEngine/wiki", NULL, NULL, SW_SHOWNORMAL);
-
 			if (ImGui::MenuItem("Download latest"))
-				ShellExecuteA(NULL, "open", "https://github.com/marcpages2020/GenesisEngine/releases", NULL, NULL, SW_SHOWNORMAL);
+				ShellExecuteA(NULL, "open", "https://github.com/polcamacho/Camel-engine/releases", NULL, NULL, SW_SHOWNORMAL);
 
 			if (ImGui::MenuItem("Report a bug"))
-				ShellExecuteA(NULL, "open", "https://github.com/marcpages2020/GenesisEngine/issues", NULL, NULL, SW_SHOWNORMAL);
+				ShellExecuteA(NULL, "open", "https://github.com/polcamacho/Camel-engine/issues", NULL, NULL, SW_SHOWNORMAL);
 
 			if (ImGui::MenuItem("View on GitHub"))
-				ShellExecuteA(NULL, "open", "https://github.com/marcpages2020/GenesisEngine", NULL, NULL, SW_SHOWNORMAL);
+				ShellExecuteA(NULL, "open", "https://github.com/polcamacho/Camel-engine", NULL, NULL, SW_SHOWNORMAL);
 
 			if (ImGui::MenuItem("About"))
 				show_about_window = true;
@@ -503,10 +519,16 @@ void Editor::ShowSceneWindow()
 			if (ImGui::Checkbox("Show Grid", &show_grid))
 				App->scene->show_grid = show_grid;
 
+			static bool show_raycast = App->camera->show_raycast;
+			if (ImGui::Checkbox("Show Ray", &show_raycast))
+				App->camera->show_raycast = show_raycast;
+
 			ImGui::EndMenuBar();
 		}
 
-		ImVec2 windowSize = ImGui::GetWindowSize();
+		windowSize = ImGui::GetWindowSize();
+		tab = ImGui::GetWindowContentRegionMin();
+		w_pos = ImGui::GetWindowPos();
 		if (image_size.x != windowSize.x || desired_aspect_ratio != aspect_ratio)
 			ResizeSceneImage(windowSize, desired_aspect_ratio);
 
@@ -533,9 +555,55 @@ void Editor::ShowHierarchyWindow()
 	ImGui::End();
 }
 
+void Editor::ShowTimePanel()
+{
+	ImGui::Spacing();
+	std::string stop_or_play = Time::running ? "STOP" : "PLAY";
+	if (ImGui::Button(stop_or_play.c_str(), ImVec2(70, 20)))
+	{
+		//Call play or stop depending of the running value
+		Time::running ? App->scene->Stop() : App->scene->Play();
+	}
+
+	ImGui::SameLine();
+
+	std::string pause_or_resume = Time::paused ? "RESUME" : "PAUSE";
+	if (ImGui::Button(pause_or_resume.c_str(), ImVec2(70, 20)))
+	{
+		Time::paused ? Time::Resume() : Time::Pause();
+	}
+
+	ImGui::SameLine();
+
+	if (Time::play_one)
+	{
+		Time::Pause();
+		Time::play_one = false;
+	}
+
+	if (ImGui::Button("I> ||", ImVec2(70, 20)))
+	{
+		Time::play_one = (Time::play_one == false) ? true : false;
+		if (Time::play_one)
+		{
+			if (Time::paused)
+			{
+				Time::Resume();
+				Time::paused = true;
+
+			}
+			else
+			{
+				Time::paused = true;
+				Time::Resume();
+			}
+		}
+	}
+}
+
 void Editor::PreorderHierarchy(GameObject* gameObject)
 {
-	ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
+	flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
 
 	if (gameObject->GetChildAmount() > 0) 
 	{
@@ -668,7 +736,6 @@ void Editor::ShowConfigurationWindow()
 				App->renderer3D->SetVSYNC(vsync);
 
 
-			//TODO:	Add two more enables
 		}
 
 		if (ImGui::CollapsingHeader("Camera")) {
@@ -772,9 +839,13 @@ void Editor::ShowAboutWindow()
 
 		ImGui::Text("Made by: ");
 		ImGui::SameLine();
-		if (ImGui::SmallButton("Marc Pages Francesch"))
-			ShellExecuteA(NULL, "open", "https://github.com/marcpages2020", NULL, NULL, SW_SHOWNORMAL);
-
+		if (ImGui::SmallButton("Pol Camacho Banal"))
+			ShellExecuteA(NULL, "open", "https://github.com/polcamacho", NULL, NULL, SW_SHOWNORMAL);
+		if (ImGui::SmallButton("Marc Rosell"))
+			ShellExecuteA(NULL, "open", "https://github.com/MarcRosellH", NULL, NULL, SW_SHOWNORMAL);
+		ImGui::SameLine();
+		if (ImGui::SmallButton("Alexandru Cercel"))
+			ShellExecuteA(NULL, "open", "https://github.com/AlexandruC5", NULL, NULL, SW_SHOWNORMAL);
 
 		ImGui::Spacing();
 		ImGui::Separator();
@@ -826,7 +897,7 @@ void Editor::ShowAboutWindow()
 		ImGui::Text("MIT License");
 		ImGui::Spacing();
 
-		ImGui::TextWrapped("Copyright (c) 2020 Marc Pages Francesch");
+		ImGui::TextWrapped("Copyright (c) 2020 Marc Rosell, Alexandru Cercel, Pol Camacho");
 		ImGui::Spacing();
 		ImGui::TextWrapped(
 			"Permission is hereby granted, free of charge, to any person obtaining a copy"

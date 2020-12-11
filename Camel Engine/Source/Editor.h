@@ -36,6 +36,7 @@ public:
 
 	bool IsSceneFocused();
 	void AddConsoleLog(const char* log, int warning_level);
+	const ImVec2& GetImageSize();
 	
 private:
 	//Dock Space
@@ -46,6 +47,7 @@ private:
 	void ShowSceneWindow();
 	void ShowInspectorWindow();
 	void ShowHierarchyWindow();
+	void ShowTimePanel();
 	void ShowConfigurationWindow();
 	void ShowAboutWindow();
 
@@ -62,6 +64,7 @@ private:
 	bool show_console_window;
 	bool show_scene_window;
 	bool show_configuration_window;
+	bool show_time_panel;
 
 	//edit subwindows
 	bool show_preferences_window;
@@ -77,9 +80,11 @@ private:
 
 	std::vector<log_message> console_log;
 
-	ImVec2 image_size;
-
 	AspectRatio aspect_ratio;
+
+public:
+	ImVec2 windowSize, image_size, tab, w_pos;
+	ImGuiTreeNodeFlags flags;
 };
 
 #endif // !_EDITOR_H_
