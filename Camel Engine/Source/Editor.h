@@ -36,6 +36,7 @@ public:
 
 	bool IsSceneFocused();
 	void AddConsoleLog(const char* log, int warning_level);
+	const ImVec2& GetImageSize();
 	
 private:
 	//Dock Space
@@ -79,9 +80,11 @@ private:
 
 	std::vector<log_message> console_log;
 
-	ImVec2 image_size;
-
 	AspectRatio aspect_ratio;
+
+public:
+	ImVec2 windowSize, image_size, tab, w_pos;
+	ImGuiTreeNodeFlags flags;
 };
 
 #endif // !_EDITOR_H_

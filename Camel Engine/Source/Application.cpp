@@ -76,7 +76,10 @@ bool Application::Init()
 	if(config_root)
 		json_value_free(config_root);
 
+	RELEASE(buffer);
+
 	ms_timer.Start();
+	RELEASE_ARRAY(buffer);
 	return ret;
 }
 

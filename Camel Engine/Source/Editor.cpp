@@ -2,6 +2,7 @@
 #include "Editor.h"
 #include "parson/parson.h"
 #include "Mesh.h"
+#include "Camera.h"
 #include "Time.h"
 #include "ModuleScene.h"
 #include "GameObject.h"
@@ -242,6 +243,11 @@ void Editor::AddConsoleLog(const char* log, int warning_level)
 	console_log.push_back(message);
 }
 
+const ImVec2& Editor::GetImageSize()
+{
+	return image_size;
+}
+
 update_status Editor::ShowDockSpace(bool* p_open) 
 {
 	update_status ret = UPDATE_CONTINUE;
@@ -369,7 +375,7 @@ bool Editor::CreateMainMenuBar() {
 			}
 			else if (ImGui::MenuItem("FBX: Cube"))
 			{
-				App->scene->AddGameObject(MeshImporter::LoadFBX("Assets/Models/Primitives/cube.fbx"));
+				App->scene->AddGameObject(MeshImporter::ImportModel("Assets/Models/Primitives/cube.fbx"));
 			}
 			else if (ImGui::MenuItem("Cylinder"))
 			{
@@ -377,7 +383,7 @@ bool Editor::CreateMainMenuBar() {
 			}
 			else if (ImGui::MenuItem("FBX: Cylinder"))
 			{
-				App->scene->AddGameObject(MeshImporter::LoadFBX("Assets/Models/Primitives/cylinder.fbx"));
+				App->scene->AddGameObject(MeshImporter::ImportModel("Assets/Models/Primitives/cylinder.fbx"));
 			}
 			else if (ImGui::MenuItem("Sphere"))
 			{
@@ -385,7 +391,7 @@ bool Editor::CreateMainMenuBar() {
 			}
 			else if (ImGui::MenuItem("FBX: Sphere"))
 			{
-				App->scene->AddGameObject(MeshImporter::LoadFBX("Assets/Models/Primitives/sphere.fbx"));
+				App->scene->AddGameObject(MeshImporter::ImportModel("Assets/Models/Primitives/sphere.fbx"));
 			}
 			else if (ImGui::MenuItem("Pyramid"))
 			{
@@ -393,7 +399,7 @@ bool Editor::CreateMainMenuBar() {
 			}
 			else if (ImGui::MenuItem("FBX: Pyramid"))
 			{
-				App->scene->AddGameObject(MeshImporter::LoadFBX("Assets/Models/Primitives/pyramid.fbx"));
+				App->scene->AddGameObject(MeshImporter::ImportModel("Assets/Models/Primitives/pyramid.fbx"));
 			}
 			else if (ImGui::MenuItem("Plane"))
 			{
@@ -401,7 +407,7 @@ bool Editor::CreateMainMenuBar() {
 			}
 			else if (ImGui::MenuItem("FBX: Plane"))
 			{
-				App->scene->AddGameObject(MeshImporter::LoadFBX("Assets/Models/Primitives/plane.fbx"));
+				App->scene->AddGameObject(MeshImporter::ImportModel("Assets/Models/Primitives/plane.fbx"));
 			}
 			else if (ImGui::MenuItem("Cone"))
 			{
@@ -409,11 +415,11 @@ bool Editor::CreateMainMenuBar() {
 			}
 			else if (ImGui::MenuItem("FBX: Cone"))
 			{
-				App->scene->AddGameObject(MeshImporter::LoadFBX("Assets/Models/Primitives/cone.fbx"));
+				App->scene->AddGameObject(MeshImporter::ImportModel("Assets/Models/Primitives/cone.fbx"));
 			}
-			else if (ImGui::MenuItem("Suzanne"))
+			else if (ImGui::MenuItem("Camera"))
 			{
-				App->scene->AddGameObject(MeshImporter::LoadFBX("Assets/Models/Primitives/monkey.fbx"));
+				App->scene->AddGameObject(new GameObject(new Camera()));
 			}
 			ImGui::EndMenu();
 		}
@@ -441,17 +447,14 @@ bool Editor::CreateMainMenuBar() {
 
 		if (ImGui::BeginMenu("Help"))
 		{
-			if (ImGui::MenuItem("Documentation"))
-				ShellExecuteA(NULL, "open", "https://github.com/marcpages2020/GenesisEngine/wiki", NULL, NULL, SW_SHOWNORMAL);
-
 			if (ImGui::MenuItem("Download latest"))
-				ShellExecuteA(NULL, "open", "https://github.com/marcpages2020/GenesisEngine/releases", NULL, NULL, SW_SHOWNORMAL);
+				ShellExecuteA(NULL, "open", "https://github.com/polcamacho/Camel-engine/releases", NULL, NULL, SW_SHOWNORMAL);
 
 			if (ImGui::MenuItem("Report a bug"))
-				ShellExecuteA(NULL, "open", "https://github.com/marcpages2020/GenesisEngine/issues", NULL, NULL, SW_SHOWNORMAL);
+				ShellExecuteA(NULL, "open", "https://github.com/polcamacho/Camel-engine/issues", NULL, NULL, SW_SHOWNORMAL);
 
 			if (ImGui::MenuItem("View on GitHub"))
-				ShellExecuteA(NULL, "open", "https://github.com/marcpages2020/GenesisEngine", NULL, NULL, SW_SHOWNORMAL);
+				ShellExecuteA(NULL, "open", "https://github.com/polcamacho/Camel-engine", NULL, NULL, SW_SHOWNORMAL);
 
 			if (ImGui::MenuItem("About"))
 				show_about_window = true;
@@ -516,10 +519,16 @@ void Editor::ShowSceneWindow()
 			if (ImGui::Checkbox("Show Grid", &show_grid))
 				App->scene->show_grid = show_grid;
 
+			static bool show_raycast = App->camera->show_raycast;
+			if (ImGui::Checkbox("Show Ray", &show_raycast))
+				App->camera->show_raycast = show_raycast;
+
 			ImGui::EndMenuBar();
 		}
 
-		ImVec2 windowSize = ImGui::GetWindowSize();
+		windowSize = ImGui::GetWindowSize();
+		tab = ImGui::GetWindowContentRegionMin();
+		w_pos = ImGui::GetWindowPos();
 		if (image_size.x != windowSize.x || desired_aspect_ratio != aspect_ratio)
 			ResizeSceneImage(windowSize, desired_aspect_ratio);
 
@@ -594,7 +603,7 @@ void Editor::ShowTimePanel()
 
 void Editor::PreorderHierarchy(GameObject* gameObject)
 {
-	ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
+	flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
 
 	if (gameObject->GetChildAmount() > 0) 
 	{
@@ -727,7 +736,6 @@ void Editor::ShowConfigurationWindow()
 				App->renderer3D->SetVSYNC(vsync);
 
 
-			//TODO:	Add two more enables
 		}
 
 		if (ImGui::CollapsingHeader("Camera")) {
@@ -831,9 +839,13 @@ void Editor::ShowAboutWindow()
 
 		ImGui::Text("Made by: ");
 		ImGui::SameLine();
-		if (ImGui::SmallButton("Marc Pages Francesch"))
-			ShellExecuteA(NULL, "open", "https://github.com/marcpages2020", NULL, NULL, SW_SHOWNORMAL);
-
+		if (ImGui::SmallButton("Pol Camacho Banal"))
+			ShellExecuteA(NULL, "open", "https://github.com/polcamacho", NULL, NULL, SW_SHOWNORMAL);
+		if (ImGui::SmallButton("Marc Rosell"))
+			ShellExecuteA(NULL, "open", "https://github.com/MarcRosellH", NULL, NULL, SW_SHOWNORMAL);
+		ImGui::SameLine();
+		if (ImGui::SmallButton("Alexandru Cercel"))
+			ShellExecuteA(NULL, "open", "https://github.com/AlexandruC5", NULL, NULL, SW_SHOWNORMAL);
 
 		ImGui::Spacing();
 		ImGui::Separator();
@@ -885,7 +897,7 @@ void Editor::ShowAboutWindow()
 		ImGui::Text("MIT License");
 		ImGui::Spacing();
 
-		ImGui::TextWrapped("Copyright (c) 2020 Marc Pages Francesch");
+		ImGui::TextWrapped("Copyright (c) 2020 Marc Rosell, Alexandru Cercel, Pol Camacho");
 		ImGui::Spacing();
 		ImGui::TextWrapped(
 			"Permission is hereby granted, free of charge, to any person obtaining a copy"

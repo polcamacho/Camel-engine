@@ -167,8 +167,14 @@
     <ClCompile Include="Libs\MathGeoLib\include\Algorithm\Random\LCG.cpp">
       <Filter>Libs\MathGeoLib\Algorithm</Filter>
     </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>GameObjects &amp; Components</Filter>
+    </ClCompile>
     <ClCompile Include="Time.cpp" />
+    </ClCompile>
     <ClCompile Include="PerfTimer.cpp" />
+        <Filter>Tools</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
@@ -442,6 +448,9 @@
     <ClInclude Include="Libs\MathGeoLib\include\Algorithm\Random\LCG.h">
       <Filter>Libs\MathGeoLib\Algorithm</Filter>
     </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>GameObjects &amp; Components</Filter>
+      </ClInclude>
     <ClInclude Include="Time.h">
       <Filter>Tools</Filter>
     </ClInclude>

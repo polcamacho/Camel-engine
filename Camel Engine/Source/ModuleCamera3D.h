@@ -1,7 +1,13 @@
-#pragma once
+#ifndef _MODULE_CAMERA_3D_H_
+#define _MODULE_CAMERA_3D_H_
+
 #include "Module.h"
 #include "Globals.h"
-#include "glmath.h"
+#include "Color.h"
+#include "MathGeoLib/include/MathGeoLib.h"
+
+class Camera;
+class GameObject;
 
 class ModuleCamera3D : public Module
 {
@@ -13,31 +19,37 @@ public:
 	bool Start();
 	bool LoadConfig(JSON_Object* config) override;
 	update_status Update(float dt);
+	void DrawRay();
 	bool CleanUp();
 
-	void Look(const vec3& Position, const vec3& Reference, bool RotateAroundReference = false);
-	void LookAt(const vec3& Spot);
-	void Move(const vec3& Movement);
-	float* GetViewMatrix();
+	void LookAt(float3& Spot);
+	void Move(const float3& Movement);
 
 	void Reset();
 	void SetBackgroundColor(float r, float g, float b, float w);
 
-private:
-
-	void CalculateViewMatrix();
+	void PickMouse();
+	//void ReturnObjectToPick(LineSegment ray);
+	void PickObject(LineSegment ray);
 
 public:
 
-	vec3 X, Y, Z, Position, Reference;
+	float3 Position, Reference;
 	Color background;
+	Camera* editor_cam;
+	GameObject* gameObject;
+	GameObject* children;
+	std::vector<GameObject*> vec_objects;
+	LineSegment ray;
 
 	float move_speed;
 	float drag_speed;
 	float zoom_speed;
 	float sensitivity;
+	float constant_mov;
 
-private:
+	bool show_raycast;
 
-	mat4x4 ViewMatrix, ViewMatrixInverse;
 };
+
+#endif // !_MODULE_CAMERA_3D_H_

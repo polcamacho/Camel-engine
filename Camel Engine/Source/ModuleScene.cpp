@@ -3,6 +3,8 @@
 #include "ModuleScene.h"
 #include "parson/parson.h"
 #include "Mesh.h"
+#include "Transform.h"
+#include "Camera.h"
 #include "FileSystem.h"
 #include "GameObject.h"
 #include "Time.h"
@@ -10,6 +12,7 @@
 ModuleScene::ModuleScene(bool start_enabled) : Module(start_enabled), show_grid(true), selectedGameObject(nullptr), root(nullptr) 
 {
 	name = "scene";
+	main_camera = nullptr;
 }
 
 ModuleScene::~ModuleScene() {}
@@ -20,20 +23,19 @@ bool ModuleScene::Start()
 	LOG("Loading Intro assets");
 	bool ret = true;
 
-	App->camera->Move(vec3(1.0f, 1.0f, 0.0f));
-	App->camera->LookAt(vec3(0, 0, 0));
+	App->camera->Move(float3(1.0f, 1.0f, 0.0f));
+	App->camera->LookAt(float3(0, 0, 0));
 
 	root = new GameObject();
 	selectedGameObject = root;
 	root->SetName("Root");
 
-	GameObject* house = MeshImporter::LoadFBX("Assets/Models/baker_house/BakerHouse.FBX");
+	GameObject* house = MeshImporter::ImportModel("Assets/Models/baker_house/BakerHouse.fbx");
+	//GameObject* house = MeshImporter::ImportModel("Assets/Models/street/street2.fbx");
 	AddGameObject(house);
-
-	//GameObject* rayman = MeshImporter::LoadFBX("Assets/Models/rayman/rayman.fbx");
-	//AddGameObject(rayman);
-
-	//MeshImporter::LoadFBX("Assets/Models/monkey.fbx");
+	CreateMainCamera();
+	//GameObject* street = MeshImporter::LoadFBX("Assets/Models/Street/street2.FBX");
+	//AddGameObject(street);
 
 	return ret;
 }
@@ -84,7 +86,7 @@ void ModuleScene::SetDroppedTexture(GnTexture* texture)
 {
 	if (selectedGameObject != nullptr) 
 	{
-		if (selectedGameObject->GetComponent(ComponentType::MESH) == nullptr) 
+		if (selectedGameObject->GetComponent(ComponentType::MESH) == nullptr && texture != nullptr) 
 		{
 			delete texture;
 			texture = nullptr;
@@ -129,6 +131,16 @@ update_status ModuleScene::Update(float dt)
 }
 
 
+void ModuleScene::CreateMainCamera()
+{
+	GameObject* main_cam = new GameObject(new Camera());
+	AddGameObject(main_cam);
+	main_cam->SetName("Main Camera");
+	main_camera = (Camera*)main_cam->GetComponent(ComponentType::CAMERA);
+	LOG("Cam created");
+}
+
+
 
 void ModuleScene::Play()
 {
@@ -138,3 +150,4 @@ void ModuleScene::Stop()
 {
 	Time::Stop();
 }
+
