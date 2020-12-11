@@ -34,13 +34,12 @@ bool ModuleScene::Start()
 	selectedGameObject = root;
 	root->SetName("Root");
 
-	GameObject* house = MeshImporter::LoadFBX("Assets/Models/baker_house/BakerHouse.FBX");
+	GameObject* house = MeshImporter::ImportModel("Assets/Models/baker_house/BakerHouse.fbx");
+	//GameObject* house = MeshImporter::ImportModel("Assets/Models/street/street2.fbx");
 	AddGameObject(house);
-
 	CreateMainCamera();
 	//GameObject* street = MeshImporter::LoadFBX("Assets/Models/Street/street2.FBX");
 	//AddGameObject(street);
-		
 	return ret;
 }
 
@@ -90,7 +89,7 @@ void ModuleScene::SetDroppedTexture(GnTexture* texture)
 {
 	if (selectedGameObject != nullptr) 
 	{
-		if (selectedGameObject->GetComponent(ComponentType::MESH) == nullptr) 
+		if (selectedGameObject->GetComponent(ComponentType::MESH) == nullptr && texture != nullptr) 
 		{
 			delete texture;
 			texture = nullptr;
