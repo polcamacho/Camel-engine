@@ -286,8 +286,9 @@ void ModuleCamera3D::PickObject(LineSegment ray)
 					LOG("Intersecting %s", children->GetName());
 				}
 			}
-			else {
-				//App->scene->selectedGameObject = nullptr;
+			else if ((!ray.Intersects(children->new_aabb)) && (App->input->GetMouseX() < App->editor->GetImageSize().x) && App->input->GetMouseY() < App->editor->GetImageSize().y)
+			{
+				App->scene->selectedGameObject = nullptr;
 			}
 		}
 	}
