@@ -2,6 +2,7 @@
 #include "Module.h"
 #include "Globals.h"
 
+
 class GameObject;
 class GnTexture;
 class Camera;
@@ -37,4 +38,5 @@ public:
 	Camera* main_camera;
 
 	GameObject* root;
+
 };

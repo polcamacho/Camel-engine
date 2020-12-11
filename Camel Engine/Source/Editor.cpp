@@ -9,13 +9,14 @@
 #include "FileSystem.h"
 
 #include "Assimp/Assimp/include/version.h"
-
 #include "glew/include/glew.h"
 
 #include "ImGui/imgui_impl_sdl.h"
 #include "ImGui/imgui_impl_opengl3.h"
 
 #include "MathGeoLib/include/MathGeoLib.h"
+
+#include "ImGuizmo/ImGuizmo.h"
 
 Editor::Editor(bool start_enabled) : Module(start_enabled), aspect_ratio(AspectRatio::FREE_ASPECT)
 {
@@ -72,6 +73,7 @@ update_status Editor::Update(float dt)
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplSDL2_NewFrame(App->window->window);
 	ImGui::NewFrame();
+	ImGuizmo::BeginFrame();
 
 	ret = ShowDockSpace(open_dockspace);
 

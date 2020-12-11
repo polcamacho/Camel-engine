@@ -9,6 +9,8 @@
 #include "GameObject.h"
 #include "Time.h"
 
+#include "ImGuizmo/ImGuizmo.h"
+
 ModuleScene::ModuleScene(bool start_enabled) : Module(start_enabled), show_grid(true), selectedGameObject(nullptr), root(nullptr) 
 {
 	name = "scene";
@@ -23,6 +25,8 @@ bool ModuleScene::Start()
 	LOG("Loading Intro assets");
 	bool ret = true;
 
+	ImGuizmo::Enable(true);
+
 	App->camera->Move(float3(1.0f, 1.0f, 0.0f));
 	App->camera->LookAt(float3(0, 0, 0));
 
@@ -36,6 +40,7 @@ bool ModuleScene::Start()
 	CreateMainCamera();
 	//GameObject* street = MeshImporter::LoadFBX("Assets/Models/Street/street2.FBX");
 	//AddGameObject(street);
+		
 	return ret;
 }
 
@@ -125,6 +130,31 @@ update_status ModuleScene::Update(float dt)
 	{
 		selectedGameObject->to_delete = true;
 	}
+	
+	//ImGuizmo::OPERATION mCurrentGizmoOperation;
+
+
+	/*ImGuizmo::OPERATION operation = ImGuizmo::TRANSLATE;
+	ImGuizmo::MODE mode = ImGuizmo::WORLD;
+
+	ImGuizmo::SetDrawlist();
+	ImGuizmo::SetRect(App->editor->w_pos.x + App->editor->tab.x, App->editor->w_pos.y + App->editor->tab.y, App->editor->image_size.x, App->editor->image_size.y);
+
+	ImGuizmo::OPERATION mCurrentGizmoOperation;
+
+	if ((App->input->GetKey(SDL_SCANCODE_M) == KEY_DOWN))
+		mCurrentGizmoOperation = ImGuizmo::OPERATION::TRANSLATE;
+
+	else if ((App->input->GetKey(SDL_SCANCODE_E) == KEY_DOWN))
+		mCurrentGizmoOperation = ImGuizmo::OPERATION::ROTATE;
+
+	else if ((App->input->GetKey(SDL_SCANCODE_R) == KEY_DOWN))
+		mCurrentGizmoOperation = ImGuizmo::OPERATION::SCALE;*/
+	
+	/*math::float4x4 matrix = global_matrix.Transposed();
+
+	ImGuizmo::Manipulate(App->camera->editor_cam->GetViewMatrix(), App->camera->editor_cam->GetProjectionMatrix(), mCurrentGizmoOperation, ImGuizmo::WORLD);
+		App->camera->current_camera->GetViewMatrix(), App->camera->current_camera->GetProjectionMatrix(), mCurrentGizmoOperation, ImGuizmo::WORLD, matrix.ptr()*/
 
 	return UPDATE_CONTINUE;
 }

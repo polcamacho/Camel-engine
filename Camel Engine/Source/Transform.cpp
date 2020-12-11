@@ -2,6 +2,7 @@
 #include "ImGui/imgui.h"
 #include "Globals.h"
 #include "GameObject.h"
+#include "ImGuizmo/ImGuizmo.h"
 
 Transform::Transform() : Component()
 {
@@ -14,6 +15,8 @@ Transform::Transform() : Component()
 
 	localTransform = float4x4::FromTRS(position, rotation, scale);
 	globalTransform = localTransform;
+
+	ImGuizmo::Enable(true);
 }
 
 Transform::Transform(float3 g_position, Quat g_rotation, float3 g_scale) : Component()
@@ -30,7 +33,10 @@ Transform::Transform(float3 g_position, Quat g_rotation, float3 g_scale) : Compo
 
 Transform::~Transform() {}
 
-void Transform::Update() {}
+void Transform::Update() 
+{
+	
+}
 
 void Transform::OnEditor()
 {
@@ -205,6 +211,11 @@ void Transform::SetProportionalScale(float multiplier)
 	scale.x = scale.y = scale.z = multiplier;
 
 	UpdateLocalTransform();
+}
+
+void Transform::SetGuizmos()
+{
+
 }
 
 float3 Transform::GetScale()

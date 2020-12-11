@@ -287,11 +287,8 @@ void ModuleCamera3D::PickObject(LineSegment ray)
 				}
 			}
 			else {
-				App->scene->selectedGameObject = nullptr;
+				//App->scene->selectedGameObject = nullptr;
 			}
 		}
-
-		//object pushback looking containsAABox condition -> upgrade
-		//obtain mesh (and transform??) and be sure that ray intersects in any of mesh vertices
 	}
 }
