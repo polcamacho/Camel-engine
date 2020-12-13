@@ -29,11 +29,11 @@ bool ModuleScene::Start()
 	root = new GameObject();
 	selectedGameObject = root;
 	root->SetName("Root");
-	CreateMainCamera();
 
 	GameObject* house = MeshImporter::ImportModel("Assets/Models/baker_house/BakerHouse.fbx");
-	//GameObject* house = MeshImporter::ImportModel("Assets/Models/street/Street environment_V01.FBX");
+	//GameObject* house = MeshImporter::ImportModel("Assets/Models/street/street2.fbx");
 	AddGameObject(house);
+	CreateMainCamera();
 	//GameObject* street = MeshImporter::LoadFBX("Assets/Models/Street/street2.FBX");
 	//AddGameObject(street);
 

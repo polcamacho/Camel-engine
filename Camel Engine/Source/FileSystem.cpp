@@ -645,31 +645,31 @@ uint64 MeshImporter::Save(const GnMesh* own_mesh, char** file_buffer)
 	//save ranges
 	bytes = sizeof(ranges);
 	memcpy(cursor, ranges, bytes);
-cursor += bytes;
+	cursor += bytes;
 
-//save indices
-bytes = sizeof(uint) * own_mesh->indices_amount;
-memcpy(cursor, own_mesh->indices, bytes);
-cursor += bytes;
+	//save indices
+	bytes = sizeof(uint) * own_mesh->indices_amount;
+	memcpy(cursor, own_mesh->indices, bytes);
+	cursor += bytes;
 
-// save vertices
-bytes = sizeof(float) * own_mesh->vertices_amount * 3;
-memcpy(cursor, own_mesh->vertices, bytes);
-cursor += bytes;
+	// save vertices
+	bytes = sizeof(float) * own_mesh->vertices_amount * 3;
+	memcpy(cursor, own_mesh->vertices, bytes);
+	cursor += bytes;
 
-// save normals
-bytes = sizeof(float) * own_mesh->normals_amount * 3;
-memcpy(cursor, own_mesh->normals, bytes);
-cursor += bytes;
+	// save normals
+	bytes = sizeof(float) * own_mesh->normals_amount * 3;
+	memcpy(cursor, own_mesh->normals, bytes);
+	cursor += bytes;
 
-// save texcoords
-bytes = sizeof(float) * own_mesh->texcoords_amout * 2;
-memcpy(cursor, own_mesh->texcoords, bytes);
+	// save texcoords
+	bytes = sizeof(float) * own_mesh->texcoords_amout * 2;
+	memcpy(cursor, own_mesh->texcoords, bytes);
 
-*file_buffer = buffer;
+	*file_buffer = buffer;
 
-// return size of buffer;
-return size;
+	// return size of buffer;
+	return size;
 }
 
 void MeshImporter::Load(const char* file_buffer, GnMesh* own_mesh)
@@ -738,19 +738,15 @@ GameObject* MeshImporter::PreorderChildren(const aiScene* scene, aiNode* node, a
 	{
 		gameObject->SetName(node->mName.C_Str());
 		// Import save and load mesh, from FBX to custom file format
-		char* buffer = nullptr;
-		uint size = 0u;
+		char* buffer;
 		GnMesh* mesh = new GnMesh();
+		aiMesh* imp_mesh = scene->mMeshes[*node->mMeshes];
+		Import(imp_mesh, mesh);
+		uint size = MeshImporter::Save(mesh, &buffer);
 		std::string path_name = "Library/Models/";
 		path_name += node->mName.C_Str();
 		path_name += ".ceMESH";
-		aiMesh* imp_mesh = scene->mMeshes[*node->mMeshes];
-		if (!FileSystem::Exists(path_name.c_str()))
-		{
-			Import(imp_mesh, mesh);
-			size = MeshImporter::Save(mesh, &buffer);
-			FileSystem::Save(path_name.c_str(), buffer, size);
-		}
+		FileSystem::Save(path_name.c_str(), buffer, size);
 
 		delete mesh;
 		mesh = nullptr;
@@ -766,7 +762,6 @@ GameObject* MeshImporter::PreorderChildren(const aiScene* scene, aiNode* node, a
 		aiMaterial* imp_material = scene->mMaterials[imp_mesh->mMaterialIndex];
 		MaterialImporter::Import(imp_material, aux_mat, path);
 		size = MaterialImporter::Save(aux_mat, &img_buffer);
-		path_name = "";
 		path_name = "Library/Textures/";
 		path_name += FileSystem::GetFile(aux_mat->GetTexture()->name.c_str());
 		path_name += ".dds";
@@ -836,10 +831,7 @@ void MaterialImporter::Import(const aiMaterial* imp_material, Material* our_mate
 	if (imp_path.length > 0)
 	{
 		std::string file_path = path;
-		std::string name = FileSystem::GetFile(FileSystem::NormalizePath(imp_path.data).c_str());
-		std::string format = FileSystem::GetFileFormat(imp_path.data);
-		file_path += name;
-		file_path += format;
+		file_path += imp_path.C_Str();
 
 		GnTexture* tex = TextureImporter::LoadTexture(file_path.c_str());
 
@@ -849,23 +841,22 @@ void MaterialImporter::Import(const aiMaterial* imp_material, Material* our_mate
 
 uint64 MaterialImporter::Save(Material* our_material, char** file_buffer)
 {
-	ILuint size = 0u;
+	ILuint size;
 	ILubyte* data;
-	if (our_material->GetTexture() != nullptr) {
-		ilBindImage(our_material->GetTexture()->id);
 
-		ilSetInteger(IL_DXTC_DATA_FORMAT, IL_DXT5);
-		size = ilSaveL(IL_DDS, nullptr, 0);
-		if (size > 0)
-		{
-			data = new ILubyte[size];
-			if (ilSaveL(IL_DDS, data, size) > 0)
-				*file_buffer = (char*)data;
+	ilBindImage(our_material->GetTexture()->id);
 
-			//RELEASE_ARRAY(data);
-		}
-		ilBindImage(0);
+	ilSetInteger(IL_DXTC_DATA_FORMAT, IL_DXT5);
+	size = ilSaveL(IL_DDS, nullptr, 0);
+	if (size > 0)
+	{
+		data = new ILubyte[size];
+		if (ilSaveL(IL_DDS, data, size) > 0) 
+			*file_buffer = (char*)data;
+
+		//RELEASE_ARRAY(data);
 	}
+	ilBindImage(0);
 
 	return size;
 }

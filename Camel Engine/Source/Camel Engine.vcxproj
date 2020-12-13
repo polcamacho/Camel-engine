@@ -78,7 +78,7 @@
       <SDLCheck>false</SDLCheck>
       <ExceptionHandling>false</ExceptionHandling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>E:\GitHub\Repositories\Camel-engine\Camel Engine\Source\Libs</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>G:\Github\GenesisEngine\GenesisEngine\Source\Libs;G:\Github\GenesisEngine\GenesisEngine\Source\Libs;</AdditionalIncludeDirectories>
       <AdditionalUsingDirectories>
       </AdditionalUsingDirectories>
       <StructMemberAlignment>Default</StructMemberAlignment>
