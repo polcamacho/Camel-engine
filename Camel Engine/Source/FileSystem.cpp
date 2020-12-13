@@ -758,25 +758,32 @@ GameObject* MeshImporter::PreorderChildren(const aiScene* scene, aiNode* node, a
 		char* img_buffer;
 		//Import save and load material/texture 
 		Material* our_material = new Material();
+		Material* aux_mat = new Material();
 		aiMaterial* imp_material = scene->mMaterials[imp_mesh->mMaterialIndex];
-		MaterialImporter::Import(imp_material, our_material, path);
-		size = MaterialImporter::Save(our_material, &img_buffer);
+		MaterialImporter::Import(imp_material, aux_mat, path);
+		size = MaterialImporter::Save(aux_mat, &img_buffer);
 		path_name = "Library/Textures/";
-		path_name += FileSystem::GetFile(our_material->GetTexture()->name.c_str());
+		path_name += FileSystem::GetFile(aux_mat->GetTexture()->name.c_str());
 		path_name += ".dds";
 		FileSystem::Save(path_name.c_str(), img_buffer, size);
 		
 		/// TODO: review material saving
 
-		delete our_material;
-		our_material = nullptr;
 		imp_material = nullptr;
-		our_material = new Material();
 
 		MaterialImporter::Load(path_name.c_str(), our_material);
-
-		our_material->SetMesh(mesh);
-		gameObject->AddComponent(our_material);
+		if (our_material->GetTexture() != nullptr)
+		{
+			mesh->SetTexture(our_material->GetTexture());
+			our_material->SetMesh(mesh);
+			gameObject->AddComponent(our_material);
+		}
+		else if (aux_mat->GetTexture() != nullptr)
+		{
+			mesh->SetTexture(aux_mat->GetTexture());
+			aux_mat->SetMesh(mesh);
+			gameObject->AddComponent(aux_mat);
+		}
 		RELEASE_ARRAY(img_buffer);
 
 		LoadTransform(node, gameObject->GetTransform());
