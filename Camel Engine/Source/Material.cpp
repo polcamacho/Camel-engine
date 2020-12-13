@@ -76,6 +76,7 @@ void Material::OnEditor()
 
 void Material::SetTexture(GnTexture* texture)
 {
+
 	if (diffuse_texture != nullptr)
 		DeleteTexture();
 
@@ -85,6 +86,16 @@ void Material::SetTexture(GnTexture* texture)
 	{
 		checkers_image = !mesh->SetTexture(diffuse_texture);
 	}
+}
+
+void Material::SetMesh(GnMesh* in_mesh)
+{
+	mesh = in_mesh;
+}
+
+GnTexture* Material::GetTexture()
+{
+	return diffuse_texture;
 }
 
 bool Material::DeleteTexture()

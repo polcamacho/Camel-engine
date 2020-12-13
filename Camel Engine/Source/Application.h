@@ -4,12 +4,14 @@
 #include "Globals.h"
 #include <vector>
 #include "Timer.h"
+#include "Time.h"
 #include "Module.h"
 #include "ModuleWindow.h"
 #include "ModuleInput.h"
 #include "ModuleRenderer3D.h"
 #include "ModuleCamera3D.h"
 #include "ModuleScene.h"
+#include "PerfTimer.h"
 #include "Editor.h"
 
 #include <string>
@@ -78,6 +80,7 @@ public:
 	int GetFPSCap();
 	void SetFPSCap(int fps_cap);
 	float GetMsTimer();
+	bool vsync = true;
 
 
 	HardwareSpecs GetHardware();
@@ -102,6 +105,16 @@ private:
 	const char* version;
 
 	const char* config_path;
+
+	//timer variables
+	uint64		frame_count = 0;
+	uint64		last_sec_frame_count;
+	uint64		prev_last_sec_frame_count;
+	bool		pause = false;
+	PerfTimer	ptimer;
+	Timer		last_sec_frame_time;
+	Timer		frame_time;
+	int			framerate_cap = 60;
 };
 
 extern Application* App;
