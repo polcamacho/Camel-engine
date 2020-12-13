@@ -37,14 +37,14 @@ void FileSystem::Init()
 {
 	ilInit();
 	iluInit();
-	if (ilutRenderer(ILUT_OPENGL)) 
+	if (ilutRenderer(ILUT_OPENGL))
 		LOG("DevIL initted correctly");
 
 	char* base_path = SDL_GetBasePath();
 
 	if (PHYSFS_init(nullptr) != 0)
 		LOG("PhysFS initted correctly");
-	
+
 	SDL_free(base_path);
 
 	AddPath("."); //Adding ProjectFolder (working directory)
@@ -113,7 +113,7 @@ bool FileSystem::AddPath(const char* path_or_zip)
 }
 
 // Check if a file exists
-bool FileSystem::Exists(const char* file) 
+bool FileSystem::Exists(const char* file)
 {
 	return PHYSFS_exists(file) != 0;
 }
@@ -129,18 +129,18 @@ bool FileSystem::CreateDir(const char* dir)
 }
 
 // Check if a file is a directory
-bool FileSystem::IsDirectory(const char* file) 
+bool FileSystem::IsDirectory(const char* file)
 {
 	return PHYSFS_isDirectory(file) != 0;
 }
 
-const char* FileSystem::GetWriteDir() 
+const char* FileSystem::GetWriteDir()
 {
 	//TODO: erase first annoying dot (".")
 	return PHYSFS_getWriteDir();
 }
 
-void FileSystem::DiscoverFiles(const char* directory, std::vector<std::string>& file_list, std::vector<std::string>& dir_list) 
+void FileSystem::DiscoverFiles(const char* directory, std::vector<std::string>& file_list, std::vector<std::string>& dir_list)
 {
 	char** rc = PHYSFS_enumerateFiles(directory);
 	char** i;
@@ -157,7 +157,7 @@ void FileSystem::DiscoverFiles(const char* directory, std::vector<std::string>& 
 	PHYSFS_freeList(rc);
 }
 
-void FileSystem::GetAllFilesWithExtension(const char* directory, const char* extension, std::vector<std::string>& file_list) 
+void FileSystem::GetAllFilesWithExtension(const char* directory, const char* extension, std::vector<std::string>& file_list)
 {
 	std::vector<std::string> files;
 	std::vector<std::string> dirs;
@@ -173,7 +173,7 @@ void FileSystem::GetAllFilesWithExtension(const char* directory, const char* ext
 	}
 }
 
-void FileSystem::GetRealDir(const char* path, std::string& output) 
+void FileSystem::GetRealDir(const char* path, std::string& output)
 {
 	output = PHYSFS_getBaseDir();
 
@@ -185,10 +185,10 @@ void FileSystem::GetRealDir(const char* path, std::string& output)
 	output.append(PHYSFS_getRealDir(path)).append("/").append(path);
 }
 
-std::string FileSystem::GetPathRelativeToAssets(const char* originalPath) 
+std::string FileSystem::GetPathRelativeToAssets(const char* originalPath)
 {
 	std::string file_path = originalPath;
-	
+
 	std::size_t pos = file_path.find("Assets");
 
 	if (pos > file_path.size())
@@ -204,21 +204,21 @@ std::string FileSystem::GetPathRelativeToAssets(const char* originalPath)
 	return file_path;
 }
 
-bool FileSystem::HasExtension(const char* path) 
+bool FileSystem::HasExtension(const char* path)
 {
 	std::string ext = "";
 	SplitFilePath(path, nullptr, nullptr, &ext);
 	return ext != "";
 }
 
-bool FileSystem::HasExtension(const char* path, std::string extension) 
+bool FileSystem::HasExtension(const char* path, std::string extension)
 {
 	std::string ext = "";
 	SplitFilePath(path, nullptr, nullptr, &ext);
 	return ext == extension;
 }
 
-bool FileSystem::HasExtension(const char* path, std::vector<std::string> extensions) 
+bool FileSystem::HasExtension(const char* path, std::vector<std::string> extensions)
 {
 	std::string ext = "";
 	SplitFilePath(path, nullptr, nullptr, &ext);
@@ -235,7 +235,7 @@ bool FileSystem::HasExtension(const char* path, std::vector<std::string> extensi
 std::string FileSystem::ProcessPath(const char* path)
 {
 	std::string final_path = path;
-	
+
 	final_path = NormalizePath(final_path.c_str());
 	std::string tmp_path = GetPathRelativeToAssets(final_path.c_str());
 
@@ -259,7 +259,7 @@ std::string FileSystem::NormalizePath(const char* full_path)
 	return newPath;
 }
 
-void FileSystem::SplitFilePath(const char* full_path, std::string* path, std::string* file, std::string* extension) 
+void FileSystem::SplitFilePath(const char* full_path, std::string* path, std::string* file, std::string* extension)
 {
 	if (full_path != nullptr)
 	{
@@ -293,7 +293,7 @@ void FileSystem::SplitFilePath(const char* full_path, std::string* path, std::st
 	}
 }
 
-unsigned int FileSystem::Load(const char* path, const char* file, char** buffer) 
+unsigned int FileSystem::Load(const char* path, const char* file, char** buffer)
 {
 	std::string full_path(path);
 	full_path += file;
@@ -301,7 +301,7 @@ unsigned int FileSystem::Load(const char* path, const char* file, char** buffer)
 }
 
 // Read a whole file and put it in a new buffer
-uint FileSystem::Load(const char* file, char** buffer) 
+uint FileSystem::Load(const char* file, char** buffer)
 {
 	uint ret = 0;
 
@@ -383,7 +383,7 @@ int close_sdl_rwops(SDL_RWops* rw)
 }
 
 // Save a whole buffer to disk
-uint FileSystem::Save(const char* file, const void* buffer, unsigned int size, bool append) 
+uint FileSystem::Save(const char* file, const void* buffer, unsigned int size, bool append)
 {
 	unsigned int ret = 0;
 
@@ -424,7 +424,7 @@ uint FileSystem::Save(const char* file, const void* buffer, unsigned int size, b
 	return ret;
 }
 
-std::string FileSystem::GetUniqueName(const char* path, const char* name) 
+std::string FileSystem::GetUniqueName(const char* path, const char* name)
 {
 	//TODO: modify to distinguix files and dirs?
 	std::vector<std::string> files, dirs;
@@ -471,7 +471,7 @@ void FileSystem::LoadFile(const char* file_path, bool drag_and_drop)
 		if (imported_fbx != nullptr)
 			App->scene->AddGameObject(imported_fbx);
 	}
-	else if (extension == ".png" || extension ==".jpg" || extension == ".bmp" || extension == ".tga")
+	else if (extension == ".png" || extension == ".jpg" || extension == ".bmp" || extension == ".tga")
 	{
 		if (drag_and_drop)
 		{
@@ -766,7 +766,7 @@ GameObject* MeshImporter::PreorderChildren(const aiScene* scene, aiNode* node, a
 		path_name += FileSystem::GetFile(aux_mat->GetTexture()->name.c_str());
 		path_name += ".dds";
 		FileSystem::Save(path_name.c_str(), img_buffer, size);
-		
+
 		/// TODO: review material saving
 
 		imp_material = nullptr;
@@ -809,7 +809,7 @@ void MeshImporter::LoadTransform(aiNode* node, Transform* transform)
 	transform->SetRotation(eulerRotation.x, eulerRotation.y, eulerRotation.z);
 
 	if (FileSystem::normalize_scales) {
-		if (scaling.x == 100 && scaling.y == 100 && scaling.z == 100) 
+		if (scaling.x == 100 && scaling.y == 100 && scaling.z == 100)
 		{
 			scaling.x = scaling.y = scaling.z = 1.0f;
 		}
@@ -851,7 +851,7 @@ uint64 MaterialImporter::Save(Material* our_material, char** file_buffer)
 	if (size > 0)
 	{
 		data = new ILubyte[size];
-		if (ilSaveL(IL_DDS, data, size) > 0) 
+		if (ilSaveL(IL_DDS, data, size) > 0)
 			*file_buffer = (char*)data;
 
 		//RELEASE_ARRAY(data);
@@ -955,16 +955,16 @@ GnTexture* TextureImporter::LoadTexture(const char* path)
 		if (ilLoadL(file_format, buffer, size) == IL_FALSE)
 		{
 			LOG_WARNING("Error trying to load the texture %s into buffer, %d: %s", path, ilGetError(), iluErrorString(ilGetError()));
-				buffer = nullptr;
-				ilBindImage(0);
-				ilDeleteImages(1, &imageID);
-				ilGenImages(1, &imageID);
-				ilBindImage(imageID);
+			buffer = nullptr;
+			ilBindImage(0);
+			ilDeleteImages(1, &imageID);
+			ilGenImages(1, &imageID);
+			ilBindImage(imageID);
 
 		}
 		if (buffer != NULL) RELEASE_ARRAY(buffer);
 	}
-	else 
+	else
 	{
 		if (ilLoadImage(normalized_path.c_str()) == IL_FALSE)
 		{
