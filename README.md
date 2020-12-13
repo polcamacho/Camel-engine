@@ -22,6 +22,17 @@ https://github.com/polcamacho/Camel-engine
 * SHIFT (Holded): Duplicate WSAD movement.
 
 ## Functionality
+### Assignment 2
+
+Now the engine has a camera component which is used for the engine scene view as well.
+There is also a main camera, which is able to do culling with the other game objects inside the scene, and now mouse picking is possible.
+Now the engine has time management to seperate the engine timer and the game timer.
+Finally, the engine uses a custom file format and importers for meshes and materials.
+
+Due to an issue with a MathGeoLib include, the development of the engine has been paused and no more work has been done since its detection, and other issues and errors haven't been solved.
+
+### Assignment 1
+
 Camel Engine supports 3D model and texture loading. Also, it is possible to drag and drop, with left mouse click hovered, models and textures.
 This models will appear with the textures they were exported with and the user can change textures dragging them from the texture folder.
 
