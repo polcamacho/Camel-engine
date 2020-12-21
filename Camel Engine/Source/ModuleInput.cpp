@@ -3,6 +3,9 @@
 #include "ModuleInput.h"
 #include "FileSystem.h"
 
+#include "ImGui/imgui_internal.h"
+#include "ImGui/imgui_impl_sdl.h"
+
 #define MAX_KEYS 300
 
 ModuleInput::ModuleInput(bool start_enabled) : Module(start_enabled)
@@ -34,11 +37,6 @@ bool ModuleInput::Init()
 	}
 
 	return ret;
-}
-
-bool ModuleInput::LoadConfig(JSON_Object* config)
-{
-	return true;
 }
 
 // Called every draw update
@@ -98,6 +96,8 @@ update_status ModuleInput::PreUpdate(float dt)
 
 	while(SDL_PollEvent(&e))
 	{
+		ImGui_ImplSDL2_ProcessEvent(&e);
+
 		switch(e.type)
 		{
 			case SDL_MOUSEWHEEL:
@@ -118,7 +118,7 @@ update_status ModuleInput::PreUpdate(float dt)
 
 			case SDL_DROPFILE:
 				dropped_filedir = e.drop.file;
-				FileSystem::LoadFile(dropped_filedir, true);
+				App->resources->DragDropFile(dropped_filedir);
 				SDL_free(dropped_filedir);
 				break;
 
@@ -126,7 +126,6 @@ update_status ModuleInput::PreUpdate(float dt)
 			{
 				if (e.window.event == SDL_WINDOWEVENT_RESIZED)
 				{
-					App->renderer3D->OnResize(e.window.data1, e.window.data2);
 					App->window->OnResize(e.window.data1, e.window.data2);
 				}
 			}

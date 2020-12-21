@@ -1,63 +1,75 @@
 #include "Time.h"
 
-float Time::delta_time;
-float Time::scale_time = 1;
-float Time::time;
+GnClock Time::realClock;
+GnClock Time::gameClock;
 
-Timer Time::game_timer;
+int Time::frameCount = 0;
 
-bool Time::paused = false;
-bool Time::running = false;
-bool Time::play_one = false;
-
-
-
-
-void Time::Start()
+void Time::Init()
 {
-	running = true;
-	game_timer.Start();
-	time = 0;
-}
-
-void Time::PreUpdate(float dt)
-{
-	//if game is running, give me dt, if not, give me 0
-	delta_time = running ? dt : 0;
-
-	if (running)
-		time = game_timer.ReadTime() / 1000.0f;
-}
-
-void Time::Update()
-{
+	gameClock.timeScale = 0.0f;
+	gameClock.started = false;
+	
+	realClock.timer.Start();
+	realClock.started = true;
 }
 
 
-void Time::Play()
+GnClock::GnClock()
 {
-	//If we press Play button, start running
-	running = true;
-}
-
-void Time::Pause()
-{
-	//if we press the pause button, stop the game_timer
-	//We don't put running to false because we are not stopping game, we are just pausing it and it stills run
-	paused = true;
-	game_timer.Stop();
-}
-
-void Time::Resume()
-{
-
+	timeScale = 1.0f;
 	paused = false;
-	game_timer.Resume();
 }
 
-void Time::Stop()
+void GnClock::Start()
 {
-	//If we stop the game, return running=false
-	running = false;
-	game_timer.Stop();
+	paused = false;
+	started = true;
+	timeScale = 1.0f;
+	timer.Start();
+}
+
+void GnClock::Stop()
+{
+	paused = false;
+	started = false;
+}
+
+void GnClock::Pause()
+{
+	paused = true;
+	timeScale = 0.0f;
+	timer.Stop();
+}
+
+void GnClock::Resume()
+{
+	paused = false;
+	timeScale = 1.0f;
+	timer.Resume();
+}
+
+void GnClock::Reset()
+{
+	timeScale = 1.0f;
+	paused = false;
+}
+
+void GnClock::Step()
+{
+	dt = (float)deltaTimer.Read() / 1000 * timeScale;
+	deltaTimer.Start();
+}
+
+float GnClock::timeSinceStartup()
+{
+	if (started)
+		return timer.ReadSec();
+	else
+		return 0.0f;
+}
+
+float GnClock::deltaTime()
+{
+	return dt * timeScale;
 }

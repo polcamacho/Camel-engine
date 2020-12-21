@@ -2,10 +2,12 @@
 #include "glew/include/glew.h"
 #include "Globals.h"
 #include "FileSystem.h"
+#include "Time.h"
+#include "GnJSON.h"
 
 #include "parson/parson.h"
 
-Application::Application(int argc, char* args[]) : argc(argc), args(args)
+Application::Application(int argc, char* args[]) : argc(argc), args(args), want_to_save(false), want_to_load(false), in_game(false)
 {
 	window = new ModuleWindow(true);
 	input = new ModuleInput(true);
@@ -13,13 +15,14 @@ Application::Application(int argc, char* args[]) : argc(argc), args(args)
 	camera = new ModuleCamera3D(true);
 	scene = new ModuleScene(true);
 	editor = new Editor(true);
+	resources = new ModuleResources(true);
 
 	// Main Modules
 	AddModule(window);
+	AddModule(resources);
 	AddModule(camera);
 	AddModule(input);
 	AddModule(scene);
-
 	AddModule(editor);
 
 	// Renderer last!
@@ -27,8 +30,6 @@ Application::Application(int argc, char* args[]) : argc(argc), args(args)
 
 	int cap = 60;
 	capped_ms = 1000 / cap;
-
-	config_path = "jsons";
 }
 
 Application::~Application()
@@ -47,94 +48,62 @@ bool Application::Init()
 	bool ret = true;
 
 	FileSystem::Init();
+	Time::Init();
 
 	char* buffer = nullptr;
 
-	uint size = FileSystem::Load("Assets/Config/config.json", &buffer);
+	uint size = FileSystem::Load("Library/Config/config.json", &buffer);
+	GnJSONObj config(buffer);
 
-	JSON_Value* config_root = nullptr;
-	JSON_Array* modules_array = JSONParser::LoadConfig(buffer, config_root);
-	
-	LoadConfig(JSONParser::GetJSONObjectByName("app", modules_array));
+	engine_name = config.GetString("engineName", "Camel Engine");
+	engine_version = config.GetString("version", "0.2");
+
+	GnJSONArray modules_array(config.GetArray("modules_config"));
 
 	// Call Init() in all modules
-	for (int i = 0; i < modules_vector.size() && ret == true; i++)
+	for (size_t i = 0; i < modules_vector.size() && ret == true; i++)
 	{
-		JSON_Object* module_object = JSONParser::GetJSONObjectByName(modules_vector[i]->name, modules_array);
+		GnJSONObj module_config(modules_array.GetObjectInArray(modules_vector[i]->name));
 
-		ret = modules_vector[i]->LoadConfig(module_object);
+		ret = modules_vector[i]->LoadConfig(module_config);
 		ret = modules_vector[i]->Init();
 	}
 
 	// After all Init calls we call Start() in all modules
 	LOG("Application Start --------------");
-	for (int i = 0; i < modules_vector.size() && ret == true; i++)
+	for (size_t i = 0; i < modules_vector.size() && ret == true; i++)
 	{
 		ret = modules_vector[i]->Start();
 	}
+	
 
-	if(config_root)
-		json_value_free(config_root);
-
-	RELEASE(buffer);
-
-	ms_timer.Start();
+	config.Release();
 	RELEASE_ARRAY(buffer);
+
+	Time::realClock.deltaTimer.Start();
 	return ret;
 }
 
 // ---------------------------------------------
 void Application::PrepareUpdate()
 {
-	frame_count++;
-	last_sec_frame_count++;
-	if (pause)
-		dt = 0.0f;
-	else
-		dt = 1.0f / framerate_cap;
-	frame_time.Start();
+	dt = (float)Time::realClock.deltaTimer.Read() / 1000;
+	fps = 1.0f / dt;
 
-	Time::PreUpdate(dt);
-}
-
-float Application::GetMsTimer()
-{
-	return ms_timer.ReadTime() / 1000.0f;
+	Time::realClock.Step();
+	Time::gameClock.Step();
 }
 
 // ---------------------------------------------
 void Application::FinishUpdate()
 {
-	Time::Update();
-	if (last_sec_frame_time.ReadTime() > 1000)
+	Uint32 last_frame_ms = Time::realClock.deltaTimer.Read();
+	if (last_frame_ms < capped_ms)
 	{
-		last_sec_frame_time.Start();
-		prev_last_sec_frame_count = last_sec_frame_count;
-		last_sec_frame_count = 0;
+		SDL_Delay(capped_ms - last_frame_ms);
 	}
-	float avg_fps = (float)frame_count / ms_timer.ReadSec();
-	float seconds_since_startup = ms_timer.ReadSec();
-	double last_frame_ms = frame_time.ReadTime();
 
-
-	
-
-	if (framerate_cap == 0)
-		framerate_cap = 1;
-	float waiting_time = (1000 / framerate_cap) - last_frame_ms;
-	if (waiting_time > (1000 / framerate_cap))
-	{
-		waiting_time = (1000 / framerate_cap);
-	}
-	else if (waiting_time < 0)
-	{
-		waiting_time = 0;
-	}
-	if (vsync)
-	{
-		SDL_Delay(waiting_time);
-
-	}
+	Time::frameCount++;
 }
 
 // Call PreUpdate, Update and PostUpdate on all modules
@@ -143,19 +112,39 @@ update_status Application::Update()
 	update_status ret = UPDATE_CONTINUE;
 	PrepareUpdate();
 	
-	for (int i = 0; i < modules_vector.size() && ret == UPDATE_CONTINUE; i++)
+	for (size_t i = 0; i < modules_vector.size() && ret == UPDATE_CONTINUE; i++)
 	{
 		ret = modules_vector[i]->PreUpdate(dt);
 	}
 
-	for (int i = 0; i < modules_vector.size() && ret == UPDATE_CONTINUE; i++)
+	for (size_t i = 0; i < modules_vector.size() && ret == UPDATE_CONTINUE; i++)
 	{
 		ret = modules_vector[i]->Update(dt);
 	}
 
-	for (int i = 0; i < modules_vector.size() && ret == UPDATE_CONTINUE; i++)
+	for (size_t i = 0; i < modules_vector.size() && ret == UPDATE_CONTINUE; i++)
 	{
 		ret = modules_vector[i]->PostUpdate(dt);
+	}
+	
+	if (!endFrameTasks.empty()) {
+		for (size_t i = 0; i < endFrameTasks.size(); i++)
+		{
+			endFrameTasks.top()->OnFrameEnd();
+			endFrameTasks.pop();
+		}
+	}
+
+	if (want_to_save)
+	{
+		scene->Save(_file_to_save);
+		want_to_save = false;
+	}
+
+	if (want_to_load)
+	{
+		scene->Load(_file_to_load);
+		want_to_load = false;
 	}
 
 	FinishUpdate();
@@ -175,14 +164,18 @@ bool Application::CleanUp()
 	return ret;
 }
 
-bool Application::LoadConfig(JSON_Object* object)
+void Application::StartGame()
 {
-	bool ret = true;
+	in_game = true;
+	Time::gameClock.Start();
+	Save("Library/Scenes/tmp.scene");
+}
 
-	engine_name = json_object_get_string(object, "engine name");
-	version = json_object_get_string(object, "version");
-
-	return ret;
+void Application::StopGame()
+{
+	in_game = false;
+	Time::gameClock.Stop();
+	Load("Library/Scenes/tmp.scene");
 }
 
 void Application::AddModule(Module* mod)
@@ -201,7 +194,24 @@ int Application::GetFPSCap()
 
 void Application::SetFPSCap(int fps_cap)
 {
-	capped_ms = 1000 / fps_cap;
+	capped_ms = 1000.0f / (float)fps_cap;
+}
+
+void Application::Save(const char* filePath)
+{
+	want_to_save = true;
+	strcpy_s(_file_to_save, filePath);
+}
+
+void Application::Load(const char* filePath)
+{
+	want_to_load = true;
+	strcpy_s(_file_to_load, filePath);
+}
+
+void Application::AddModuleToTaskStack(Module* callback)
+{
+	endFrameTasks.push(callback);
 }
 
 HardwareSpecs Application::GetHardware()
@@ -213,7 +223,7 @@ HardwareSpecs Application::GetHardware()
 	specs.cache = SDL_GetCPUCacheLineSize();
 
 	//RAM
-	specs.ram = SDL_GetSystemRAM() / 1000;
+	specs.ram = SDL_GetSystemRAM() / 1000.0f;
 	
 	//Caps
 	specs.RDTSC = SDL_HasRDTSC();
@@ -245,9 +255,5 @@ HardwareSpecs Application::GetHardware()
 	return specs;
 }
 
-const char* Application::GetEngineVersion()
-{
-	return version;
-}
 
 

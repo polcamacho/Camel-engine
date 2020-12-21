@@ -1,34 +1,37 @@
-#ifndef TIME_H
-#define TIME_H
+#ifndef _TIME_H_
+#define _TIME_H_
 
 #include "Timer.h"
 
-
-class Time
+struct GnClock
 {
-public:
+	GnClock();
+	void Start();
+	void Stop();
+	void Pause();
+	void Resume();
+	void Reset();
+	void Step();
+	//time since startup
+	float timeSinceStartup();
 
-	//basic
-	static void Start();
-	static void PreUpdate(float dt);
-	static void Update();
-
-	//Buttons functions
-	static void Play();
-	static void Pause();
-	static void Resume();
-	static void Stop();
-
-public:
-
-	static float delta_time;
-	static float scale_time;
-	static float time;
-	static Timer game_timer;
-	static bool paused;
-	static bool running;
-	static bool play_one;
+	float deltaTime(); //last frame expressed in seconds time
+	float timeScale; //scale at which time is passing
+	bool paused;
+	bool started;
+	float dt;
+	Timer timer;
+	Timer deltaTimer;
 };
 
+class Time {
+public:
+	static void Init();
+	static int frameCount; //frames since game start
 
-#endif // !TIME_H
+public:
+	static GnClock realClock;
+	static GnClock gameClock;
+};
+
+#endif

@@ -1,11 +1,13 @@
 #pragma once
 #include "Module.h"
 #include "Globals.h"
+#include "ImGui/imgui.h"
+#include "ImGuizmo/ImGuizmo.h"
+
+#include <vector>
 
 class GameObject;
 class GnTexture;
-class Camera;
-class Transform;
 
 class ModuleScene : public Module
 {
@@ -15,26 +17,29 @@ public:
 
 	bool Start();
 	bool Init();
-	bool LoadConfig(JSON_Object* config) override;
+	bool LoadConfig(GnJSONObj& config) override;
 	update_status Update(float dt);
+	void HandleInput();
 	bool CleanUp();
 
 	void AddGameObject(GameObject* gameObject);
 	void DeleteGameObject(GameObject* gameObject);
 	GameObject* GetRoot() { return root; }
-	void SetDroppedTexture(GnTexture* texture);
+	std::vector<GameObject*> GetAllGameObjects();
+	void PreorderGameObjects(GameObject* gameObject, std::vector<GameObject*>& gameObjects);
+	void EditTransform();
 
+	bool ClearScene();
 
-	void CreateMainCamera();
-
-	void Stop();
-	void Play();
-
+	bool Save(const char* file_path);
+	bool Load(const char* scene_file);
 
 public:
 	bool show_grid;
 	GameObject* selectedGameObject;
-	Camera* main_camera;
 
+private:
 	GameObject* root;
+	ImGuizmo::OPERATION mCurrentGizmoOperation;
+	ImGuizmo::MODE mCurrentGizmoMode;
 };

@@ -4,42 +4,33 @@
 
 #include <string>
 
-typedef unsigned char GLubyte;
 class GnMesh;
-
-struct GnTexture 
-{
-	std::string name = "Unnamed Texture";
-	std::string path = "Unknown path";
-	uint id = -1;
-	GLubyte* data = nullptr;
-	int width = -1;
-	int height = -1;
-
-	~GnTexture()
-	{
-		name.clear();
-		path.clear();
-		//delete data;
-		data = nullptr;
-	}
-};
+class ResourceMaterial;
+class ResourceTexture;
+class GnJSONArray;
 
 class Material : public Component {
 public: 
 	Material();
-	Material(GnMesh* mesh, GnTexture* diffuse_texture);
+	Material(GameObject* gameObject);
 	~Material();
+
+	void SetResourceUID(uint UID) override;
+	void BindTexture();
+
+	void Save(GnJSONArray& save_array) override;
+	void Load(GnJSONObj& load_object) override;
 	void OnEditor() override;
 
-	void SetTexture(GnTexture* texture);
-	void SetMesh(GnMesh* in_mesh);
-
-	GnTexture* GetTexture();
-	bool DeleteTexture();
+	void SetTexture(ResourceTexture* texture);
+	void AssignCheckersImage();
+	ResourceTexture* GetDiffuseTexture();
 
 private:
-	GnTexture* diffuse_texture;
-	GnMesh* mesh;
 	bool checkers_image;
+	bool colored;
+
+	ResourceMaterial* _resource;
+	ResourceTexture* _diffuseTexture;
+	uint checkersID;
 };

@@ -1,27 +1,35 @@
 #pragma once
-#ifndef _GAMEOBJECT_H_
-#define _GAMEOBJECT_H_
+
+#include "Globals.h"
+
 #include <vector>
 #include <string>
+
 #include "MathGeoLib/include/MathGeoLib.h"
 
 class Component;
 class Transform;
 class GnMesh;
-class Camera;
-enum class ComponentType;
+enum ComponentType;
+
+class GnJSONObj;
+class GnJSONArray;
 
 class GameObject {
 public:
 	GameObject();
-	GameObject(GnMesh* mesh);
-	GameObject(Camera* cam);
+	GameObject(ComponentType component);
 	~GameObject();
 
 	void Update();
 	void OnEditor();
 
+	void Save(GnJSONArray& save_array);
+	uint Load(GnJSONObj* object);
+	uint LoadNodeData(GnJSONObj* object);
+
 	Component* GetComponent(ComponentType component);
+	std::vector<Component*> GetComponents();
 	Component* AddComponent(ComponentType type);
 	void AddComponent(Component* component);
 	bool RemoveComponent(Component* component);
@@ -30,34 +38,36 @@ public:
 	void SetName(const char* name);
 	void SetTransform(Transform transform);
 	Transform* GetTransform();
+	AABB GetAABB();
+	bool IsVisible();
 
 	GameObject* GetParent();
 	void SetParent(GameObject* parent);
+	void Reparent(GameObject* newParent);
 
 	void AddChild(GameObject* child);
-	int GetChildAmount();
+	int GetChildrenAmount();
 	GameObject* GetChildAt(int index);
 	bool RemoveChild(GameObject* gameObject);
 	void DeleteChildren();
 	void UpdateChildrenTransforms();
 
-	math::AABB GetAABB() const;
-	void GenerateOBB();
-	void DrawBoundingBox();
-
-public:
+public: 
 	bool to_delete;
-	AABB new_aabb;
-	OBB obb;
-	bool enabled;
-	
+	uint UUID = 0;
+
 private:
-	bool bbox_enabled;
+	void GenerateAABB(GnMesh* mesh);
+
+private:
+	bool enabled;
+	bool _visible;
 	std::string name;
-	GameObject* parent;
+	GameObject* _parent;
 	Transform* transform;
 	std::vector<Component*> components;
 	std::vector<GameObject*> children;
-};
 
-#endif // !_GAMEOBJECT_H
+	OBB _OBB;
+	AABB _AABB;
+};

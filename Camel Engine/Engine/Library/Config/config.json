@@ -1,0 +1,77 @@
+{
+  "engineName": "Camel Engine",
+  "version": "0.2",
+  "modules_config": [
+    {
+      "name" :  "resources"
+    },
+    {
+      "name": "camera",
+      "drag_speed": 0.75,
+      "move_speed": 5,
+      "orbit_speed": 5,
+      "zoom_speed": 20,
+      "sensitivity": 12.5
+    },
+    {
+      "name": "window",
+      "width": 1600,
+      "height": 900,
+      "fullscreen": false,
+      "fullscreen_desktop": false,
+      "resizable": true,
+      "borderless": false
+    },
+    {
+      "name": "input"
+    },
+    {
+      "name": "renderer",
+      "debug": false,
+      "vsync": false,
+      "draw_vertex_normals": false,
+      "draw_face_normals": false
+    },
+    {
+      "name": "scene",
+      "show_grid": true
+    },
+    {
+      "name": "editor",
+      "windows": [
+        {
+          "name": "scene",
+          "visible": true
+        },
+        {
+          "name": "inspector",
+          "visible": true
+        },
+        {
+          "name": "hierarchy",
+          "visible": true
+        },
+        {
+          "name": "assets",
+          "visible": true
+        },
+        {
+          "name": "console",
+          "visible": true
+        },
+        {
+          "name": "configuration",
+          "visible": true
+        },
+        {
+          "name": "preferences",
+          "visible": false
+        },
+        {
+          "name": "about",
+          "visible": false
+        }
+      ]
+    }
+  ]
+}

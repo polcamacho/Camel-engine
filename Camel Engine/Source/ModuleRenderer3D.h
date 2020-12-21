@@ -1,10 +1,8 @@
-#ifndef _MODULE_RENDERER_3D_H_
-#define _MODULE_RENDERER_3D_H_
-
+#pragma once
 #include "Module.h"
-#include "Light.h"
 #include "Globals.h"
-//#include "glmath.h"
+#include "MathGeoLib/include/MathGeoLib.h"
+#include "Light.h"
 
 #define MAX_LIGHTS 8
 
@@ -12,8 +10,7 @@ typedef unsigned int GLuint;
 typedef unsigned int GLenum;
 typedef unsigned char GLubyte;
 typedef void* SDL_GLContext;
-class GnMesh;
-class GnMeshCollection;
+class Camera;
 
 enum DisplayMode
 {
@@ -28,26 +25,29 @@ public:
 	~ModuleRenderer3D();
 
 	bool Init();
-	bool LoadConfig(JSON_Object* config) override;
+	bool LoadConfig(GnJSONObj& config) override;
 	update_status PreUpdate(float dt) override;
 	update_status Update(float dt) override;
 	update_status PostUpdate(float dt) override;
 	bool CleanUp();
 	
-	void AddMesh(GnMesh* mesh);
-	void AddMeshCollection(GnMeshCollection* mesh);
-	void DrawMeshes();
 	void OnResize(int width, int height);
+	void UpdateProjectionMatrix(float* projectionMatrix);
 
+	void DrawAABB(float3* aabb);
 	DisplayMode GetDisplayMode();
 	void SetDisplayMode(DisplayMode display);
+	void SetMainCamera(Camera* camera);
+	Camera* GetMainCamera();
+	bool IsInsideCameraView(AABB aabb);
 
 	void SetCapActive(GLenum cap, bool active);
 	void SetVSYNC(bool enabled);
 
-	GLubyte GetCheckersImage();
+	void DrawRay();
 
 private:
+	void GenerateBuffers();
 	void DrawDirectModeCube();
 	void BeginDebugDraw();
 	void EndDebugDraw();
@@ -55,24 +55,28 @@ private:
 	GLuint frameBuffer;
 
 public:
-	GLuint texColorBuffer;
+	GLuint colorTexture;
 	GLuint renderBuffer;
+
+	GLuint depthRenderBuffer;
+	GLuint depthTexture;
 
 	Light lights[MAX_LIGHTS];
 	SDL_GLContext context;
-	mat3x3 NormalMatrix;
-	mat4x4 ModelMatrix, ViewMatrix, ProjectionMatrix;
+	//mat3x3 NormalMatrix;
+	//mat4x4 ModelMatrix, ViewMatrix, ProjectionMatrix;
 	DisplayMode display_mode;
 
-	std::vector<GnMesh*> meshes;
-	std::vector<GnMeshCollection*> mesh_collections;
+	LineSegment _ray;
+	bool cull_editor_camera;
 
+	bool draw_mouse_picking_ray;
+	bool draw_aabbs;
 	bool draw_vertex_normals;
 	bool draw_face_normals;
 
 	bool vsync;
 
-private:
-	bool debug;
+private: 
+	Camera* _mainCamera;
 };
-#endif // !_MODULE_RENDERER_3D_H_

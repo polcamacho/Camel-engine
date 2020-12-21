@@ -3,7 +3,10 @@
 #include "Component.h"
 #include <vector>;
 #include "Material.h"
+
 #include "MathGeoLib/include/MathGeoLib.h"
+
+class ResourceMesh;
 
 typedef float GLfloat;
 typedef unsigned short GLushort;
@@ -14,46 +17,33 @@ public:
 	GnMesh();
 	virtual ~GnMesh();
 
-	void GenerateBuffers();
+	void Save(GnJSONArray& save_array) override;
+	void Load(GnJSONObj& load_object) override;
+	void SetResourceUID(uint UID) override;
+	Resource* GetResource(ResourceType type) override;
 
-	bool SetTexture(GnTexture* texture);
-	void AssignCheckersImage();
+	void GenerateAABB();
+	AABB GetAABB();
 
 	virtual void Update() override;
 	virtual void Render();
 	virtual void OnEditor() override;
 
-	void RemoveTexture();
-
 	void DrawVertexNormals();
 	void DrawFaceNormals();
 
 public:
-	uint vertices_buffer = -1;
-	uint vertices_amount = -1;
-	float* vertices = nullptr;
-
-	uint indices_buffer = -1;
-	uint indices_amount = -1;
-	uint* indices = nullptr;
-
-	uint normals_buffer;
-	float* normals;
-	uint normals_amount = -1;
-
-	uint texture_buffer = -1;
-	uint textureID;
-	GnTexture* texture;
-	float* texcoords = nullptr;
-	uint texcoords_amout = -1;
-
-	float* colors;
-
 	const char* name;
+	char* path;
 
 private:
+	AABB _AABB;
+
 	bool draw_vertex_normals;
 	bool draw_face_normals;
+
+	ResourceMesh* _resource;
+	
 };
 
 class GnCube : public GnMesh {
@@ -122,23 +112,3 @@ private:
 	float radius;
 	float height;
 };
-
-class GnMeshCollection : public Component{
-public:
-	GnMeshCollection();
-	~GnMeshCollection();
-
-	void GenerateBuffers();
-	virtual void Update() override;
-	void Render();
-
-public:
-	std::vector<GnMesh*> meshes;
-};
-
-/*
-class Frustum : public GnMesh {
-public:
-private:
-};
-*/

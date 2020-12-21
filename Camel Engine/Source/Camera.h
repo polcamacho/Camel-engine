@@ -1,43 +1,53 @@
 #pragma once
-#ifndef _CAMERA_H_
-#define _CAMERA_H_
-
+#include "Globals.h"
 #include "Component.h"
-#include "MathGeoLib/include/Geometry/Frustum.h"
+#include "MathGeoLib/include/MathGeoLib.h"
 
-class GnMesh;
-class Camera: public Component{
+class GameObject;
 
-public:
-	Camera();
-	~Camera();
-	virtual void Update() override;
-	virtual void OnEditor() override;
-
-	float GetNearPlane();
-	float GetFarPlane();
-	float GetAspectRatio();
-	float GetFOV();
-
-	void SetNearPlane(float nearP);
-	void SetFarPlane(float farP);
-	void SetFOV(float vFOV);
-	void SetAspectRatio(float a_ratio);
-
-	float* GetProjectionMatrix();
-	float* GetViewMatrix();
-
-	void DrawCameraLines();
-	void LookAt(float3& Spot);
-	void CullingObjects(GameObject* go);
-	bool ContainsAaBox(const AABB& refBox) const;
-
-public:
-	Frustum frustum;
-	float aspect_ratio;
-	const char* name;
-
-private:
+enum FixedFOV {
+	FIXED_VERTICAL_FOV,
+	FIXED_HORIZONTAL_FOV
 };
 
-#endif // !_CAMERA_
+class Camera : public Component {
+public:
+	Camera();
+	Camera(GameObject* gameObject);
+	~Camera();
+
+	void Update() override;
+	void OnEditor() override;
+
+	void Save(GnJSONArray& save_array) override;
+	void Load(GnJSONObj& load_object) override;
+
+	void SetFixedFOV(FixedFOV fixedFOV);
+	void AdjustFieldOfView();
+	void AdjustFieldOfView(float width, float height);
+	void SetVerticalFieldOfView(float verticalFOV, float screen_width, float screen_height);
+	void SetHorizontalFieldOfView(float horizontalFOV, float screen_width = 16.0f, float screen_height = 9.0f);
+	void SetPosition(float3 position);
+	float3 GetPosition();
+	void SetReference(float3 reference);
+	float3 GetReference();
+	void SetNearPlaneDistance(float distance);
+	void SetFarPlaneDistance(float distance);
+
+	void LookAt(float3 spot);
+	Frustum GetFrustum();
+
+	float* GetViewMatrix();
+	float* GetProjectionMatrix();
+	bool ContainsAABB(AABB& aabb);
+	//virtual void Enable() override;
+	//virtual void Disable() override;
+
+public:
+	FixedFOV fixedFOV;
+
+private:
+	Frustum _frustum;
+	float _aspectRatio;
+	float3 _reference;
+};

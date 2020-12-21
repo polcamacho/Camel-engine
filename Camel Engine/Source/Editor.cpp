@@ -1,60 +1,71 @@
 #include "Application.h"
 #include "Editor.h"
-#include "parson/parson.h"
+#include "GnJSON.h"
 #include "Mesh.h"
-#include "Camera.h"
-#include "Time.h"
 #include "ModuleScene.h"
 #include "GameObject.h"
 #include "FileSystem.h"
+#include "Camera.h"
+#include "Time.h"
 
-#include "Assimp/Assimp/include/version.h"
+#include <vector>
+#include <string>
+#include <algorithm>
 
 #include "glew/include/glew.h"
-
 #include "ImGui/imgui_impl_sdl.h"
 #include "ImGui/imgui_impl_opengl3.h"
 
 #include "MathGeoLib/include/MathGeoLib.h"
 
-Editor::Editor(bool start_enabled) : Module(start_enabled), aspect_ratio(AspectRatio::FREE_ASPECT)
+//Windows
+#include "WindowHierarchy.h"
+#include "WindowInspector.h"
+#include "WindowScene.h"
+#include "WindowAssets.h"
+#include "WindowConfiguration.h"
+#include "WindowAbout.h"
+#include "WindowImport.h"
+
+#ifdef _WIN32
+#define IM_NEWLINE  "\r\n"
+#else
+#define IM_NEWLINE  "\n"
+#endif
+
+Editor::Editor(bool start_enabled) : Module(start_enabled)
 {
 	name = "editor";
-	//*open_dockspace = true;
-
-	show_scene_window = true;
-	show_inspector_window = true;
-	show_hierarchy_window = true;
-	show_project_window = true;
-	show_console_window = true;
-	show_configuration_window = false;
-
-	show_preferences_window = false;
-	show_about_window = false;
 
 	scene_window_focused = false;
+	show_game_buttons = true;
 
 	current_theme = 1;
 
-	fps_log.resize(100, 0);
-	ms_log.resize(100, 0);
-
 	image_size = { 0,0 };
+
+	windows[HIERARCHY_WINDOW] = new WindowHierarchy();
+	windows[INSPECTOR_WINDOW] = new WindowInspector();
+	windows[SCENE_WINDOW] = new WindowScene();
+	windows[ASSETS_WINDOW] = new WindowAssets();
+	windows[CONFIGURATION_WINDOW] = new WindowConfiguration();
+	windows[ABOUT_WINDOW] = new WindowAbout();
+	windows[IMPORT_WINDOW] = new WindowImport();
+
+	//CONSOLE_WINDOW,
+	scene_name[0] = '\0';
+	selected_file[0] = '\0';
+	selected_folder[0] = '\0';
 }
 
-Editor::~Editor() 
-{
-	fps_log.clear();
-	ms_log.clear();
-}
+Editor::~Editor() {}
 
 bool Editor::Init()
 {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
-	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable | ImGuiConfigFlags_NavEnableKeyboard | ImGuiConfigFlags_NavEnableSetMousePos;
 	//io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 
 	ImGui::StyleColorsDark();
@@ -63,6 +74,18 @@ bool Editor::Init()
 	ImGui_ImplOpenGL3_Init();
 
 	return true;
+}
+
+bool Editor::Start()
+{
+	bool ret = true;
+
+	for (size_t i = 0; i < MAX_WINDOWS; i++)
+	{
+		windows[i]->Init();
+	}
+
+	return ret;
 }
 
 update_status Editor::Update(float dt)
@@ -80,34 +103,13 @@ update_status Editor::Update(float dt)
 
 update_status Editor::Draw()
 {
-	//Inspector
-	if (show_inspector_window)
+	for (size_t i = 0; i < MAX_WINDOWS; i++)
 	{
-		if (ImGui::Begin("Inspector", &show_inspector_window)) 
-		{
-			ShowInspectorWindow();
-		}
-		ImGui::End();
+		if(windows[i]->visible)
+			windows[i]->Draw();
 	}
 
-	//Project 
-	if (show_project_window)
-	{
-		ImGui::Begin("Project", &show_project_window);
-		ImGui::End();
-	}
-
-	//Hierarchy
-	if (show_hierarchy_window)
-	{
-		ShowHierarchyWindow();
-	}
-
-	//scene window
-	if (show_scene_window)
-	{
-		ShowSceneWindow();
-	}
+	ShowGameButtons();
 
 	//Console
 	if (show_console_window)
@@ -140,45 +142,18 @@ update_status Editor::Draw()
 		ImGui::End();
 	}
 
-	//Time Panel
-
-	if (show_time_panel)
-	{
-		ImGui::Begin("Time", &show_time_panel);
-		ImGui::Text("Real Time: %.3f", App->GetMsTimer());
-		ImGui::Text("Game Time: %.3f", Time::time);
-		ShowTimePanel();
-		
-		ImGui::End();
-	}
-
 	//Preferences
 	if (show_preferences_window)
+		ShowPreferencesWindow();
+
+	if (file_dialog == opened)
 	{
-		if (ImGui::Begin("Preferences", &show_preferences_window)) {
-			//Style
-			{
-				const char* items[] = { "Classic", "Dark", "Light" };
-				if (ImGui::Combo("Interface Style", &current_theme, items, IM_ARRAYSIZE(items)))
-				{
-					ChangeTheme(std::string(items[current_theme]));
-				}
-				ImGui::SameLine();
-			}
+		if (scene_operation == SceneOperation::LOAD)
+			LoadFile(".scene", "Library/");
+		else if (scene_operation == SceneOperation::SAVE) {
+			sprintf_s(selected_folder, 256, "Library/Scenes");
+			SaveFile(".scene", "Library/");
 		}
-		ImGui::End();
-	}
-
-	//Configuration
-	if (show_configuration_window)
-	{
-		ShowConfigurationWindow();
-	}
-
-	//About
-	if (show_about_window)
-	{
-		ShowAboutWindow();
 	}
 
 	ImGui::Render();
@@ -194,41 +169,45 @@ bool Editor::CleanUp()
 	ImGui_ImplSDL2_Shutdown();
 	ImGui::DestroyContext();
 
-	fps_log.clear();
-	ms_log.clear();
 	console_log.clear();
+
+	for (size_t i = 0; i < MAX_WINDOWS; i++)
+	{
+		delete windows[i];
+		windows[i] = nullptr;
+	}
 
 	return true;
 }
 
-bool Editor::LoadConfig(JSON_Object* object)
+bool Editor::LoadConfig(GnJSONObj& config)
 {
-	JSON_Array* windows = json_object_get_array(object, "windows");
+	GnJSONArray jsonWindows(config.GetArray("windows"));
 	
-	JSON_Object* window = json_array_get_object_by_name(windows, "scene");
-	show_scene_window = json_object_get_boolean(window, "visible");
+	GnJSONObj window = jsonWindows.GetObjectInArray("scene");
+	windows[SCENE_WINDOW]->visible = window.GetBool("visible");
 
-	window = json_array_get_object_by_name(windows, "inspector");
-	show_inspector_window = json_object_get_boolean(window, "visible");
+	window = jsonWindows.GetObjectInArray("inspector");
+	windows[INSPECTOR_WINDOW]->visible = window.GetBool("visible");
 
-	window = json_array_get_object_by_name(windows, "hierarchy");
-	show_hierarchy_window = json_object_get_boolean(window, "visible");
+	window = jsonWindows.GetObjectInArray("hierarchy");
+	windows[HIERARCHY_WINDOW]->visible = window.GetBool("visible");
 
-	window = json_array_get_object_by_name(windows, "project");
-	show_project_window = json_object_get_boolean(window, "visible");
+	window = jsonWindows.GetObjectInArray("assets");
+	windows[ASSETS_WINDOW]->visible = window.GetBool("visible");
 
-	window = json_array_get_object_by_name(windows, "console");
-	show_console_window = json_object_get_boolean(window, "visible");
+	window = jsonWindows.GetObjectInArray("console");
+	show_console_window = window.GetBool("visible");
 
-	window = json_array_get_object_by_name(windows, "configuration");
-	show_configuration_window = json_object_get_boolean(window, "visible");
+	window = jsonWindows.GetObjectInArray("configuration");
+	windows[CONFIGURATION_WINDOW]->visible = window.GetBool("visible");
 
-	window = json_array_get_object_by_name(windows, "preferences");
-	show_preferences_window = json_object_get_boolean(window, "visible");
+	window = jsonWindows.GetObjectInArray("preferences");
+	show_preferences_window = window.GetBool("visible");
 
-	window = json_array_get_object_by_name(windows, "about");
-	show_about_window = json_object_get_boolean(window, "visible");
-
+	window = jsonWindows.GetObjectInArray("about");
+	windows[ABOUT_WINDOW]->visible = window.GetBool("visible");
+	
 	return true;
 }
 
@@ -237,15 +216,16 @@ bool Editor::IsSceneFocused()
 	return scene_window_focused;
 }
 
+bool Editor::MouseOnScene()
+{
+	return mouseScenePosition.x > 0 && mouseScenePosition.x < image_size.x 
+		   && mouseScenePosition.y > 0 && mouseScenePosition.y < image_size.y;
+}
+
 void Editor::AddConsoleLog(const char* log, int warning_level)
 {
 	log_message message = { log, warning_level };
 	console_log.push_back(message);
-}
-
-const ImVec2& Editor::GetImageSize()
-{
-	return image_size;
 }
 
 update_status Editor::ShowDockSpace(bool* p_open) 
@@ -319,27 +299,6 @@ void Editor::ChangeTheme(std::string theme)
 	}
 }
 
-void Editor::GetMemoryStatistics(const char* gpu_brand, GLint& vram_budget, GLint& vram_usage, GLint& vram_available, GLint& vram_reserved)
-{
-	if (strcmp(gpu_brand, "NVIDIA Corporation") == 0)
-	{
-		glGetIntegerv(GL_GPU_MEMORY_INFO_TOTAL_AVAILABLE_MEMORY_NVX, &vram_budget);
-		glGetIntegerv(GL_GPU_MEMORY_INFO_DEDICATED_VIDMEM_NVX, &vram_usage);
-		glGetIntegerv(GL_GPU_MEMORY_INFO_CURRENT_AVAILABLE_VIDMEM_NVX, &vram_available);
-		glGetIntegerv(GL_GPU_MEMORY_INFO_EVICTED_MEMORY_NVX, &vram_reserved);
-	}
-	else if (strcmp(gpu_brand, "ATI Technologies") == 0)
-	{
-		//glGetIntegerv(GL_GPU_MEMORY_INFO_TOTAL_AVAILABLE_MEMORY_NVX, &vram_budget);
-		vram_budget = -1;
-		//glGetIntegerv(GL_GPU_MEMORY_INFO_DEDICATED_VIDMEM_NVX, &vram_usage);
-		vram_usage = -1;
-		glGetIntegerv(GL_VBO_FREE_MEMORY_ATI, &vram_available);
-		//glGetIntegerv(GL_GPU_MEMORY_INFO_EVICTED_MEMORY_NVX, &vram_reserved);
-		vram_reserved = -1;
-	}
-}
-
 bool Editor::CreateMainMenuBar() {
 	bool ret = true;
 
@@ -347,7 +306,17 @@ bool Editor::CreateMainMenuBar() {
 	{
 		if (ImGui::BeginMenu("File"))
 		{
-			if (ImGui::MenuItem("Exit"))
+			if (ImGui::MenuItem("Save Scene"))
+			{
+				file_dialog = opened;
+				scene_operation = SceneOperation::SAVE;
+			}
+			else if (ImGui::MenuItem("Load Scene"))
+			{
+				file_dialog = opened;
+				scene_operation = SceneOperation::LOAD;
+			}
+			else if (ImGui::MenuItem("Exit"))
 			{
 				ret = false;
 			}
@@ -358,7 +327,7 @@ bool Editor::CreateMainMenuBar() {
 		{
 			if (ImGui::MenuItem("Configuration"))
 			{
-				show_configuration_window = true;
+				windows[CONFIGURATION_WINDOW]->visible = true;
 			}
 			else if (ImGui::MenuItem("Preferences"))
 			{
@@ -369,95 +338,94 @@ bool Editor::CreateMainMenuBar() {
 	
 		if (ImGui::BeginMenu("Game Object"))
 		{
-			if (ImGui::MenuItem("Cube"))
+			if (ImGui::MenuItem("Empty Object"))
 			{
-				App->scene->AddGameObject(new GameObject(new GnCube()));
+				App->scene->AddGameObject(new GameObject());
 			}
-			else if (ImGui::MenuItem("FBX: Cube"))
+			else if (ImGui::MenuItem("Cube"))
 			{
-				App->scene->AddGameObject(MeshImporter::ImportModel("Assets/Models/Primitives/cube.fbx"));
+				App->scene->AddGameObject(App->resources->RequestGameObject("Assets/EngineAssets/Primitives/cube.fbx"));
 			}
 			else if (ImGui::MenuItem("Cylinder"))
 			{
-				App->scene->AddGameObject(new GameObject(new GnCylinder()));
-			}
-			else if (ImGui::MenuItem("FBX: Cylinder"))
-			{
-				App->scene->AddGameObject(MeshImporter::ImportModel("Assets/Models/Primitives/cylinder.fbx"));
+				App->scene->AddGameObject(App->resources->RequestGameObject("Assets/EngineAssets/Primitives/cylinder.fbx"));
 			}
 			else if (ImGui::MenuItem("Sphere"))
 			{
-				App->scene->AddGameObject(new GameObject(new GnSphere()));
-			}
-			else if (ImGui::MenuItem("FBX: Sphere"))
-			{
-				App->scene->AddGameObject(MeshImporter::ImportModel("Assets/Models/Primitives/sphere.fbx"));
+				App->scene->AddGameObject(App->resources->RequestGameObject("Assets/EngineAssets/Primitives/sphere.fbx"));
 			}
 			else if (ImGui::MenuItem("Pyramid"))
 			{
-				App->scene->AddGameObject(new GameObject(new GnPyramid()));
-			}
-			else if (ImGui::MenuItem("FBX: Pyramid"))
-			{
-				App->scene->AddGameObject(MeshImporter::ImportModel("Assets/Models/Primitives/pyramid.fbx"));
+				App->scene->AddGameObject(App->resources->RequestGameObject("Assets/EngineAssets/Primitives/pyramid.fbx"));
 			}
 			else if (ImGui::MenuItem("Plane"))
 			{
-				App->scene->AddGameObject(new GameObject(new GnPlane()));
-			}
-			else if (ImGui::MenuItem("FBX: Plane"))
-			{
-				App->scene->AddGameObject(MeshImporter::ImportModel("Assets/Models/Primitives/plane.fbx"));
+				App->scene->AddGameObject(App->resources->RequestGameObject("Assets/EngineAssets/Primitives/plane.fbx"));
 			}
 			else if (ImGui::MenuItem("Cone"))
 			{
-				App->scene->AddGameObject(new GameObject(new GnCone()));
+				App->scene->AddGameObject(App->resources->RequestGameObject("Assets/EngineAssets/Primitives/cone.fbx"));
 			}
-			else if (ImGui::MenuItem("FBX: Cone"))
+			else if (ImGui::MenuItem("Torus"))
 			{
-				App->scene->AddGameObject(MeshImporter::ImportModel("Assets/Models/Primitives/cone.fbx"));
+				App->scene->AddGameObject(App->resources->RequestGameObject("Assets/EngineAssets/Primitives/torus.fbx"));
+			}
+			else if (ImGui::MenuItem("Suzanne"))
+			{
+				App->scene->AddGameObject(App->resources->RequestGameObject("Assets/EngineAssets/Primitives/monkey.fbx"));
 			}
 			else if (ImGui::MenuItem("Camera"))
 			{
-				App->scene->AddGameObject(new GameObject(new Camera()));
+				App->scene->AddGameObject(new GameObject(ComponentType::CAMERA));
 			}
 			ImGui::EndMenu();
 		}
 
 		if (ImGui::BeginMenu("Window"))
 		{
-			if (ImGui::MenuItem("Inspector", NULL, show_inspector_window))
+			if (ImGui::MenuItem("Inspector", NULL, windows[INSPECTOR_WINDOW]->visible))
 			{
-				show_inspector_window = !show_inspector_window;
+				windows[INSPECTOR_WINDOW]->visible = !windows[INSPECTOR_WINDOW]->visible;
 			}
-			else if (ImGui::MenuItem("Scene", NULL, show_scene_window))
+			else if (ImGui::MenuItem("Hierarchy", NULL, windows[HIERARCHY_WINDOW]->visible))
 			{
-				show_scene_window = !show_scene_window;
+				windows[HIERARCHY_WINDOW]->visible = !windows[HIERARCHY_WINDOW]->visible;
 			}
-			else if (ImGui::MenuItem("Project", NULL, show_project_window))
+			else if (ImGui::MenuItem("Scene", NULL, windows[SCENE_WINDOW]->visible))
 			{
-				show_project_window = !show_project_window;
+				windows[SCENE_WINDOW]->visible = !windows[SCENE_WINDOW]->visible;
+			}
+			else if (ImGui::MenuItem("Assets", NULL, windows[ASSETS_WINDOW]->visible))
+			{
+				windows[ASSETS_WINDOW]->visible = !windows[ASSETS_WINDOW]->visible;
 			}
 			else if (ImGui::MenuItem("Console", NULL, show_console_window))
 			{
 				show_console_window = !show_console_window;
+			}
+			else if (ImGui::MenuItem("Configuration", NULL, windows[CONFIGURATION_WINDOW]->visible))
+			{
+				windows[CONFIGURATION_WINDOW]->visible = !windows[CONFIGURATION_WINDOW]->visible;
 			}
 			ImGui::EndMenu();
 		}
 
 		if (ImGui::BeginMenu("Help"))
 		{
+			if (ImGui::MenuItem("Documentation"))
+				ShellExecuteA(NULL, "open", "https://github.com/marcpages2020/GenesisEngine/wiki", NULL, NULL, SW_SHOWNORMAL);
+
 			if (ImGui::MenuItem("Download latest"))
-				ShellExecuteA(NULL, "open", "https://github.com/polcamacho/Camel-engine/releases", NULL, NULL, SW_SHOWNORMAL);
+				ShellExecuteA(NULL, "open", "https://github.com/marcpages2020/GenesisEngine/releases", NULL, NULL, SW_SHOWNORMAL);
 
 			if (ImGui::MenuItem("Report a bug"))
-				ShellExecuteA(NULL, "open", "https://github.com/polcamacho/Camel-engine/issues", NULL, NULL, SW_SHOWNORMAL);
+				ShellExecuteA(NULL, "open", "https://github.com/marcpages2020/GenesisEngine/issues", NULL, NULL, SW_SHOWNORMAL);
 
 			if (ImGui::MenuItem("View on GitHub"))
-				ShellExecuteA(NULL, "open", "https://github.com/polcamacho/Camel-engine", NULL, NULL, SW_SHOWNORMAL);
+				ShellExecuteA(NULL, "open", "https://github.com/marcpages2020/GenesisEngine", NULL, NULL, SW_SHOWNORMAL);
 
 			if (ImGui::MenuItem("About"))
-				show_about_window = true;
+				windows[ABOUT_WINDOW]->visible = true;
 
 			ImGui::EndMenu();
 		}
@@ -468,483 +436,203 @@ bool Editor::CreateMainMenuBar() {
 	return ret;
 }
 
-//Windows
-void Editor::ShowSceneWindow()
+void Editor::ShowGameButtons()
 {
-	if (ImGui::Begin("Scene", &show_scene_window, ImGuiWindowFlags_MenuBar))
+	ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration;
+
+	ImGui::SetNextWindowSize(ImVec2(130, 40));
+	if (ImGui::Begin("Game Buttons", &show_game_buttons, flags))
 	{
-		scene_window_focused = ImGui::IsWindowFocused();
-		static AspectRatio desired_aspect_ratio = aspect_ratio;
+		ImGui::Columns(2);
 
-		if (ImGui::BeginMenuBar())
+		if (App->in_game == false)
 		{
-			if (ImGui::BeginMenu("Display"))
-			{
-				if (ImGui::BeginMenu("Shading Mode"))
-				{
-					if (ImGui::MenuItem("Solid"))
-						App->renderer3D->SetDisplayMode(DisplayMode::SOLID);
-					if (ImGui::MenuItem("Wireframe"))
-						App->renderer3D->SetDisplayMode(DisplayMode::WIREFRAME);
-					ImGui::EndMenu();
-				}
-
-				static bool vertex_normals = App->renderer3D->draw_vertex_normals;
-				if (ImGui::Checkbox("Vertex Normals", &vertex_normals))
-					App->renderer3D->draw_vertex_normals = vertex_normals;
-
-				static bool face_normals = App->renderer3D->draw_face_normals;
-				if (ImGui::Checkbox("Face Normals", &face_normals))
-					App->renderer3D->draw_face_normals = face_normals;
-
-				if (ImGui::BeginMenu("Aspect"))
-				{
-					if (ImGui::MenuItem("Free Aspect"))
-						desired_aspect_ratio = AspectRatio::FREE_ASPECT;
-					else if (ImGui::MenuItem("16:9"))
-						desired_aspect_ratio = AspectRatio::ASPECT_16_9;
-					else if (ImGui::MenuItem("4:3"))
-						desired_aspect_ratio = AspectRatio::ASPECT_4_3;
-					ImGui::EndMenu();
-				}
-
-				ImGui::EndMenu();
-			}
-
-			static bool lighting = glIsEnabled(GL_LIGHTING);
-			if (ImGui::Checkbox("Lighting", &lighting))
-				App->renderer3D->SetCapActive(GL_LIGHTING, lighting);
-
-			static bool show_grid = App->scene->show_grid;
-			if (ImGui::Checkbox("Show Grid", &show_grid))
-				App->scene->show_grid = show_grid;
-
-			static bool show_raycast = App->camera->show_raycast;
-			if (ImGui::Checkbox("Show Ray", &show_raycast))
-				App->camera->show_raycast = show_raycast;
-
-			ImGui::EndMenuBar();
+			if (ImGui::Button("Play", ImVec2(40, 20)))
+				App->StartGame();
+		}
+		else {
+			if (ImGui::Button("Stop", ImVec2(40, 20)))
+				App->StopGame();
 		}
 
-		windowSize = ImGui::GetWindowSize();
-		tab = ImGui::GetWindowContentRegionMin();
-		w_pos = ImGui::GetWindowPos();
-		if (image_size.x != windowSize.x || desired_aspect_ratio != aspect_ratio)
-			ResizeSceneImage(windowSize, desired_aspect_ratio);
+		ImGui::NextColumn();
+		if (Time::gameClock.paused) 
+		{
+			if (ImGui::Button("Resume", ImVec2(45, 20)))
+				Time::gameClock.Resume();
+		}
+		else 
+		{
+			if (ImGui::Button("Pause", ImVec2(45, 20))) 
+				Time::gameClock.Pause();
+		}
 
-		ImGui::Image((ImTextureID)App->renderer3D->texColorBuffer, image_size, ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
 	}
 	ImGui::End();
 }
 
-void Editor::ShowInspectorWindow()
+void Editor::LoadFile(const char* filter_extension, const char* from_dir)
 {
-	if (App->scene->selectedGameObject != nullptr) 
+	ImGui::OpenPopup("Load File");
+	if (ImGui::BeginPopupModal("Load File", nullptr))
 	{
-		App->scene->selectedGameObject->OnEditor();
-	}
-}
+		in_modal = true;
 
-void Editor::ShowHierarchyWindow()
-{
-	if (ImGui::Begin("Hierarchy", &show_hierarchy_window)) 
-	{
-		GameObject* root = App->scene->GetRoot();
-		PreorderHierarchy(root);
-	}
-	ImGui::End();
-}
+		ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.0f);
+		ImGui::BeginChild("File Browser", ImVec2(0, 300), true);
+		 DrawDirectoryRecursive(from_dir, filter_extension);
+		ImGui::EndChild();
+		ImGui::PopStyleVar();
 
-void Editor::ShowTimePanel()
-{
-	ImGui::Spacing();
-	std::string stop_or_play = Time::running ? "STOP" : "PLAY";
-	if (ImGui::Button(stop_or_play.c_str(), ImVec2(70, 20)))
-	{
-		//Call play or stop depending of the running value
-		Time::running ? App->scene->Stop() : App->scene->Play();
-	}
+		ImGui::PushItemWidth(250.f);
+		if (ImGui::InputText("##file_selector", selected_file, 256, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll))
+			file_dialog = ready_to_close;
 
-	ImGui::SameLine();
-
-	std::string pause_or_resume = Time::paused ? "RESUME" : "PAUSE";
-	if (ImGui::Button(pause_or_resume.c_str(), ImVec2(70, 20)))
-	{
-		Time::paused ? Time::Resume() : Time::Pause();
-	}
-
-	ImGui::SameLine();
-
-	if (Time::play_one)
-	{
-		Time::Pause();
-		Time::play_one = false;
-	}
-
-	if (ImGui::Button("I> ||", ImVec2(70, 20)))
-	{
-		Time::play_one = (Time::play_one == false) ? true : false;
-		if (Time::play_one)
-		{
-			if (Time::paused)
-			{
-				Time::Resume();
-				Time::paused = true;
-
-			}
-			else
-			{
-				Time::paused = true;
-				Time::Resume();
-			}
+		ImGui::PopItemWidth();
+		ImGui::SameLine();
+		if (ImGui::Button("Ok", ImVec2(50, 20))) {
+			file_dialog = ready_to_close;
+			App->Load(selected_file);
 		}
+		ImGui::SameLine();
+
+		if (ImGui::Button("Cancel", ImVec2(50, 20)))
+			file_dialog = ready_to_close;
+
+		if (file_dialog == ready_to_close)
+		{
+			selected_file[0] = '\0';
+			strcpy(selected_folder, "Library/Scenes");
+		}
+
+		ImGui::EndPopup();
 	}
 }
 
-void Editor::PreorderHierarchy(GameObject* gameObject)
+void Editor::SaveFile(const char* filter_extension, const char* from_dir)
 {
-	flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
-
-	if (gameObject->GetChildAmount() > 0) 
+	ImGui::OpenPopup("Save File");
+	if (ImGui::BeginPopupModal("Save File", nullptr))
 	{
-		if (gameObject == App->scene->GetRoot())
-			flags |= ImGuiTreeNodeFlags_DefaultOpen;
+		in_modal = true;
 
-		if (App->scene->selectedGameObject == gameObject)
+		ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.0f);
+		ImGui::BeginChild("File Browser", ImVec2(0, 300), true);
+		DrawDirectoryRecursive(from_dir, filter_extension);
+		ImGui::EndChild();
+		ImGui::PopStyleVar();
+
+		ImGui::PushItemWidth(250.f);
+		if (ImGui::InputText("##file_selector", scene_name, 128, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll))
+		{
+			file_dialog = ready_to_close;
+			if (scene_name[0] == '\0')
+				strcpy(scene_name, "untitled");
+
+			sprintf_s(selected_file, 128, "%s/%s.scene", selected_folder, scene_name);
+			App->Save(selected_file);
+
+			selected_file[0] = '\0';
+		}
+
+		ImGui::PopItemWidth();
+		ImGui::SameLine();
+		if (ImGui::Button("Ok", ImVec2(50, 20)))
+		{
+			file_dialog = ready_to_close;
+			if (scene_name[0] == '\0')
+				strcpy(scene_name, "untitled");
+
+			sprintf_s(selected_file, 128, "%s/%s.scene", selected_folder, scene_name);
+			App->Save(selected_file);
+		}
+		ImGui::SameLine();
+
+		if (ImGui::Button("Cancel", ImVec2(50, 20)))
+		{
+			file_dialog = ready_to_close;
+		}
+
+		if (file_dialog == ready_to_close)
+		{
+			selected_file[0] = '\0';
+			strcpy(selected_folder, "Library/Scenes");
+			scene_name[0] = '\0';
+		}
+
+		ImGui::EndPopup();
+	}
+}
+
+void Editor::DrawDirectoryRecursive(const char* directory, const char* filter_extension)
+{
+	std::vector<std::string> files;
+	std::vector<std::string> dirs;
+	ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_None;
+
+	std::string dir((directory) ? directory : "");
+
+	FileSystem::DiscoverFiles(dir.c_str(), files, dirs);
+
+	for (std::vector<std::string>::const_iterator it = dirs.begin(); it != dirs.end(); ++it)
+	{
+		std::string folder = (dir + (*it)).c_str();
+		if (strcmp(folder.c_str(), selected_folder) == 0)
+			flags = ImGuiTreeNodeFlags_Selected;
+
+		if (ImGui::TreeNodeEx(folder.c_str(), flags, "%s/", (*it).c_str()))
+		{
+			flags = ImGuiTreeNodeFlags_None;
+
+			if(ImGui::IsItemClicked())
+				sprintf_s(selected_folder, 256, "%s%s", directory, (*it).c_str());
+
+			DrawDirectoryRecursive((dir + (*it)).c_str(), filter_extension);
+			ImGui::TreePop();
+		}
+
+		flags = ImGuiTreeNodeFlags_None;
+	}
+
+	std::sort(files.begin(), files.end());
+
+	for (std::vector<std::string>::const_iterator it = files.begin(); it != files.end(); ++it)
+	{
+		const std::string& str = *it;
+
+		bool ok = true;
+
+		if (filter_extension && str.find(filter_extension) == std::string::npos)
+			ok = false;
+
+		flags = ImGuiTreeNodeFlags_Leaf;
+
+		std::string complete_path = std::string(directory) + "/" + str;
+		if(strcmp(selected_file, complete_path.c_str()) == 0)
 			flags |= ImGuiTreeNodeFlags_Selected;
 
-		if (ImGui::TreeNodeEx(gameObject->GetName(), flags)) 
+		if (ok && ImGui::TreeNodeEx(str.c_str(), flags))
 		{
-			if (ImGui::IsItemClicked())
-				App->scene->selectedGameObject = gameObject;
+			if (ImGui::IsItemClicked()) {
+				sprintf_s(selected_file, 256, "%s/%s", dir.c_str(), str.c_str());
 
-			for (size_t i = 0; i < gameObject->GetChildAmount(); i++)
-			{
-				PreorderHierarchy(gameObject->GetChildAt(i));
+				if (ImGui::IsMouseDoubleClicked(0))
+				{
+					file_dialog = ready_to_close;
+					App->Load(selected_file);
+				}
 			}
 
 			ImGui::TreePop();
 		}
 	}
-	else
-	{
-		flags |= ImGuiTreeNodeFlags_Leaf;
-
-		if (App->scene->selectedGameObject == gameObject)
-			flags |= ImGuiTreeNodeFlags_Selected;
-
-		if (ImGui::TreeNodeEx(gameObject->GetName(), flags))
-		{
-			if (ImGui::IsItemClicked())
-				App->scene->selectedGameObject = gameObject;
-
-			ImGui::TreePop();
-		}
-	}
 }
 
-void Editor::ShowConfigurationWindow()
+void Editor::OnResize(ImVec2 window_size)
 {
-	if (ImGui::Begin("Configuration", &show_configuration_window))
-	{
-		if (ImGui::CollapsingHeader("Application"))
-		{
-			static int fps_cap = App->GetFPSCap();
-			if (ImGui::SliderInt("Max FPS", &fps_cap, 10, 120)) {
-				App->SetFPSCap(fps_cap);
-			}
+	image_size = window_size;
 
-			char title[25];
-			//FPS graph
-			fps_log.erase(fps_log.begin());
-			fps_log.push_back(App->GetFPS());
-			//if (fps_log[fps_log.size() - 1] != 0) {
-			sprintf_s(title, 25, "Framerate %.1f", fps_log[fps_log.size() - 1]);
-			ImGui::PlotHistogram("##framerate", &fps_log[0], fps_log.size(), 0, title, 0.0f, 100.0f, ImVec2(310, 100));
-			//}
-
-			//Ms graph
-			ms_log.erase(ms_log.begin());
-			ms_log.push_back(App->GetLastDt() * 1000);
-			//if(ms_log[ms_log.size() - 1] != 0){
-			sprintf_s(title, 25, "Milliseconds %.1f", ms_log[ms_log.size() - 1]);
-			ImGui::PlotHistogram("##milliseconds", &ms_log[0], ms_log.size(), 0, title, 0.0f, 40.0f, ImVec2(310, 100));
-			//}
-		}
-
-		if (ImGui::CollapsingHeader("Window"))
-		{
-			static float brightness = App->window->GetBrightness();
-			if (ImGui::SliderFloat("Brightness", &brightness, 0.0f, 1.0f))
-				App->window->SetBrightness(brightness);
-
-			static int width, height;
-				App->window->GetSize(width, height);
-
-			if ((ImGui::SliderInt("Width", &width, 640, 3840) || ImGui::SliderInt("Height", &height, 360, 2160)))
-				App->window->SetSize(width, height);
-
-			static bool fullscreen = App->window->fullscreen;
-			static bool fullscreen_desktop = App->window->fullscreen_desktop;
-			static bool resizable = App->window->resizable;
-			static bool borderless = App->window->borderless;
-
-			if (ImGui::Checkbox("Fullscreen", &fullscreen))
-				App->window->SetFullscreen(fullscreen);
-
-			ImGui::SameLine();
-			if (ImGui::Checkbox("Resizable", &resizable))
-				App->window->SetResizable(resizable);
-
-			if (ImGui::Checkbox("Borderless", &borderless))
-				App->window->SetBorderless(borderless);
-
-			ImGui::SameLine();
-			if (ImGui::Checkbox("Fullscreen Desktop", &fullscreen_desktop))
-				App->window->SetFullscreenDesktop(fullscreen_desktop);
-
-		}
-
-		if (ImGui::CollapsingHeader("Renderer"))
-		{
-			static bool depth_test = glIsEnabled(GL_DEPTH_TEST);
-			static bool cull_face = glIsEnabled(GL_CULL_FACE);
-			static bool lighting = glIsEnabled(GL_LIGHTING);
-			static bool color_material = glIsEnabled(GL_COLOR_MATERIAL);
-			static bool texture_2D = glIsEnabled(GL_TEXTURE_2D);
-			static bool vsync = App->renderer3D->vsync;
-
-			if (ImGui::Checkbox("Depth Test", &depth_test))
-				App->renderer3D->SetCapActive(GL_DEPTH_TEST, depth_test);
-
-			ImGui::SameLine();
-			if (ImGui::Checkbox("Cull Face", &cull_face))
-				App->renderer3D->SetCapActive(GL_CULL_FACE, cull_face);
-
-			if (ImGui::Checkbox("Texture 2D", &texture_2D))
-				App->renderer3D->SetCapActive(GL_TEXTURE_2D, texture_2D);
-
-			ImGui::SameLine();
-			if (ImGui::Checkbox("Lighting", &lighting))
-				App->renderer3D->SetCapActive(GL_LIGHTING, lighting);
-
-
-			if (ImGui::Checkbox("Color Material", &color_material))
-				App->renderer3D->SetCapActive(GL_COLOR_MATERIAL, color_material);
-
-			if (ImGui::Checkbox("VSYNC", &vsync)) 
-				App->renderer3D->SetVSYNC(vsync);
-
-
-		}
-
-		if (ImGui::CollapsingHeader("Camera")) {
-			//static ImVec4 color = ImVec4(114.0f / 255.0f, 144.0f / 255.0f, 154.0f / 255.0f, 200.0f / 255.0f);
-			static ImVec4 color = ImVec4(App->camera->background.r, App->camera->background.g, App->camera->background.b, App->camera->background.a);
-
-			if (ImGui::ColorEdit3("Background Color##1", (float*)&color)) {
-				App->camera->SetBackgroundColor(color.x, color.y, color.z, color.w);
-			}
-
-			ImGui::SliderFloat("Movement Speed", &App->camera->move_speed, 0.0f, 50.0f);
-			ImGui::SliderFloat("Drag Speed", &App->camera->drag_speed, 0.0f, 10.0f);
-			ImGui::SliderFloat("Zoom Speed", &App->camera->zoom_speed, 0.0f, 50.0f);
-			ImGui::SliderFloat("Sensitivity", &App->camera->sensitivity, 0.0f, 50.0f);
-		}
-
-		if (ImGui::CollapsingHeader("Hardware"))
-		{
-			ImVec4 values_color(1.0f, 1.0f, 0.0f, 1.0f);
-
-			//SDL Version
-			SDL_version version;
-			SDL_GetVersion(&version);
-			ImGui::Text("SDL Version:");
-			ImGui::SameLine();
-			ImGui::TextColored(values_color, "%d.%d.%d", version.major, version.minor, version.patch);
-
-			ImGui::Spacing();
-			ImGui::Separator();
-			ImGui::Spacing();
-
-			//Hardware
-			static HardwareSpecs specs = App->GetHardware();
-			//CPU
-			ImGui::Text("CPUs:");
-			ImGui::SameLine();
-			ImGui::TextColored(values_color, "%d (Cache: %dkb)", specs.cpu_count, specs.cache);
-			//RAM
-			ImGui::Text("System RAM:");
-			ImGui::SameLine();
-			ImGui::TextColored(values_color, "%.1f Gb", specs.ram);
-			//Caps
-			ImGui::Text("Caps:");
-			ImGui::SameLine();
-			ImGui::TextColored(values_color, "%s", specs.caps.c_str());
-
-			ImGui::Spacing();
-			ImGui::Separator();
-			ImGui::Spacing();
-
-			//GPU
-			ImGui::Text("GPU:");
-			ImGui::SameLine();
-			ImGui::TextColored(values_color, "%s", specs.gpu);
-
-			ImGui::Text("Brand:");
-			ImGui::SameLine();
-			ImGui::TextColored(values_color, "%s", specs.gpu_brand);
-
-			//VRAM
-			GLint vram_budget, vram_usage, vram_available, vram_reserved;
-
-			GetMemoryStatistics(specs.gpu_brand, vram_budget, vram_usage, vram_available, vram_reserved);
-
-			ImGui::Text("VRAM Budget:");
-			ImGui::SameLine();
-			ImGui::TextColored(values_color, "%.1f Mb", vram_budget * 0.001f);
-
-			ImGui::Text("VRAM Available:");
-			ImGui::SameLine();
-			ImGui::TextColored(values_color, "%.1f Mb", vram_available * 0.001f);
-
-			/*
-			ImGui::Text("VRAM Usage:");
-			ImGui::SameLine();
-			ImGui::TextColored(values_color, "%.1f Mb", vram_usage * 0.001f);
-
-			ImGui::Text("VRAM Reserved:");
-			ImGui::SameLine();
-			ImGui::TextColored(values_color, "%.1f Mb", vram_reserved * 0.001f);
-			*/
-
-		}
-
-		if (ImGui::CollapsingHeader("File System")) {
-			ImGui::Checkbox("Normalize imported meshes", &FileSystem::normalize_scales);
-		}
-		
-	}
-	ImGui::End();
-}
-
-void Editor::ShowAboutWindow()
-{
-	if (ImGui::Begin("About", &show_about_window))
-	{
-		static const char* engine_version = App->GetEngineVersion();
-		ImGui::Text("%s v%s", App->engine_name, engine_version);
-		ImGui::Text("The first chapter of your creation");
-		ImGui::Spacing();
-
-		ImGui::Text("Made by: ");
-		ImGui::SameLine();
-		if (ImGui::SmallButton("Pol Camacho Banal"))
-			ShellExecuteA(NULL, "open", "https://github.com/polcamacho", NULL, NULL, SW_SHOWNORMAL);
-		if (ImGui::SmallButton("Marc Rosell"))
-			ShellExecuteA(NULL, "open", "https://github.com/MarcRosellH", NULL, NULL, SW_SHOWNORMAL);
-		ImGui::SameLine();
-		if (ImGui::SmallButton("Alexandru Cercel"))
-			ShellExecuteA(NULL, "open", "https://github.com/AlexandruC5", NULL, NULL, SW_SHOWNORMAL);
-
-		ImGui::Spacing();
-		ImGui::Separator();
-		ImGui::Spacing();
-
-		ImGui::Text("External libraries used: ");
-
-		//SDL Version
-		ImGui::BulletText("SDL %d.%d.%d", SDL_MAJOR_VERSION, SDL_MINOR_VERSION, SDL_PATCHLEVEL);
-
-		//OpenGL Version
-		static GLint openGL_major = -1;
-		static GLint openGL_minor = -1;
-
-		if (openGL_major == -1)
-			glGetIntegerv(GL_MAJOR_VERSION, &openGL_major);
-		if (openGL_minor == -1)
-			glGetIntegerv(GL_MINOR_VERSION, &openGL_minor);
-
-		ImGui::BulletText("OpenGL %d.%d", openGL_major, openGL_minor);
-
-		//MathGeoLib
-		ImGui::BulletText("MathGeoLib 1.5");
-
-		//ImGui
-		static const char* imgui_version = { ImGui::GetVersion() };
-		ImGui::BulletText("ImGui %s", imgui_version);
-
-		//Glew
-		ImGui::BulletText("Glew %d.%d.%d", GLEW_VERSION_MAJOR, GLEW_VERSION_MINOR, GLEW_VERSION_MICRO);
-
-		ImGui::BulletText("DevIL 1.8.0");
-
-		ImGui::BulletText("Assimp %d.%d.%d", aiGetVersionMajor(), aiGetVersionMinor(), aiGetVersionRevision());
-
-		static std::string physfs_version;
-		FileSystem::GetPhysFSVersion(physfs_version);
-		ImGui::BulletText("PhysFS %s", physfs_version.c_str());
-
-		ImGui::BulletText("Parson 1.1.0");
-
-		ImGui::Spacing();
-		ImGui::Separator();
-		ImGui::Spacing();
-
-		ImGui::Text("License: ");
-		ImGui::Spacing();
-
-		ImGui::Text("MIT License");
-		ImGui::Spacing();
-
-		ImGui::TextWrapped("Copyright (c) 2020 Marc Rosell, Alexandru Cercel, Pol Camacho");
-		ImGui::Spacing();
-		ImGui::TextWrapped(
-			"Permission is hereby granted, free of charge, to any person obtaining a copy"
-			"of this software and associated documentation files Camel Engine, to deal"
-			"in the Software without restriction, including without limitation the rights"
-			"to use, copy, modify, merge, publish, distribute, sublicense, and /or sell"
-			"copies of the Software, and to permit persons to whom the Software is"
-			"furnished to do so, subject to the following conditions : ");
-		ImGui::Spacing();
-
-		ImGui::TextWrapped(
-			"The above copyright notice and this permission notice shall be included in all"
-			"copies or substantial portions of the Software.");
-		ImGui::Spacing();
-
-		ImGui::TextWrapped(
-			"THE SOFTWARE IS PROVIDED 'AS I', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR"
-			"IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,"
-			"FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.IN NO EVENT SHALL THE"
-			"AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER"
-			"LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,"
-			"OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE"
-			"SOFTWARE.");
-	}
-	ImGui::End();
-}
-
-void Editor::ResizeSceneImage(ImVec2 window_size, AspectRatio g_aspect_ratio)
-{
-	if (g_aspect_ratio == AspectRatio::FREE_ASPECT)
-	{
-		float size_proportion = (float)App->window->width / (float)App->window->height;
-
-		image_size.x = window_size.x;
-		image_size.y = image_size.x / size_proportion;
-	}
-	else if (g_aspect_ratio == AspectRatio::ASPECT_16_9)
-	{
-		image_size.y = window_size.y;
-		image_size.x = window_size.x * 9 / 16;
-	}
-	else if (g_aspect_ratio == AspectRatio::ASPECT_4_3)
-	{
-		image_size.y = window_size.y;
-		image_size.x = window_size.x * 3 / 4;
-	}
-
-	aspect_ratio = g_aspect_ratio;
+	App->camera->OnResize(image_size.x, image_size.y);
+	App->renderer3D->OnResize(image_size.x, image_size.y);
 }
 

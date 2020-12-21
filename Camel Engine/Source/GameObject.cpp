@@ -1,4 +1,3 @@
-#include "Application.h"
 #include "GameObject.h"
 #include "Component.h"
 #include "Transform.h"
@@ -6,62 +5,81 @@
 #include "Material.h"
 #include "Camera.h"
 #include "ImGui/imgui.h"
-#include "glew/include/glew.h"
+#include "GnJSON.h"
+#include "Application.h"
+
+#include "MathGeoLib/include/MathGeoLib.h"
 
 #include <vector>
 
-GameObject::GameObject() : enabled(true), bbox_enabled(true), name("Empty Game Object"), parent(nullptr), to_delete(false)
+GameObject::GameObject() : enabled(true), name("Empty Game Object"), _parent(nullptr), to_delete(false), transform(nullptr), _visible(false)
 {
-	transform = (Transform*)AddComponent(ComponentType::TRANSFORM);
+	transform = (Transform*)AddComponent(TRANSFORM);
+	UUID = LCG().Int();
 }
 
-GameObject::GameObject(GnMesh* mesh) : GameObject()
+GameObject::GameObject(ComponentType component) : GameObject()
 {
-	SetName(mesh->name);
-	AddComponent((Component*)mesh);
+	AddComponent(component);
 
+	switch (component)
+	{
+	case ComponentType::CAMERA:
+		name = "Camera";
+		break;
+	case ComponentType::LIGHT:
+		name = "Light";
+		break;
+	default:
+		break;
+	}
 }
 
-GameObject::GameObject(Camera* cam) : GameObject()
+GameObject::~GameObject()
 {
-	SetName(cam->name);
-	AddComponent((Component*)cam);
-}
-
-GameObject::~GameObject(){
-	parent = nullptr;
+	_parent = nullptr;
 
 	for (size_t i = 0; i < components.size(); i++)
 	{
 		delete components[i];
 		components[i] = nullptr;
 	}
-	transform = nullptr;
 
+	transform = nullptr;
 	components.clear();
 	children.clear();
 	name.clear();
+	UUID = 0;
 }
 
 void GameObject::Update()
 {
 	if (enabled)
 	{
-		App->scene->main_camera->CullingObjects(this);
 		for (size_t i = 0; i < components.size(); i++)
 		{
-			if (components[i]->IsEnabled())
-				components[i]->Update();
+			//Update Components
+			if (components[i]->IsEnabled()) 
+			{
+				if (components[i]->GetType() == ComponentType::MESH) 
+				{
+					GnMesh* mesh = (GnMesh*)components[i];
+					GenerateAABB(mesh);
+
+					if(App->renderer3D->IsInsideCameraView(_AABB))
+						mesh->Update();
+				}
+				else
+				{
+					components[i]->Update();
+				}
+			}
 		}
-		
+
+		//Update Children
 		for (size_t i = 0; i < children.size(); i++)
 		{
-			
 			children[i]->Update();
-		}
-		if (bbox_enabled) {
-			GenerateOBB();
-			DrawBoundingBox();
 		}
 	}
 }
@@ -70,10 +88,10 @@ void GameObject::OnEditor()
 {
 	ImGui::Checkbox("Enabled", &enabled);
 	ImGui::SameLine();
-	ImGui::Text(name.c_str());
-	//static char buf[64] = "Name";
-	//strcpy(buf, name.c_str());
-	//if (ImGui::InputText("", &buf[0], IM_ARRAYSIZE(buf))){}
+
+	//if (ImGui::InputText("##file_selector", selected_file, 256, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll))
+	char* buf = (char*)name.c_str();
+	ImGui::InputText("##name", buf, 64, ImGuiInputTextFlags_EnterReturnsTrue);
 
 	for (size_t i = 0; i < components.size(); i++)
 	{
@@ -82,15 +100,89 @@ void GameObject::OnEditor()
 
 	if(ImGui::CollapsingHeader("Debugging Information")) 
 	{
-		if (parent != nullptr) {
-			ImGui::Text("Parent: %s", parent->GetName());
-		}
-		else {
+		if(_parent != nullptr)
+			ImGui::Text("Parent: %s", _parent->GetName());
+		else 
 			ImGui::Text("No parent");
-		}
 
-		ImGui::Checkbox("Activate Bounding Box", &bbox_enabled);
+		ImGui::Text("UUID: %d", UUID);
 	}
+}
+
+void GameObject::Save(GnJSONArray& save_array)
+{
+	GnJSONObj save_object;
+
+	save_object.AddInt("UUID", UUID);
+
+	if(_parent != nullptr)
+		save_object.AddInt("Parent UUID",_parent->UUID);
+	else 
+		save_object.AddInt("Parent UUID", 0);
+
+	save_object.AddString("Name", name.c_str());
+
+	GnJSONArray componentsSave = save_object.AddArray("Components");
+
+	for (size_t i = 0; i < components.size(); i++)
+	{
+		components[i]->Save(componentsSave);
+	}
+
+	save_array.AddObject(save_object);
+
+	for (size_t i = 0; i < children.size(); i++)
+	{
+		children[i]->Save(save_array);
+	}
+}
+
+uint GameObject::Load(GnJSONObj* object)
+{
+	UUID = object->GetInt("UUID");
+	name = object->GetString("Name", "No Name");
+	uint parentUUID = object->GetInt("Parent UUID");
+
+	GnJSONArray componentsArray = object->GetArray("Components");
+
+	for (size_t i = 0; i < componentsArray.Size(); i++)
+	{
+		GnJSONObj componentObject = componentsArray.GetObjectAt(i);
+		Component* component = AddComponent((ComponentType)componentObject.GetInt("Type"));
+		component->Load(componentObject);
+	}
+
+	return parentUUID;
+}
+
+uint GameObject::LoadNodeData(GnJSONObj* object)
+{
+	UUID = object->GetInt("UUID");
+	name = object->GetString("Name", "No Name");
+	uint parentUUID = object->GetInt("Parent UUID");
+
+	float3 position = object->GetFloat3("Position");
+	transform->SetPosition(position);
+
+	Quat rotation = object->GetQuaternion("Rotation");
+	transform->SetRotation(rotation);
+
+	float3 scale = object->GetFloat3("Scale");
+	transform->SetScale(scale);
+
+	int meshID = object->GetInt("Mesh", -1);
+	if (meshID != -1) {
+		GnMesh* mesh = (GnMesh*)AddComponent(ComponentType::MESH);
+		mesh->SetResourceUID(meshID);
+	}
+
+	int materialID = object->GetInt("Material", -1);
+	if (materialID != -1) {
+		Material* material = (Material*)AddComponent(ComponentType::MATERIAL);
+		material->SetResourceUID(materialID);
+	}
+
+	return parentUUID;
 }
 
 Component* GameObject::GetComponent(ComponentType component)
@@ -106,35 +198,46 @@ Component* GameObject::GetComponent(ComponentType component)
 	return nullptr;
 }
 
+std::vector<Component*> GameObject::GetComponents()
+{
+	return components;
+}
+
 Component* GameObject::AddComponent(ComponentType type)
 {
-	if (type == ComponentType::TRANSFORM) 
+	Component* component = nullptr;
+
+	switch (type)
 	{
-		Transform* transform = new Transform();
-		transform->SetGameObject(this);
-		components.push_back(transform);
-		return transform;
-	}
-	else if (type == ComponentType::MESH)
-	{
-		GnMesh* mesh = new GnMesh();
-		components.push_back(mesh);
-		return mesh;
-	}
-	else if (type == ComponentType::MATERIAL)
-	{
-		Material* material = new Material();
-		components.push_back(material);
-		return material;
-	}
-	else if (type == ComponentType::CAMERA)
-	{
-		Camera* camera = new Camera();
-		components.push_back(camera);
-		return camera;
+	case TRANSFORM:
+		if (transform != nullptr)
+		{
+			RemoveComponent(transform);
+		}
+
+		transform = new Transform();
+		component = transform;
+		break;
+	case MESH:
+		component = new GnMesh();
+		break;
+	case MATERIAL:
+		component = new Material(this);
+		break;
+	case CAMERA:
+		component = new Camera(this);
+		break;
+	case LIGHT:
+		component = new Light(this);
+		break;
+	default:
+		break;
 	}
 
-	return nullptr;
+	component->SetGameObject(this);
+	components.push_back(component);
+
+	return component;
 }
 
 void GameObject::AddComponent(Component* component)
@@ -179,12 +282,25 @@ Transform* GameObject::GetTransform()
 	return transform;
 }
 
-void GameObject::AddChild(GameObject* child)
+AABB GameObject::GetAABB()
 {
-	children.push_back(child);
+	return _AABB;
 }
 
-int GameObject::GetChildAmount()
+bool GameObject::IsVisible()
+{
+	return _visible;
+}
+
+void GameObject::AddChild(GameObject* child)
+{
+	if(child != nullptr)
+		children.push_back(child);
+
+	child->SetParent(this);
+}
+
+int GameObject::GetChildrenAmount()
 {
 	return children.size();
 }
@@ -196,12 +312,23 @@ GameObject* GameObject::GetChildAt(int index)
 
 GameObject* GameObject::GetParent()
 {
-	return parent;
+	return _parent;
 }
 
 void GameObject::SetParent(GameObject* g_parent)
 {
-	parent = g_parent;
+	_parent = g_parent;
+}
+
+void GameObject::Reparent(GameObject* newParent)
+{
+	if (newParent != nullptr) 
+	{
+		_parent->RemoveChild(this);
+		_parent = newParent;
+		newParent->AddChild(this);
+		transform->ChangeParentTransform(newParent->GetTransform()->GetGlobalTransform());
+	}
 }
 
 bool GameObject::RemoveChild(GameObject* gameObject)
@@ -231,46 +358,27 @@ void GameObject::DeleteChildren()
 
 void GameObject::UpdateChildrenTransforms()
 {
-	transform->UpdateLocalTransform();
+	transform->UpdateGlobalTransform();
 
 	for (size_t i = 0; i < children.size(); i++)
 	{
 		children[i]->GetTransform()->UpdateGlobalTransform(transform->GetGlobalTransform());
+		children[i]->UpdateChildrenTransforms();
 	}
 }
 
-math::AABB GameObject::GetAABB() const
+void GameObject::GenerateAABB(GnMesh* mesh)
 {
-	return new_aabb;
-}
+	if (mesh->GetResource(ResourceType::RESOURCE_MESH) == nullptr)
+		return;
 
-void GameObject::GenerateOBB()
-{
-	GnMesh* mesh = (GnMesh*)GetComponent(ComponentType::MESH);
-	Transform* tr = (Transform*)GetComponent(ComponentType::TRANSFORM);
+	_OBB = mesh->GetAABB();
+	_OBB.Transform(transform->GetGlobalTransform());
 
-	if (mesh != nullptr) {
+	_AABB.SetNegativeInfinity();
+	_AABB.Enclose(_OBB);
 
-		new_aabb.SetNegativeInfinity();
-		new_aabb.Enclose((float3*)mesh->vertices, mesh->vertices_amount);
-	}
-	obb.SetFrom(new_aabb);
-	obb.Transform(tr->GetGlobalTransform());
-	new_aabb.SetNegativeInfinity();
-	new_aabb.Enclose(obb);
-}
-
-void GameObject::DrawBoundingBox()
-{
-	glBegin(GL_LINES);
-	glLineWidth(5.0f);
-	glColor4f(0.25f, 1.0f, 0.0f, 1.0f);
-
-	for (uint i = 0; i < 12; i++)
-	{
-		glVertex3f(new_aabb.Edge(i).a.x, new_aabb.Edge(i).a.y, new_aabb.Edge(i).a.z);
-		glVertex3f(new_aabb.Edge(i).b.x, new_aabb.Edge(i).b.y, new_aabb.Edge(i).b.z);
-	}
-	glEnd();
-	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+	float3 cornerPoints[8];
+	_AABB.GetCornerPoints(cornerPoints);
+	App->renderer3D->DrawAABB(cornerPoints);
 }

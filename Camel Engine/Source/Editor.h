@@ -5,17 +5,12 @@
 #include "Globals.h"
 
 #include "ImGui/imgui.h"
+#include "EditorWindow.h"
 
 #include <vector>
 #include <string>
 
 typedef int GLint;
-
-enum class AspectRatio {
-	FREE_ASPECT,
-	ASPECT_16_9,
-	ASPECT_4_3
-};
 
 struct log_message {
 	std::string log_text;
@@ -29,62 +24,74 @@ public:
 	~Editor();
 
 	bool Init();
-	bool LoadConfig(JSON_Object* config) override;
+	bool Start() override;
+	bool LoadConfig(GnJSONObj& config) override;
 	update_status Update(float dt);
 	update_status Draw();
 	bool CleanUp();
 
 	bool IsSceneFocused();
+	bool MouseOnScene();
 	void AddConsoleLog(const char* log, int warning_level);
-	const ImVec2& GetImageSize();
-	
+
+	void OnResize(ImVec2 window_size);
+	void LoadFile(const char* filter_extension, const char* from_dir);
+	void SaveFile(const char* filter_extension, const char* from_dir);
+	void DrawDirectoryRecursive(const char* directory, const char* filter_extension);
+
 private:
 	//Dock Space
 	update_status ShowDockSpace(bool* p_open);
 	bool CreateMainMenuBar();
 
+	void ShowGameButtons();
+
 	//Windows
-	void ShowSceneWindow();
-	void ShowInspectorWindow();
-	void ShowHierarchyWindow();
-	void ShowTimePanel();
-	void ShowConfigurationWindow();
-	void ShowAboutWindow();
+	void ShowPreferencesWindow();
 
 	void ChangeTheme(std::string theme);
-	void GetMemoryStatistics(const char* gpu_brand, GLint& vram_budget, GLint& vram_usage, GLint& vram_available, GLint& vram_reserved);
 
-	void ResizeSceneImage(ImVec2 window_size, AspectRatio ratio);
-	void PreorderHierarchy(GameObject* gameObject);
+public:
+	ImVec2 image_size;
+	ImVec2 sceneWindowOrigin;
+	ImVec2 mouseScenePosition;
+	bool scene_window_focused;
+	EditorWindow* windows[MAX_WINDOWS];
 
 private:
-	bool show_inspector_window;
+
 	bool show_project_window;
-	bool show_hierarchy_window;
 	bool show_console_window;
-	bool show_scene_window;
-	bool show_configuration_window;
-	bool show_time_panel;
 
 	//edit subwindows
 	bool show_preferences_window;
-	bool show_about_window;
+	bool show_game_buttons;
+
 	//menus
 	bool* open_dockspace;
-	bool scene_window_focused;
 
 	int current_theme;
 
-	std::vector<float> fps_log;
-	std::vector<float> ms_log;
-
 	std::vector<log_message> console_log;
 
-	AspectRatio aspect_ratio;
+	enum
+	{
+		closed,
+		opened,
+		ready_to_close
+	} file_dialog = closed;
 
-public:
-	ImVec2 windowSize, image_size, tab, w_pos;
-	ImGuiTreeNodeFlags flags;
+	enum class SceneOperation
+	{
+		SAVE,
+		LOAD, 
+		NONE
+	}scene_operation = SceneOperation::NONE;
+
+	bool in_modal = false;
+	char selected_folder[256];
+	char scene_name[128];
+	char selected_file[256];
 };
 
 #endif // !_EDITOR_H_

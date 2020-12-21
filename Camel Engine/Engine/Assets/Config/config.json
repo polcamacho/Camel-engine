@@ -2,7 +2,7 @@
   "modules": [
     {
       "name": "app",
-      "engine name": "Camel Engine",
+      "engine name": "Genesis Engine",
       "version": "0.1"
     },
     {

@@ -1,195 +1,282 @@
 #include "Camera.h"
-#include "Globals.h"
-#include "Transform.h"
-#include "Mesh.h"
 #include "GameObject.h"
-#include "MathGeoLib/include/MathGeoLib.h"
+#include "Transform.h"
+#include "Application.h"
+#include "ModuleRenderer3D.h"
 #include "ImGui/imgui.h"
-#include "ModuleCamera3D.h"
+#include "GnJSON.h"
 
-#include "glew/include/glew.h"
-
-Camera::Camera() : Component() {
-	
-	name = { "Camera" };
+Camera::Camera() : Component(nullptr), _aspectRatio(16.0f/9.0f), fixedFOV(FIXED_HORIZONTAL_FOV) {
 	type = ComponentType::CAMERA;
 
-	frustum.type = PerspectiveFrustum;
+	_frustum.type = FrustumType::PerspectiveFrustum;
+	
+	_frustum.pos = float3(0.0f, 0.0f, -5.0f);
+	_frustum.up = float3(0.0f, 1.0f, 0.0f);
+	_frustum.front = float3(0.0f, 0.0f, 1.0f);
 
-	frustum.front = float3::unitZ;
-	frustum.up = float3::unitY;
-	frustum.pos = float3(0,0,0);
+	_frustum.horizontalFov = 60.0f * DEGTORAD;
+	AdjustFieldOfView();
 
-	frustum.farPlaneDistance = 50.0f;
-	frustum.nearPlaneDistance = 1.0f;
-	frustum.verticalFov = 60.0f*DEGTORAD;
-	aspect_ratio = (float)16/9;
-	frustum.horizontalFov = 2 * atanf(tanf(frustum.verticalFov / 2) * aspect_ratio);
-
+	_frustum.nearPlaneDistance = 0.3f;
+	_frustum.farPlaneDistance = 1000.0f;
 }
 
-Camera::~Camera()
+Camera::Camera(GameObject* gameObject) : Component(gameObject), _aspectRatio(16.0f/9.0f), fixedFOV(FIXED_HORIZONTAL_FOV)
 {
+	type = ComponentType::CAMERA;
 
+	_frustum.type = FrustumType::PerspectiveFrustum;
+
+	_frustum.pos = float3(0.0f, 0.0f, -5.0f);
+	_frustum.up = float3(0.0f, 1.0f, 0.0f);
+	_frustum.front = float3(0.0f, 0.0f, 1.0f);
+
+	_frustum.horizontalFov = 60.0f * DEGTORAD;
+	AdjustFieldOfView();
+
+	_frustum.nearPlaneDistance = 0.3f;
+	_frustum.farPlaneDistance = 1000.0f;
 }
+
+Camera::~Camera(){}
 
 void Camera::Update()
 {
-	frustum.pos = gameObject->GetTransform()->GetPosition();
-	frustum.up = gameObject->GetTransform()->GetGlobalTransform().WorldY();
-	frustum.front = gameObject->GetTransform()->GetGlobalTransform().WorldZ();
-
-	GetProjectionMatrix();
-	DrawCameraLines();
+	_frustum.pos = _gameObject->GetTransform()->GetPosition();
 	
+	_frustum.up = _gameObject->GetTransform()->GetGlobalTransform().WorldY();
+	_frustum.front = _gameObject->GetTransform()->GetGlobalTransform().WorldZ();
+
+	float3 corner_points[8];
+	_frustum.GetCornerPoints(corner_points);
+	App->renderer3D->DrawAABB(corner_points);
 }
 
 void Camera::OnEditor()
 {
 	if (ImGui::CollapsingHeader("Camera", ImGuiTreeNodeFlags_DefaultOpen))
 	{
-		float new_near_plane = GetNearPlane();
-		float new_far_plane = GetFarPlane();
-		float new_FOV = GetFOV();
+		ImGui::Spacing();
 
-		if (ImGui::SliderFloat("Near Plane", &new_near_plane, 0, 50) && new_near_plane < new_far_plane) {
-			SetNearPlane(new_near_plane);
+		bool fixedVerticalFOV = fixedFOV == FixedFOV::FIXED_VERTICAL_FOV;
+		bool fixedHorizontalFOV = fixedFOV == FixedFOV::FIXED_HORIZONTAL_FOV;
+
+		if (ImGui::RadioButton("Fixed VerticalFOV", fixedVerticalFOV))
+			fixedFOV = FixedFOV::FIXED_VERTICAL_FOV;
+		ImGui::SameLine();
+		if (ImGui::RadioButton("Fixed HorizontalFOV", fixedHorizontalFOV))
+			fixedFOV = FixedFOV::FIXED_HORIZONTAL_FOV;
+
+		ImGui::Spacing();
+
+		//Fixed Vertical FOV Settings
+		if (fixedVerticalFOV)
+		{
+			float verticalFOV = _frustum.verticalFov * RADTODEG;
+			if (ImGui::SliderFloat("Vertical FOV", &verticalFOV, 20.0f, 60.0f))
+			{
+				_frustum.verticalFov = verticalFOV * DEGTORAD;
+				_frustum.horizontalFov = 2.0f * std::atan(std::tan(_frustum.verticalFov * 0.5f) * (_aspectRatio));
+			}
+
+			ImGui::Spacing();
+			ImGui::Text("Horizontal FOV: %.2f", _frustum.horizontalFov * RADTODEG);
 		}
-		if (ImGui::SliderFloat("Far Plane", &new_far_plane, 0, 1000) && new_near_plane < new_far_plane) {
-			SetFarPlane(new_far_plane);
+		//Fixed Horizontal FOV Settings
+		else
+		{
+			float horizontalFOV = _frustum.horizontalFov * RADTODEG;
+			if (ImGui::SliderFloat("Horizontal FOV", &horizontalFOV, 55.0f, 110.0f))
+			{
+				_frustum.horizontalFov = horizontalFOV * DEGTORAD;
+				_frustum.verticalFov = 2.0f * std::atan(std::tan(_frustum.horizontalFov * 0.5f) * (1 / _aspectRatio));
+			}
+			ImGui::Spacing();
+			ImGui::Text("Vertical FOV: %.2f", _frustum.verticalFov * RADTODEG);
 		}
-		if (ImGui::SliderFloat("Vertical FOV", &new_FOV, 0, 90)) {
-			SetFOV(new_FOV);
-		}
-		ImGui::Text("Aspect ratio: %.2f", aspect_ratio);
+
+		ImGui::Spacing();
+		ImGui::Separator();
+		ImGui::Spacing();
+
+		ImGui::DragFloat("Near Plane", &_frustum.nearPlaneDistance, 0.05f, 100.0f);
+		ImGui::DragFloat("Far Plane", &_frustum.farPlaneDistance, 5.0f, 2000.0f);
+
+		ImGui::Spacing();
 	}
 }
 
-float Camera::GetNearPlane()
+void Camera::Save(GnJSONArray& save_array)
 {
-	return frustum.nearPlaneDistance;
+	GnJSONObj save_object;
+
+	save_object.AddString("name", name.c_str());
+	save_object.AddInt("Type", type);
+	bool mainCamera = App->renderer3D->GetMainCamera() == this;
+	save_object.AddBool("Main Camera", mainCamera);
+	save_object.AddFloat3("position", _frustum.pos);
+	save_object.AddFloat3("up", _frustum.up);
+	save_object.AddFloat3("front", _frustum.front);
+	save_object.AddFloat("horizontalFOV", _frustum.horizontalFov * DEGTORAD);
+	save_object.AddFloat("verticalFOV", _frustum.verticalFov * DEGTORAD);
+	save_object.AddFloat("nearPlane", _frustum.nearPlaneDistance);
+	save_object.AddFloat("farPlane", _frustum.farPlaneDistance);
+	save_object.AddFloat("aspectRatio", _aspectRatio);
+	save_object.AddFloat3("reference", _reference);
+
+	save_array.AddObject(save_object);
 }
 
-float Camera::GetFarPlane()
+void Camera::Load(GnJSONObj& load_object)
 {
-	return frustum.farPlaneDistance;
+	if (load_object.GetBool("Main Camera", false))
+		App->renderer3D->SetMainCamera(this);
+
+	name = load_object.GetString("name", "camera");
+	_frustum.pos = load_object.GetFloat3("position");
+	_frustum.up = load_object.GetFloat3("up");
+	_frustum.front = load_object.GetFloat3("front");
+	_frustum.horizontalFov = load_object.GetFloat("horizontalFOV") * RADTODEG;
+	_frustum.verticalFov = load_object.GetFloat("verticalFOV") * RADTODEG;
+	_frustum.nearPlaneDistance = load_object.GetFloat("nearPlane");
+	_frustum.farPlaneDistance = load_object.GetFloat("farPlane");
+	_reference = load_object.GetFloat3("reference");
 }
 
-float Camera::GetAspectRatio()
+void Camera::SetFixedFOV(FixedFOV g_fixedFOV)
 {
-	return frustum.AspectRatio();
+	fixedFOV = g_fixedFOV;
 }
 
-float Camera::GetFOV()
+void Camera::AdjustFieldOfView()
 {
-	return frustum.verticalFov * RADTODEG;
+	if(fixedFOV == FixedFOV::FIXED_HORIZONTAL_FOV)
+		_frustum.verticalFov = 2 * atan(tan(_frustum.horizontalFov * 0.5f) * (1/_aspectRatio));
+	else 
+		_frustum.horizontalFov = 2.0f * std::atan(std::tan(_frustum.verticalFov * 0.5f) * (_aspectRatio));
 }
 
-void Camera::SetNearPlane(float nearP) {
-	frustum.nearPlaneDistance = nearP;
-}
-
-void Camera::SetFarPlane(float farP) {
-	frustum.farPlaneDistance = farP;
-}
-
-void Camera::SetFOV(float vFOV) {
-	frustum.verticalFov = DEGTORAD * vFOV;
-	frustum.horizontalFov = 2 * atanf(tanf(frustum.verticalFov / 2) * aspect_ratio);
-}
-
-void Camera::SetAspectRatio(float a_ratio) {
-	aspect_ratio = a_ratio;
-	frustum.horizontalFov = 2 * atanf(tanf(frustum.verticalFov / 2) * a_ratio);
-}
-
-float* Camera::GetProjectionMatrix() {
-	float4x4 new_matrix;
-	new_matrix = frustum.ProjectionMatrix();
-	new_matrix.Transpose();
-
-	return (float*)new_matrix.v;
-}
-
-float* Camera::GetViewMatrix() {
-	float4x4 new_matrix;
-	new_matrix = frustum.ViewMatrix();
-	new_matrix.Transpose();
-
-	return (float*)new_matrix.v;
-}
-
-void Camera::DrawCameraLines()
+void Camera::AdjustFieldOfView(float width, float height)
 {
-	glBegin(GL_LINES);
-	glLineWidth(5.0f);
-	glColor4f(1.0f, 0.0f, 0.5f, 1.0f);
-
-	for (uint i = 0; i < 12; i++)
-	{
-		glVertex3f(frustum.Edge(i).a.x, frustum.Edge(i).a.y, frustum.Edge(i).a.z);
-		glVertex3f(frustum.Edge(i).b.x, frustum.Edge(i).b.y, frustum.Edge(i).b.z);
-	}
-	glEnd();
-	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+	if(fixedFOV == FIXED_HORIZONTAL_FOV)
+		_frustum.verticalFov = 2.0f * std::atan(std::tan(_frustum.horizontalFov * 0.5f) * (height / width));
+	else 
+		_frustum.horizontalFov = 2.0f * std::atan(std::tan(_frustum.verticalFov * 0.5f) * (width / height));
 }
 
-// -----------------------------------------------------------------
-void Camera::LookAt(float3& Spot)
+void Camera::SetVerticalFieldOfView(float verticalFOV, float screen_width, float screen_height)
 {
-	
-	float3 direction = Spot - frustum.pos;
-	float3x3 matrix = float3x3::LookAt(frustum.front, direction.Normalized(), frustum.up, float3(0, 1, 0));
-
-	frustum.front = matrix.MulDir(frustum.front).Normalized();
-	frustum.up = matrix.MulDir(frustum.up).Normalized();
-
+	_frustum.verticalFov = verticalFOV;
+	_frustum.horizontalFov = 2.0f * std::atan(std::tan(_frustum.verticalFov * 0.5f) * (screen_width / screen_height));
 }
 
-void Camera::CullingObjects(GameObject* go)
-{	
-	GnMesh* mesh = (GnMesh*)go->GetComponent(ComponentType::MESH);
-	if (mesh != nullptr) {
-
-		if (ContainsAaBox(go->GetAABB())) {
-			mesh->Enable();
-		}
-		else {
-			mesh->Disable();
-		}
-	}
-	
-}
-
-bool Camera::ContainsAaBox(const AABB& refBox) const
+void Camera::SetHorizontalFieldOfView(float horizontalFOV, float screen_width, float screen_height)
 {
-	float3 corner_vert[8];
-	int iTotalIn = 0;
-	Plane* m_plane = new Plane[6];
-	
-	refBox.GetCornerPoints(corner_vert); // get the corners of the box into the vCorner array
-	frustum.GetPlanes(m_plane);
-	
+	_frustum.horizontalFov = horizontalFOV;
+	_frustum.verticalFov = 2.0f * std::atan(std::tan(_frustum.horizontalFov * 0.5f) * (screen_height / screen_width));
+}
+
+void Camera::SetPosition(float3 position)
+{
+	_frustum.pos = position;
+}
+
+float3 Camera::GetPosition()
+{
+	return _frustum.pos;
+}
+
+void Camera::SetReference(float3 reference)
+{
+	_reference = reference;
+}
+
+float3 Camera::GetReference()
+{
+	return _reference;
+}
+
+void Camera::SetNearPlaneDistance(float distance)
+{
+	_frustum.nearPlaneDistance = distance;
+}
+
+void Camera::SetFarPlaneDistance(float distance)
+{
+	_frustum.farPlaneDistance = distance;
+}
+
+void Camera::LookAt(float3 spot)
+{
+	float3 difference = spot - _frustum.pos;
+
+	float3x3 matrix = float3x3::LookAt(_frustum.front, difference.Normalized(), _frustum.up, float3::unitY);
+
+	_frustum.front = matrix.MulDir(_frustum.front).Normalized();
+	_frustum.up = matrix.MulDir(_frustum.up).Normalized();
+}
+
+Frustum Camera::GetFrustum()
+{
+	return _frustum;
+}
+
+float* Camera::GetViewMatrix()
+{
+	float4x4 viewMatrix;
+
+	viewMatrix = _frustum.ViewMatrix();
+	viewMatrix.Transpose();
+
+	return (float*)viewMatrix.v;
+}
+
+float* Camera::GetProjectionMatrix()
+{
+	float4x4 projectionMatrix;
+
+	projectionMatrix = _frustum.ProjectionMatrix();
+	projectionMatrix.Transpose();
+
+	return (float*)projectionMatrix.v;
+}
+
+bool Camera::ContainsAABB(AABB& aabb)
+{
+	float3 cornerPoints[8];
+	int totalInside = 0;
+
+	//get frustum planes
+	Plane m_plane[6]; 
+	_frustum.GetPlanes(m_plane);
+
+	//get AABB points
+	aabb.GetCornerPoints(cornerPoints); 
+
 	for (int p = 0; p < 6; ++p) {
 		int iInCount = 8;
 		int iPtIn = 1;
-		
-		for (int i = 0; i < 8; ++i) {
-			if (m_plane[p].IsOnPositiveSide(corner_vert[i]))
+
+		for (int i = 0; i < 8; ++i) 
+		{
+			if (m_plane[p].normal.Dot(cornerPoints[i]) - m_plane[p].d >= 0.0f) 
 			{
 				iPtIn = 0;
 				--iInCount;
 			}
 		}
-		if (iInCount == 0) {
+		
+		if(iInCount == 0)
 			return false;
-		}
-		iTotalIn += iPtIn;
+
+		totalInside += iPtIn;
 	}
-	//// so if iTotalIn is 6, then all are inside the view
-	//if (iTotalIn == 6){
-	//	return true;
-	//}
-	// we must be partly in then otherwise
+
+	//Totally inside camera view
+	if (totalInside == 6)
+		return true;
+
+	//Partially inside camera view
 	return true;
 }

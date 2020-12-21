@@ -4,26 +4,17 @@
 #include "Globals.h"
 #include <vector>
 #include "Timer.h"
-#include "Time.h"
 #include "Module.h"
 #include "ModuleWindow.h"
 #include "ModuleInput.h"
 #include "ModuleRenderer3D.h"
 #include "ModuleCamera3D.h"
 #include "ModuleScene.h"
-#include "PerfTimer.h"
 #include "Editor.h"
+#include "ModuleResources.h"
 
 #include <string>
-
-struct json_array_t;
-typedef json_array_t JSON_Array;
-
-struct json_value_t;
-typedef json_value_t JSON_Value;
-
-struct json_object_t;
-typedef json_object_t JSON_Object;
+#include <stack>
 
 struct HardwareSpecs
 {
@@ -60,8 +51,11 @@ public:
 	ModuleScene* scene;
 	Editor* editor;
 	ModuleRenderer3D* renderer3D;
+	ModuleResources* resources;
 
 	const char* engine_name;
+	const char* engine_version;
+	bool in_game;
 
 public:
 
@@ -72,19 +66,18 @@ public:
 	update_status Update();
 	bool CleanUp();
 
-	bool LoadConfig(JSON_Object* object);
+	void StartGame();
+	void StopGame();
 
-public:
 	float GetFPS();
 	float GetLastDt();
 	int GetFPSCap();
 	void SetFPSCap(int fps_cap);
-	float GetMsTimer();
-	bool vsync = true;
+	void Save(const char* filePath);
+	void Load(const char* filePath);
 
-
+	void AddModuleToTaskStack(Module* callback);
 	HardwareSpecs GetHardware();
-	const char* GetEngineVersion();
 
 private:
 
@@ -96,25 +89,20 @@ private:
 	int	   argc;
 	char** args;
 
-	Timer	ms_timer;
 	float	dt;
 	float	fps;
 	float	capped_ms;
 	std::vector<Module*> modules_vector;
 
-	const char* version;
-
 	const char* config_path;
 
-	//timer variables
-	uint64		frame_count = 0;
-	uint64		last_sec_frame_count;
-	uint64		prev_last_sec_frame_count;
-	bool		pause = false;
-	PerfTimer	ptimer;
-	Timer		last_sec_frame_time;
-	Timer		frame_time;
-	int			framerate_cap = 60;
+	bool want_to_save;
+	bool want_to_load;
+
+	char _file_to_load[256];
+	char _file_to_save[256];
+
+	std::stack<Module*> endFrameTasks;
 };
 
 extern Application* App;
